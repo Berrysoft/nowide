@@ -1,17 +1,16 @@
 #!/bin/bash
 
-rm -fr nowide nowide_standalone nowide_standalone.zip boost_nowide boost_nowide.zip
-mkdir -p nowide/nowide
-mkdir -p nowide/src
-mkdir -p nowide/test
+rm -fr nowide_standalone nowide_standalone.zip
+mkdir -p nowide_standalone/include/nowide
+mkdir -p nowide_standalone/src
+mkdir -p nowide_standalone/test
 
-cp ../include/boost/nowide/*.hpp nowide/nowide
-cp ../src/*.cpp nowide/src
-cp ../test/*.cpp ../test/*.hpp nowide/test
-cp ./*.hpp nowide/nowide/
+cp ../include/boost/nowide/*.hpp nowide_standalone/include/nowide
+cp ../src/*.cpp nowide_standalone/src
+cp ../test/*.cpp ../test/*.hpp nowide_standalone/test
+cp ./*.hpp nowide_standalone/include/nowide/
 
-SOURCES="nowide/test/* nowide/src/* nowide/nowide/*"
-
+SOURCES="nowide_standalone/test/* nowide_standalone/src/* nowide_standalone/include/nowide/*"
 
 sed 's/BOOST_NOWIDE_/NOWIDE_/g' -i $SOURCES
 sed 's/BOOST_/NOWIDE_/g' -i $SOURCES
@@ -25,10 +24,8 @@ sed 's/<boost\/locale\//<nowide\//g' -i $SOURCES
 sed 's/<boost\/nowide\//<nowide\//g' -i $SOURCES
 sed 's/<boost\//<nowide\//g' -i $SOURCES
 
-cp CMakeLists.txt nowide/
-cp -a nowide nowide_standalone
+cp ../CMakeLists.txt nowide_standalone
+cp ../MinGW.cmake nowide_standalone
+cp ../src/CMakeLists.txt nowide_standalone/src
+cp ../test/CMakeLists.txt nowide_standalone/test
 zip -r nowide_standalone.zip  nowide_standalone
-
-#mkdir boost_nowide
-#cp -a ../boost ../libs boost_nowide
-#zip -r boost_nowide.zip boost_nowide

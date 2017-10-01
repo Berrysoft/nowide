@@ -28,27 +28,5 @@
 #   define BOOST_NOWIDE_DECL
 #endif
 
-//
-// Automatically link to the correct build variant where possible. 
-// 
-#if !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_NOWIDE_NO_LIB) && !defined(BOOST_NOWIDE_SOURCE)
-//
-// Set the name of our library, this will get undef'ed by auto_link.hpp
-// once it's done with it:
-//
-#define BOOST_LIB_NAME boost_nowide
-//
-// If we're importing code from a dll, then tell auto_link.hpp about it:
-//
-#if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_NOWIDE_DYN_LINK)
-#  define BOOST_DYN_LINK
-#endif
-//
-// And include the header that does the work:
-//
-#include <boost/config/auto_link.hpp>
-#endif  // auto-linking disabled
-
-
 #endif // boost/nowide/config.hpp
 // vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

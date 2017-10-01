@@ -1,0 +1,3 @@
+/build/*
+# Don't ignore Jamfiles, also in subfolders
+!Jamfile.*
