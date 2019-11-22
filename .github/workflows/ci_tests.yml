@@ -1,0 +1,43 @@
+name: CI Tests
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    strategy:
+      matrix:
+        buildType: [Debug, Release]
+    runs-on: ubuntu-16.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: install cmake
+      run: |
+        pip install cmake==3.13.3
+        echo "::set-env name=PATH::$HOME/.local/bin:$PATH"
+    - name: configure
+      working-directory: build
+      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install
+    - name: build
+      run: cmake --build build --config ${{matrix.buildType}}
+    - name: test
+      working-directory: build
+      run: ctest --output-on-failure -C ${{matrix.buildType}}
+    - name: install
+      run: cmake --build build --config ${{matrix.buildType}} --target install
+  windows:
+    strategy:
+      matrix:
+        buildType: [Debug, Release]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: configure
+      working-directory: build
+      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install
+    - name: build
+      run: cmake --build build --config ${{matrix.buildType}}
+    - name: test
+      working-directory: build
+      run: ctest --output-on-failure -C ${{matrix.buildType}}
+    - name: install
+      run: cmake --build build --config ${{matrix.buildType}} --target install
