@@ -9,11 +9,19 @@ jobs:
         os: [ubuntu-16.04, windows-latest]
         buildType: [Debug, Release]
         standalone: [false, true]
+        generator: ['Visual Studio 16 2019', 'MinGW Makefiles', 'Unix Makefiles']
+        exclude:
+          - os: ubuntu-16.04
+            generator: MinGW Makefiles
+          - os: ubuntu-16.04
+            generator: Visual Studio 16 2019
+          - os: windows-latest
+            generator: Unix Makefiles
     runs-on: ${{matrix.os}}
     steps:
     - uses: actions/checkout@v1
     - name: install cmake
-      if: matrix.os == 'ubuntu-16.04'
+      if: runner.os == 'ubuntu-16.04'
       run: |
         pip install cmake==3.13.3
         echo "::set-env name=PATH::$HOME/.local/bin:$PATH"
@@ -27,7 +35,7 @@ jobs:
         mkdir build
     - name: configure
       working-directory: build
-      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install
+      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
     - name: build
       run: cmake --build build --config ${{matrix.buildType}}
     - name: test
