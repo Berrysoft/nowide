@@ -1,8 +1,6 @@
 #include <boost/nowide/fstream.hpp>
 #include <boost/nowide/cstdio.hpp>
 #include <iostream>
-
-#include <iostream>
 #include "test.hpp"
 
 #ifdef BOOST_MSVC
