@@ -1,3 +1,4 @@
 /build/*
+/nowide_standalone
 # Don't ignore Jamfiles, also in subfolders
 !Jamfile.*

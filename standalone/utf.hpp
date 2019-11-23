@@ -9,18 +9,7 @@
 #define NOWIDE_UTF_HPP_INCLUDED
 
 #include <nowide/config.hpp>
-
-#ifndef NOWIDE_MSVC
-namespace nowide  {
-namespace utf {
-    typedef unsigned uint32_t;
-    typedef unsigned short uint16_t;
-    typedef unsigned char uint8_t;
-}
-}
-#else
-#include <stdint.h>
-#endif
+#include <nowide/cstdint.hpp>
 
 namespace nowide {
 ///

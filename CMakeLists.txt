@@ -26,7 +26,7 @@ else()
 endif()
 
 # Find out if we are beeing build as standalone or boost version
-if(EXISTS include/nowide)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/nowide)
   set(NOWIDE_STANDALONE ON)
 else()
   set(NOWIDE_STANDALONE OFF)
@@ -89,6 +89,8 @@ if(NOT NOWIDE_STANDALONE)
   if(NOWIDE_USE_FILESYSTEM)
     target_compile_definitions(${libName} ${argScope} BOOST_NOWIDE_USE_FILESYSTEM BOOST_FILESYSTEM_NO_LIB)
   endif()
+else()
+  target_compile_features(${libName} ${argScope} cxx_std_11)
 endif()
 
 if(WIN32)
