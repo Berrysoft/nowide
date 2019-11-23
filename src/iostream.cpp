@@ -165,7 +165,7 @@ namespace details {
             wchar_t *b = wbuffer_;
             wchar_t *e = b + wsize_;
             wchar_t *p = b;
-            uf::code_point c;
+            uf::code_point c = uf::incomplete;
             wsize_ = e-p;
             while(p < e && (c = uf::utf_traits<wchar_t>::decode(p,e))!=uf::illegal && c!=uf::incomplete) {
                 out = uf::utf_traits<char>::encode(c,out);

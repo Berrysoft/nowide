@@ -222,6 +222,7 @@ namespace utf {
                 if (!is_trail(tmp))
                     return illegal;
                 c = (c << 6) | ( tmp & 0x3F);
+                /* Falls through. */
             case 2:
                 if(NOWIDE_UNLIKELY(p==e))
                     return incomplete;
@@ -229,6 +230,7 @@ namespace utf {
                 if (!is_trail(tmp))
                     return illegal;
                 c = (c << 6) | ( tmp & 0x3F);
+                /* Falls through. */
             case 1:
                 if(NOWIDE_UNLIKELY(p==e))
                     return incomplete;

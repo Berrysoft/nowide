@@ -20,19 +20,15 @@ int main(int argc,char **argv)
                           "Non-BMP letters: \xf0\x9d\x84\x9e\n";
 
     try {
-        // If we are using the standard rdbuf we can only put back 2 chars on MSVC -.-
+        // If we are using the standard rdbuf we can only put back 1 char
         if(boost::nowide::cin.rdbuf() == std::cin.rdbuf()) {
             std::cout << "Using std::cin" << std::endl;
             int maxval = 15000;
-            for(int i = 0; i < maxval; i+=2) {
-                for(int j = 0; j < 2; j++) {
-                    char c = (i + j) % 96 + ' ';
-                    TEST(boost::nowide::cin.putback(c));
-                }
-                for(int j = 1; j >= 0; j--) {
-                    int c = (i + j) % 96 + ' ';
-                    TEST(boost::nowide::cin.get() == c);
-                }
+            for(int i = 0; i < maxval; i++) {
+                char c = i % 96 + ' ';
+                TEST(boost::nowide::cin.putback(c));
+                int ci = i % 96 + ' ';
+                TEST(boost::nowide::cin.get() == ci);
             }
         } else {
             int maxval = 15000;
