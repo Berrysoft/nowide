@@ -36,6 +36,32 @@ int main()
         TEST(boost::filesystem::is_regular_file(utf8_name)==false);
         TEST(boost::filesystem::is_regular_file(wide_name)==false);
         
+        boost::filesystem::path txtPath(utf8_name);
+        TEST(txtPath == boost::filesystem::path(wide_name));
+        {
+            boost::nowide::ofstream fs(txtPath);
+            TEST(fs);
+            fs.close();
+            fs.open(txtPath);
+            TEST(fs);
+        }
+        {
+            boost::nowide::ifstream fs(txtPath);
+            TEST(fs);
+            fs.close();
+            fs.open(txtPath);
+            TEST(fs);
+        }
+        {
+            boost::nowide::fstream fs(txtPath);
+            TEST(fs);
+            fs.close();
+            fs.open(txtPath);
+            TEST(fs);
+        }
+        TEST(boost::filesystem::is_regular_file(utf8_name) == true);
+        boost::nowide::remove(utf8_name);
+        TEST(boost::filesystem::is_regular_file(utf8_name) == false);
     }
     catch(std::exception const &e) {
         std::cerr << "Failed : " << e.what() << std::endl;

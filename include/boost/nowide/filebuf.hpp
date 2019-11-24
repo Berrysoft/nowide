@@ -14,6 +14,13 @@
 #include <fstream>
 #include <streambuf>
 #include <stdio.h>
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#ifdef BOOST_WINDOWS
+#include <boost/filesystem/path.hpp>
+#else
+#include <boost/filesystem/fstream.hpp>
+#endif
+#endif
 
 #ifdef BOOST_MSVC
 #  pragma warning(push)
@@ -24,8 +31,14 @@
 namespace boost {
 namespace nowide {
 #if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_FSTREAM_TESTS) && !defined(BOOST_NOWIDE_DOXYGEN)
-    using std::basic_filebuf;
-    using std::filebuf;
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#define BOOST_NOWIDE_FS_NS boost::filesystem
+#else
+#define BOOST_NOWIDE_FS_NS std
+#endif
+    using BOOST_NOWIDE_FS_NS::basic_filebuf;
+    using BOOST_NOWIDE_FS_NS::filebuf;
+#undef BOOST_NOWIDE_FS_NS
 #else // Windows
     
     ///
@@ -82,25 +95,37 @@ namespace nowide {
         ///
         basic_filebuf *open(char const *s,std::ios_base::openmode mode)
         {
-            if(file_) {
-                sync();
-                ::fclose(file_);
-                file_ = 0;
-            }
-            bool ate = bool(mode & std::ios_base::ate);
-            if(ate)
-                mode = mode ^ std::ios_base::ate;
-            wchar_t const *smode = get_mode(mode);
-            if(!smode)
-                return 0;
+#ifdef BOOST_WINDOWS
             wstackstring name;
             if(!name.convert(s)) 
                 return 0;
-            #ifdef BOOST_NOWIDE_FSTREAM_TESTS
+            return open(name.c_str(),mode);
+#else
+            reset();
+            bool ate = bool(mode & std::ios_base::ate);
+            wchar_t const *smode = get_mode(mode);
+            if(!smode)
+                return 0;
             FILE *f = ::fopen(s,boost::nowide::convert(smode).c_str());
-            #else
-            FILE *f = ::_wfopen(name.c_str(),smode);
-            #endif
+            if(!f)
+                return 0;
+            if(ate && fseek(f,0,SEEK_END)!=0) {
+                fclose(f);
+                return 0;
+            }
+            file_ = f;
+            return this;
+#endif
+        }
+#ifdef BOOST_WINDOWS
+        basic_filebuf *open(wchar_t const *s,std::ios_base::openmode mode)
+        {
+            reset();
+            bool ate = bool(mode & std::ios_base::ate);
+            wchar_t const *smode = get_mode(mode);
+            if(!smode)
+                return 0;
+            FILE *f = ::_wfopen(s,smode);
             if(!f)
                 return 0;
             if(ate && fseek(f,0,SEEK_END)!=0) {
@@ -110,6 +135,13 @@ namespace nowide {
             file_ = f;
             return this;
         }
+#endif
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+        basic_filebuf *open(boost::filesystem::path const &s, std::ios_base::openmode mode)
+        {
+            return open(s.c_str(), mode);
+        }
+#endif
         ///
         /// Same as std::filebuf::close()
         ///
@@ -342,6 +374,8 @@ namespace nowide {
         
         static wchar_t const *get_mode(std::ios_base::openmode mode)
         {
+            // Flag out ate
+            mode &= ~std::ios_base::ate;
             //
             // done according to n2914 table 106 27.9.1.4
             //
