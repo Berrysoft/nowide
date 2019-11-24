@@ -56,7 +56,7 @@ int main()
                 TEST(tmp=="test");
                 fi.close();
             }
-            #if defined(BOOST_WINDOWS) || defined(BOOST_NOWIDE_FSTREAM_TESTS) 
+            #if defined(BOOST_WINDOWS)
             // C++11 interfaces aren't enabled at all platforms so need to skip
             // for std::*fstream
             {

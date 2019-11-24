@@ -9,13 +9,7 @@
 #define NOWIDE_ENCODING_ERRORS_HPP_INCLUDED
 
 #include <nowide/config.hpp>
-#ifdef BOOST_MSVC
-#  pragma warning(push)
-#  pragma warning(disable : 4275 4251 4231 4660)
-#endif
 #include <stdexcept>
-
-
 
 namespace nowide {
     namespace conv {
@@ -35,11 +29,11 @@ namespace nowide {
         ///
         /// enum that defines conversion policy
         ///
-        typedef enum {
+        enum method_type{
             skip            = 0,    ///< Skip illegal/unconvertable characters
             stop            = 1,    ///< Stop conversion and throw conversion_error
             default_method  = skip  ///< Default method - skip
-        } method_type;
+        };
 
 
         /// @}
@@ -47,10 +41,6 @@ namespace nowide {
     } // conv
 
 } // nowide
-
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 
 #endif
 

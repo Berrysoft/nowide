@@ -9,9 +9,10 @@
 #include <boost/nowide/system.hpp>
 #include <boost/nowide/args.hpp>
 #include <boost/nowide/cenv.hpp>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include "test.hpp"
-#include <stdio.h>
 
 int main(int argc,char **argv,char **env)
 {

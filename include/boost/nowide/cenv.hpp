@@ -8,16 +8,16 @@
 #ifndef BOOST_NOWIDE_CENV_H_INCLUDED
 #define BOOST_NOWIDE_CENV_H_INCLUDED
 
-#include <string>
-#include <stdexcept>
-#include <stdlib.h>
 #include <boost/config.hpp>
-#include <boost/nowide/stackstring.hpp>
-#include <vector>
-
 #ifdef BOOST_WINDOWS
+#include <boost/nowide/stackstring.hpp>
 #include <boost/nowide/windows.hpp>
+#include <string>
+#include <vector>
+#else
+#include <cstdlib>
 #endif
+
 
 namespace boost {
 namespace nowide {

@@ -8,6 +8,7 @@
 
 #include <boost/nowide/cenv.hpp>
 #include <iostream>
+#include <cstring>
 #include "test.hpp"
 
 #if defined(BOOST_NOWIDE_TEST_INCLUDE_WINDOWS) && defined(BOOST_WINDOWS)

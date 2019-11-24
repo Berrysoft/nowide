@@ -8,19 +8,22 @@
 #ifndef BOOST_NOWIDE_FSTREAM_INCLUDED_HPP
 #define BOOST_NOWIDE_FSTREAM_INCLUDED_HPP
 
-#include <iosfwd>
 #include <boost/config.hpp>
-#include <boost/nowide/convert.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <fstream>
-#include <memory>
-#include <boost/nowide/filebuf.hpp>
-#ifdef BOOST_NOWIDE_USE_FILESYSTEM
 #ifdef BOOST_WINDOWS
-#include <boost/filesystem/path.hpp>
+#  include <boost/nowide/filebuf.hpp>
+#  include <boost/scoped_ptr.hpp>
+#  include <iosfwd>
+#  include <streambuf>
+#  include <cstdio>
+#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#    include <boost/filesystem/path.hpp>
+#  endif
 #else
-#include <boost/filesystem/fstream.hpp>
-#endif
+#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#    include <boost/filesystem/fstream.hpp>
+#  else
+#    include <fstream>
+#  endif
 #endif
 
 namespace boost {
@@ -30,7 +33,7 @@ namespace boost {
 /// of std namespace (i.e. not on Windows)
 ///
 namespace nowide {
-#if !defined(BOOST_WINDOWS)  && !defined(BOOST_NOWIDE_FSTREAM_TESTS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
 #define BOOST_NOWIDE_FS_NS boost::filesystem
 #else
@@ -78,7 +81,6 @@ namespace nowide {
             open(file_name,mode);
         }
         
-#ifdef BOOST_WINDOWS
         void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
             if(!buf_->open(file_name, mode | std::ios_base::in)) {
@@ -87,7 +89,6 @@ namespace nowide {
                 this->clear();
             }
         }
-#endif
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         explicit basic_ifstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in):
             internal_stream_type(0)
@@ -114,10 +115,6 @@ namespace nowide {
             else {
                 this->clear();
             }
-        }
-        bool is_open()
-        {
-            return buf_->is_open();
         }
         bool is_open() const
         {
@@ -176,7 +173,6 @@ namespace nowide {
             open(file_name,mode);
         }
 
-#ifdef BOOST_WINDOWS
         void open(wchar_t const *file_name,std::ios_base::openmode mode = std::ios_base::out)
         {
             if(!buf_->open(file_name,mode | std::ios_base::out)) {
@@ -186,7 +182,6 @@ namespace nowide {
                 this->clear();
             }
         }
-#endif
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         explicit basic_ofstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out):
             internal_stream_type(0)
@@ -213,10 +208,6 @@ namespace nowide {
             else {
                 this->clear();
             }
-        }
-        bool is_open()
-        {
-            return buf_->is_open();
         }
         bool is_open() const
         {
@@ -275,7 +266,6 @@ namespace nowide {
             open(file_name,mode);
         }
 
-#ifdef BOOST_WINDOWS
         void open(wchar_t const *file_name,std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in)
         {
             if(!buf_->open(file_name,mode)) {
@@ -285,7 +275,6 @@ namespace nowide {
                 this->clear();
             }
         }
-#endif
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         explicit basic_fstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in):
             internal_stream_type(0)
@@ -312,10 +301,6 @@ namespace nowide {
             else {
                 this->clear();
             }
-        }
-        bool is_open()
-        {
-            return buf_->is_open();
         }
         bool is_open() const
         {

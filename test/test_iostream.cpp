@@ -1,6 +1,7 @@
 #include <boost/nowide/iostream.hpp>
 #include <boost/locale/utf.hpp>
 #include "test.hpp"
+#include <iostream>
 
 bool isValidUTF8(const std::string& s){
     using namespace boost::locale::utf;

@@ -9,10 +9,13 @@
 #define BOOST_NOWIDE_IOSTREAM_HPP_INCLUDED
 
 #include <boost/nowide/config.hpp>
+#ifdef BOOST_WINDOWS
 #include <boost/scoped_ptr.hpp>
-#include <iostream>
 #include <ostream>
 #include <istream>
+#else
+#include <iostream>
+#endif
 
 #ifdef BOOST_MSVC
 #  pragma warning(push)

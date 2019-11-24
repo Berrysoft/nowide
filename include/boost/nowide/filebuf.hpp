@@ -8,18 +8,20 @@
 #ifndef BOOST_NOWIDE_FILEBUF_HPP
 #define BOOST_NOWIDE_FILEBUF_HPP
 
-#include <iosfwd>
 #include <boost/config.hpp>
-#include <boost/nowide/stackstring.hpp>
-#include <fstream>
-#include <streambuf>
-#include <stdio.h>
-#ifdef BOOST_NOWIDE_USE_FILESYSTEM
 #ifdef BOOST_WINDOWS
-#include <boost/filesystem/path.hpp>
+#  include <boost/nowide/stackstring.hpp>
+#  include <streambuf>
+#  include <cstdio>
+#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#    include <boost/filesystem/path.hpp>
+#  endif
 #else
-#include <boost/filesystem/fstream.hpp>
-#endif
+#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#    include <boost/filesystem/fstream.hpp>
+#  else
+#    include <fstream>
+#  endif
 #endif
 
 #ifdef BOOST_MSVC
@@ -30,7 +32,7 @@
 
 namespace boost {
 namespace nowide {
-#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_FSTREAM_TESTS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
 #define BOOST_NOWIDE_FS_NS boost::filesystem
 #else
@@ -95,29 +97,11 @@ namespace nowide {
         ///
         basic_filebuf *open(char const *s,std::ios_base::openmode mode)
         {
-#ifdef BOOST_WINDOWS
             wstackstring name;
             if(!name.convert(s)) 
                 return 0;
             return open(name.c_str(),mode);
-#else
-            reset();
-            bool ate = bool(mode & std::ios_base::ate);
-            wchar_t const *smode = get_mode(mode);
-            if(!smode)
-                return 0;
-            FILE *f = ::fopen(s,boost::nowide::convert(smode).c_str());
-            if(!f)
-                return 0;
-            if(ate && fseek(f,0,SEEK_END)!=0) {
-                fclose(f);
-                return 0;
-            }
-            file_ = f;
-            return this;
-#endif
         }
-#ifdef BOOST_WINDOWS
         basic_filebuf *open(wchar_t const *s,std::ios_base::openmode mode)
         {
             reset();
@@ -135,7 +119,6 @@ namespace nowide {
             file_ = f;
             return this;
         }
-#endif
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         basic_filebuf *open(boost::filesystem::path const &s, std::ios_base::openmode mode)
         {
