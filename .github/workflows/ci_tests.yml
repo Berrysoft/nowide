@@ -38,9 +38,16 @@ jobs:
       run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
     - name: build
       run: cmake --build build --config ${{matrix.buildType}}
+    # Run test with both bash and powershell and watch for "Using std::cin" on bash but not on powershell
     - name: test
       working-directory: build
-      run: ctest --output-on-failure -C ${{matrix.buildType}}
+      shell: bash
+      run: ctest --output-on-failure -C ${{matrix.buildType}} --verbose
+    - name: test
+      working-directory: build
+      shell: powershell
+      if: runner.os == 'windows-latest'
+      run: ctest --output-on-failure -C ${{matrix.buildType}} --verbose
     - name: install
       run: |
         cmake --build build --config ${{matrix.buildType}} --target install
