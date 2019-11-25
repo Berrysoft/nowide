@@ -7,6 +7,7 @@
 //
 #include <boost/nowide/utf8_codecvt.hpp>
 #include <locale>
+#include <vector>
 #include <iostream>
 #include <iomanip>
 #include <cstring>

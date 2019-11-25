@@ -359,7 +359,7 @@ protected:
     }
     
     virtual std::codecvt_base::result 
-    do_out( std::mbstate_t &,
+    do_out( std::mbstate_t &/*std_state*/,
             uchar const *from,
             uchar const *from_end,
             uchar const *&from_next,
