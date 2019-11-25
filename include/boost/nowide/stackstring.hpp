@@ -34,7 +34,6 @@ public:
     basic_stackstring(basic_stackstring const &other) : 
     mem_buffer_(0)
     {
-        clear();
         if(other.mem_buffer_) {
             size_t len = 0;
             while(other.mem_buffer_[len])
@@ -47,17 +46,25 @@ public:
         }
     }
     
-    void swap(basic_stackstring &other)
+    friend void swap(basic_stackstring& lhs, basic_stackstring& rhs)
     {
-        std::swap(mem_buffer_,other.mem_buffer_);
+        std::swap(lhs.mem_buffer_, rhs.mem_buffer_);
         for(size_t i=0;i<buffer_size;i++)
-            std::swap(buffer_[i],other.buffer_[i]);
+            std::swap(lhs.buffer_[i], rhs.buffer_[i]);
     }
     basic_stackstring &operator=(basic_stackstring const &other)
     {
         if(this != &other) {
-            basic_stackstring tmp(other);
-            swap(tmp);            
+            clear();
+            if(other.mem_buffer_) {
+                size_t len = 0;
+                while(other.mem_buffer_[len])
+                    len++;
+                mem_buffer_ = new output_char[len + 1];
+                memcpy(mem_buffer_, other.mem_buffer_, sizeof(output_char) * (len + 1));
+            } else {
+                memcpy(buffer_, other.buffer_, buffer_size * sizeof(output_char));
+            }
         }
         return *this;
     }
