@@ -69,6 +69,7 @@ namespace nowide {
             buffer_(0),
             file_(0),
             own_(true),
+            last_char_(EOF),
             mode_(std::ios::in | std::ios::out)
         {
             setg(0,0,0);

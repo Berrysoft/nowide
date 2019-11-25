@@ -74,7 +74,7 @@ namespace details {
             if(n > buffer_size)
                 return -1;
             wchar_t *out = wbuffer_;
-            uf::code_point c;
+            uf::code_point c = uf::illegal;
             size_t decoded = 0;
             while(p < e && (c = uf::utf_traits<char>::decode(p,e))!=uf::illegal && c!=uf::incomplete) {
                 out = uf::utf_traits<wchar_t>::encode(c,out);
