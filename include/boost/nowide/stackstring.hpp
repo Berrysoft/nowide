@@ -21,10 +21,10 @@ namespace nowide {
 /// \brief A class that allows to create a temporary wide or narrow UTF strings from
 /// wide or narrow UTF source.
 ///
-/// It uses on stack buffer of the string is short enough
-/// and allocated a buffer on the heap if the size of the buffer is too small
+/// It uses a stack buffer if the string is short enough
+/// otherwise allocates a buffer on the heap.
 ///
-/// If invalid UTF charracters are detected they are replaced with U+FFFD substutution charracter
+/// If invalid UTF characters are detected they are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
 ///    
 template<typename CharOut=wchar_t,typename CharIn = char,size_t BufferSize = 256>
 class basic_stackstring {
@@ -147,19 +147,19 @@ private:
 };  //basic_stackstring
 
 ///
-/// Convinience typedef
+/// Convenience typedef
 ///
 typedef basic_stackstring<wchar_t,char,256> wstackstring;
 ///
-/// Convinience typedef
+/// Convenience typedef
 ///
 typedef basic_stackstring<char,wchar_t,256> stackstring;
 ///
-/// Convinience typedef
+/// Convenience typedef
 ///
 typedef basic_stackstring<wchar_t,char,16> wshort_stackstring;
 ///
-/// Convinience typedef
+/// Convenience typedef
 ///
 typedef basic_stackstring<char,wchar_t,16> short_stackstring;
 

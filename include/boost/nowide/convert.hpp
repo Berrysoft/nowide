@@ -20,8 +20,8 @@ namespace nowide {
     ///
     /// In case of success a NULL terminated string is returned (buffer), otherwise 0 is returned.
     ///
-    /// If there is not enough room in the buffer 0 is returned, and the contents of the buffer are undefined.
-    /// Any illegal sequences are replaced with U+FFFD substutution charracter
+    /// If there is not enough room in the buffer 0 is returned, and the content of the buffer is undefined.
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     template<typename CharOut,typename CharIn>
     CharOut *basic_convert(CharOut *buffer,size_t buffer_size,CharIn const *source_begin,CharIn const *source_end)
@@ -32,7 +32,7 @@ namespace nowide {
         buffer_size --;
         while(source_begin!=source_end) {
             using namespace boost::locale::utf;
-            code_point c = utf_traits<CharIn>::template decode<CharIn const *>(source_begin,source_end);
+            code_point c = utf_traits<CharIn>::decode(source_begin,source_end);
             if(c==illegal || c==incomplete) {
                 c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
             }
@@ -41,7 +41,7 @@ namespace nowide {
                 rv=0;
                 break;
             }
-            buffer = utf_traits<CharOut>::template encode<CharOut *>(c,buffer);
+            buffer = utf_traits<CharOut>::encode(c,buffer);
             buffer_size -= width;
         }
         *buffer++ = 0;
@@ -51,7 +51,7 @@ namespace nowide {
     ///
     /// \brief Template function that converts a buffer of UTF sequences in range [source_begin,source_end) and returns a string containing converted value
     ///
-    /// Any illegal sequences are replaced with U+FFFD substutution charracter
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     template<typename CharOut,typename CharIn>
     std::basic_string<CharOut>
@@ -65,11 +65,11 @@ namespace nowide {
         using namespace boost::locale::utf;
         code_point c;
         while(begin!=end) {
-            c=utf_traits<CharIn>::template decode<CharIn const *>(begin,end);
+            c=utf_traits<CharIn>::decode(begin,end);
             if(c==illegal || c==incomplete) {
                 c=BOOST_NOWIDE_REPLACEMENT_CHARACTER;
             }
-            utf_traits<CharOut>::template encode<inserter_type>(c,inserter);
+            utf_traits<CharOut>::encode(c,inserter);
         }
         return result;
     }
@@ -92,7 +92,7 @@ namespace nowide {
     ///
     /// \brief Template function that converts a string \a s from one type of UTF to another UTF and returns a string containing converted value
     ///
-    /// Any illegal sequences are replaced with U+FFFD substutution charracter
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     template<typename CharOut,typename CharIn>
     std::basic_string<CharOut>
@@ -103,7 +103,7 @@ namespace nowide {
     ///
     /// \brief Template function that converts a string \a s from one type of UTF to another UTF and returns a string containing converted value
     ///
-    /// Any illegal sequences are replaced with U+FFFD substutution charracter
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     template<typename CharOut,typename CharIn>
     std::basic_string<CharOut>
@@ -118,8 +118,8 @@ namespace nowide {
     /// Convert NULL terminated UTF source string to NULL terminated \a output string of size at
     /// most output_size (including NULL)
     /// 
-    /// In case of success output is returned, if the input sequence is illegal,
-    /// or there is not enough room NULL is returned 
+    /// In case of success output is returned, if there is not enough room NULL is returned.
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline char *narrow(char *output,size_t output_size,wchar_t const *source)
     {
@@ -129,8 +129,8 @@ namespace nowide {
     /// Convert UTF text in range [begin,end) to NULL terminated \a output string of size at
     /// most output_size (including NULL)
     /// 
-    /// In case of success output is returned, if the input sequence is illegal,
-    /// or there is not enough room NULL is returned 
+    /// In case of success output is returned, if there is not enough room NULL is returned.
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline char *narrow(char *output,size_t output_size,wchar_t const *begin,wchar_t const *end)
     {
@@ -140,8 +140,8 @@ namespace nowide {
     /// Convert NULL terminated UTF source string to NULL terminated \a output string of size at
     /// most output_size (including NULL)
     /// 
-    /// In case of success output is returned, if the input sequence is illegal,
-    /// or there is not enough room NULL is returned 
+    /// In case of success output is returned, if there is not enough room NULL is returned.
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline wchar_t *widen(wchar_t *output,size_t output_size,char const *source)
     {
@@ -151,8 +151,8 @@ namespace nowide {
     /// Convert UTF text in range [begin,end) to NULL terminated \a output string of size at
     /// most output_size (including NULL)
     /// 
-    /// In case of success output is returned, if the input sequence is illegal,
-    /// or there is not enough room NULL is returned 
+    /// In case of success output is returned, if there is not enough room NULL is returned.
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline wchar_t *widen(wchar_t *output,size_t output_size,char const *begin,char const *end)
     {
@@ -163,7 +163,7 @@ namespace nowide {
     ///
     /// Convert between Wide - UTF-16/32 string and UTF-8 string.
     ///
-    /// boost::locale::conv::conversion_error is thrown in a case of a error
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline std::string narrow(wchar_t const *s)
     {
@@ -172,7 +172,7 @@ namespace nowide {
     ///
     /// Convert between UTF-8 and UTF-16 string
     ///
-    /// boost::locale::conv::conversion_error is thrown in a case of a error
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline std::wstring widen(char const *s)
     {
@@ -181,7 +181,7 @@ namespace nowide {
     ///
     /// Convert between Wide - UTF-16/32 string and UTF-8 string
     ///
-    /// boost::locale::conv::conversion_error is thrown in a case of a error
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline std::string narrow(std::wstring const &s) 
     {
@@ -190,7 +190,7 @@ namespace nowide {
     ///
     /// Convert between UTF-8 and UTF-16 string
     ///
-    /// boost::locale::conv::conversion_error is thrown in a case of a error
+    /// Any illegal sequences are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     inline std::wstring widen(std::string const &s) 
     {

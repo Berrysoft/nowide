@@ -43,18 +43,18 @@ namespace nowide {
 #else // Windows
     
     ///
-    /// \brief This forward declaration defined the basic_filebuf type.
+    /// \brief This forward declaration defines the basic_filebuf type.
     ///
-    /// it is implemented and specialized for CharType = char, it behaves
+    /// it is implemented and specialized for CharType = char, it
     /// implements std::filebuf over standard C I/O
     ///
     template<typename CharType,typename Traits = std::char_traits<CharType> >
     class basic_filebuf;
     
     ///
-    /// \brief This is implementation of std::filebuf
+    /// \brief This is the implementation of std::filebuf
     ///
-    /// it is implemented and specialized for CharType = char, it behaves
+    /// it is implemented and specialized for CharType = char, it
     /// implements std::filebuf over standard C I/O
     ///
     template<>
@@ -351,7 +351,7 @@ namespace nowide {
     };
     
     ///
-    /// \brief Convinience typedef
+    /// \brief Convenience typedef
     ///
     typedef basic_filebuf<char> filebuf;
     
