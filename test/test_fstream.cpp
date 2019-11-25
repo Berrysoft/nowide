@@ -59,7 +59,8 @@ public:
     }
     void read(char *buf,int size)
     {
-        fread(buf,1,size,f_);
+        size_t res = fread(buf,1,size,f_);
+        (void)res;
     }
     void rewind()
     {
