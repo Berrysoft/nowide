@@ -97,9 +97,7 @@ namespace nowide {
         ///
         basic_filebuf *open(char const *s,std::ios_base::openmode mode)
         {
-            wstackstring name;
-            if(!name.convert(s)) 
-                return 0;
+            wstackstring const name(s);
             return open(name.c_str(),mode);
         }
         basic_filebuf *open(wchar_t const *s,std::ios_base::openmode mode)
