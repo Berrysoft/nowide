@@ -251,14 +251,14 @@ namespace nowide {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
         }
-        explicit basic_fstream(char const *file_name,std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in) :
+        explicit basic_fstream(char const *file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
             open(file_name,mode);
         }
-        explicit basic_fstream(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in) :
+        explicit basic_fstream(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
@@ -266,7 +266,7 @@ namespace nowide {
             open(file_name,mode);
         }
 
-        void open(wchar_t const *file_name,std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in)
+        void open(wchar_t const *file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
             if(!buf_->open(file_name,mode)) {
                 this->setstate(std::ios_base::failbit);
@@ -276,24 +276,24 @@ namespace nowide {
             }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
-        explicit basic_fstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in):
+        explicit basic_fstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out):
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
             open(file_path, mode);
         }
-        void open(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::in)
+        void open(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
             open(file_path.c_str(), mode);
         }
 #endif
 
-        void open(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::out | std::ios_base::out)
+        void open(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
             open(file_name.c_str(),mode);
         }
-        void open(char const *file_name,std::ios_base::openmode mode = std::ios_base::out | std::ios_base::out)
+        void open(char const *file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
             if(!buf_->open(file_name,mode)) {
                 this->setstate(std::ios_base::failbit);

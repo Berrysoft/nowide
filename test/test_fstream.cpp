@@ -1,5 +1,6 @@
 #include <boost/nowide/fstream.hpp>
 #include <boost/nowide/cstdio.hpp>
+#include <fstream>
 #include <iostream>
 #include "test.hpp"
 
@@ -7,6 +8,12 @@
 #  pragma warning(disable : 4996)
 #endif
 
+namespace nw = boost::nowide;
+
+void makeEmptyFile(const char* filepath){
+    nw::ofstream f(filepath, std::ios_base::out | std::ios::trunc);
+    TEST(f);
+}
 
 int main()
 {
@@ -17,7 +24,6 @@ int main()
 #endif    
 
     try {
-        namespace nw=boost::nowide;
         
         std::cout << "Testing fstream" << std::endl;
         {
@@ -94,13 +100,38 @@ int main()
                 TEST(!fi);
             }
             {
-                nw::fstream f(example,nw::fstream::in | nw::fstream::out | nw::fstream::trunc | nw::fstream::binary);
+                // Create with default flags
+                makeEmptyFile(example);
+                nw::fstream f(example);
                 TEST(f);
-                f << "test2" ;
+                f << "test2";
                 std::string tmp;
                 f.seekg(0);
-                f>> tmp;
-                TEST(tmp=="test2");
+                f >> tmp;
+                TEST(tmp == "test2");
+                f.close();
+            }
+            {
+                // Open with default flags
+                makeEmptyFile(example);
+                nw::fstream f;
+                f.open(example);
+                TEST(f);
+                f << "test2";
+                std::string tmp;
+                f.seekg(0);
+                f >> tmp;
+                TEST(tmp == "test2");
+                f.close();
+            }
+            {
+                nw::fstream f(example, nw::fstream::in | nw::fstream::out | nw::fstream::trunc | nw::fstream::binary);
+                TEST(f);
+                f << "test2";
+                std::string tmp;
+                f.seekg(0);
+                f >> tmp;
+                TEST(tmp == "test2");
                 f.close();
             }
             {
