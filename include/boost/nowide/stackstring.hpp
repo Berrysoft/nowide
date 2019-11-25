@@ -9,6 +9,7 @@
 #define BOOST_NOWIDE_DETAILS_WIDESTR_H_INCLUDED
 
 #include <boost/nowide/convert.hpp>
+#include <boost/static_assert.hpp>
 #include <string.h>
 #include <algorithm>
 
@@ -63,6 +64,7 @@ public:
 
     basic_stackstring() : mem_buffer_(0)
     {
+        buffer_[0] = 0;
     }
     bool convert(input_char const *input)
     {
@@ -89,13 +91,13 @@ public:
         }
 
     }
-    output_char *c_str()
+    output_char* c_str()
     {
         if(mem_buffer_)
             return mem_buffer_;
         return buffer_;
     }
-    output_char const *c_str() const
+    output_char const* c_str() const
     {
         if(mem_buffer_)
             return mem_buffer_;
