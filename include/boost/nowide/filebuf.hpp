@@ -105,7 +105,8 @@ namespace nowide {
         }
         basic_filebuf *open(wchar_t const *s,std::ios_base::openmode mode)
         {
-            reset();
+            if(is_open())
+                return NULL;
             bool ate = bool(mode & std::ios_base::ate);
             wchar_t const *smode = get_mode(mode);
             if(!smode)
