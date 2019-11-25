@@ -297,7 +297,7 @@ namespace nowide {
         static wchar_t const *get_mode(std::ios_base::openmode mode)
         {
             // Flag out ate
-            mode &= ~std::ios_base::ate;
+            mode = static_cast<std::ios_base::openmode>(static_cast<unsigned>(mode) & ~static_cast<unsigned>(std::ios_base::ate));
             //
             // done according to n2914 table 106 27.9.1.4
             //
