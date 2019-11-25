@@ -36,10 +36,12 @@ sed 's/BOOST_/NOWIDE_/g' -i $SOURCES
 sed 's/boost::nowide::/nowide::/g' -i $SOURCES
 sed 's/boost::nowide/nowide/g' -i $SOURCES
 sed 's/boost::locale::/nowide::/g' -i $SOURCES
+sed 's/boost::chrono::/std::chrono::/g' -i $SOURCES
 sed 's/boost::/nowide::/g' -i $SOURCES
 sed 's/namespace boost {//' -i $SOURCES
 sed 's/} *\/\/ *namespace boost//' -i $SOURCES
 sed 's/<boost\/locale\//<nowide\//g' -i $SOURCES
+sed 's/<boost\/chrono.hpp/<chrono/g' -i $SOURCES
 sed 's/<boost\/nowide\//<nowide\//g' -i $SOURCES
 sed 's/<boost\//<nowide\//g' -i $SOURCES
 
