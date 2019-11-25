@@ -9,8 +9,8 @@
 #define BOOST_NOWIDE_FSTREAM_INCLUDED_HPP
 
 #include <boost/config.hpp>
+#include <boost/nowide/filebuf.hpp>
 #ifdef BOOST_WINDOWS
-#  include <boost/nowide/filebuf.hpp>
 #  include <boost/scoped_ptr.hpp>
 #  include <iosfwd>
 #  include <streambuf>

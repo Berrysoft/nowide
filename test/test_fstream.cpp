@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 #include "test.hpp"
 
 #ifdef BOOST_MSVC
