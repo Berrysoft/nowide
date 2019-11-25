@@ -18,7 +18,7 @@ namespace boost {
         inline void nowide_filesystem()
         {
             std::locale tmp = std::locale(std::locale(),new boost::nowide::utf8_codecvt<wchar_t>());
-            boost::filesystem::path::imbue(tmp);
+            boost::filesystem::path::imbue((tmp));
         }
     } // nowide
 } // boost
