@@ -10,8 +10,9 @@
 
 #include <boost/nowide/convert.hpp>
 #include <boost/static_assert.hpp>
-#include <string.h>
+#include <cstring>
 #include <algorithm>
+#include <cassert>
 
 namespace boost {
 namespace nowide {
@@ -81,8 +82,7 @@ public:
     }
     output_char *convert(input_char const *input)
     {
-        convert(input,details::basic_strend(input));
-        return c_str();
+        return convert(input,details::basic_strend(input));
     }
     output_char *convert(input_char const *begin,input_char const *end)
     {
@@ -90,11 +90,15 @@ public:
 
         size_t space = get_space(sizeof(input_char),sizeof(output_char),end - begin) + 1;
         if(space <= buffer_size) {
-            basic_convert(buffer_,buffer_size,begin,end);
+            output_char* res = basic_convert(buffer_,buffer_size,begin,end);
+            assert(res);
+            (void)res;
         }
         else {
             mem_buffer_ = new output_char[space];
-            basic_convert(mem_buffer_,space,begin,end);
+            output_char* res = basic_convert(mem_buffer_,space,begin,end);
+            assert(res);
+            (void)res;
         }
         return c_str();
     }

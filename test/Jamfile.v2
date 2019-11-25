@@ -13,7 +13,7 @@ project
     
    test-suite "nowide"
         :   [ run test_convert.cpp ]
-            [ run test_fstream.cpp ]
+            [ run test_fstream.cpp : : : <library>/boost/system//boost_system : test_fstream ]
             [ run test_stdio.cpp ]
             [ run test_codecvt.cpp ]
             [ run test_env.cpp      :       : 

@@ -10,19 +10,10 @@
 
 #include <string>
 #include <boost/locale/encoding_utf.hpp>
+#include <boost/nowide/replacement.hpp>
 
 namespace boost {
 namespace nowide {
-    struct ErrorMethod{
-        enum EVal{
-            abort,
-            replace
-        };
-        EVal value;
-        ErrorMethod(EVal value):value(value){}
-        bool operator==(ErrorMethod other)const{return value==other.value;}
-        bool operator!=(ErrorMethod other)const{return value!=other.value;}
-    };
     ///
     /// \brief Template function that converts a buffer of UTF sequences in range [source_begin,source_end)
     /// to the output \a buffer of size \a buffer_size.
@@ -33,7 +24,7 @@ namespace nowide {
     /// Any illegal sequences are replaced with U+FFFD substutution charracter
     ///
     template<typename CharOut,typename CharIn>
-    CharOut *basic_convert(CharOut *buffer,size_t buffer_size,CharIn const *source_begin,CharIn const *source_end, const ErrorMethod method = ErrorMethod::replace)
+    CharOut *basic_convert(CharOut *buffer,size_t buffer_size,CharIn const *source_begin,CharIn const *source_end)
     {
         CharOut *rv = buffer;
         if(buffer_size == 0)
@@ -43,7 +34,7 @@ namespace nowide {
             using namespace boost::locale::utf;
             code_point c = utf_traits<CharIn>::template decode<CharIn const *>(source_begin,source_end);
             if(c==illegal || c==incomplete) {
-                c = 0xFFFD;
+                c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
             }
             size_t width = utf_traits<CharOut>::width(c);
             if(buffer_size < width) {
@@ -76,7 +67,7 @@ namespace nowide {
         while(begin!=end) {
             c=utf_traits<CharIn>::template decode<CharIn const *>(begin,end);
             if(c==illegal || c==incomplete) {
-                c=0xFFFD;
+                c=BOOST_NOWIDE_REPLACEMENT_CHARACTER;
             }
             utf_traits<CharOut>::template encode<inserter_type>(c,inserter);
         }
@@ -130,9 +121,9 @@ namespace nowide {
     /// In case of success output is returned, if the input sequence is illegal,
     /// or there is not enough room NULL is returned 
     ///
-    inline char *narrow(char *output,size_t output_size,wchar_t const *source, const ErrorMethod method = ErrorMethod::replace)
+    inline char *narrow(char *output,size_t output_size,wchar_t const *source)
     {
-        return basic_convert(output,output_size,source,details::basic_strend(source),method);
+        return basic_convert(output,output_size,source,details::basic_strend(source));
     }
     ///
     /// Convert UTF text in range [begin,end) to NULL terminated \a output string of size at
@@ -141,9 +132,9 @@ namespace nowide {
     /// In case of success output is returned, if the input sequence is illegal,
     /// or there is not enough room NULL is returned 
     ///
-    inline char *narrow(char *output,size_t output_size,wchar_t const *begin,wchar_t const *end, const ErrorMethod method = ErrorMethod::replace)
+    inline char *narrow(char *output,size_t output_size,wchar_t const *begin,wchar_t const *end)
     {
-        return basic_convert(output,output_size,begin,end,method);
+        return basic_convert(output,output_size,begin,end);
     }
     ///
     /// Convert NULL terminated UTF source string to NULL terminated \a output string of size at
@@ -152,9 +143,9 @@ namespace nowide {
     /// In case of success output is returned, if the input sequence is illegal,
     /// or there is not enough room NULL is returned 
     ///
-    inline wchar_t *widen(wchar_t *output,size_t output_size,char const *source, const ErrorMethod method = ErrorMethod::replace)
+    inline wchar_t *widen(wchar_t *output,size_t output_size,char const *source)
     {
-        return basic_convert(output,output_size,source,details::basic_strend(source),method);
+        return basic_convert(output,output_size,source,details::basic_strend(source));
     }
     ///
     /// Convert UTF text in range [begin,end) to NULL terminated \a output string of size at
@@ -163,9 +154,9 @@ namespace nowide {
     /// In case of success output is returned, if the input sequence is illegal,
     /// or there is not enough room NULL is returned 
     ///
-    inline wchar_t *widen(wchar_t *output,size_t output_size,char const *begin,char const *end, const ErrorMethod method = ErrorMethod::replace)
+    inline wchar_t *widen(wchar_t *output,size_t output_size,char const *begin,char const *end)
     {
-        return basic_convert(output,output_size,begin,end,method);
+        return basic_convert(output,output_size,begin,end);
     }
 
 
