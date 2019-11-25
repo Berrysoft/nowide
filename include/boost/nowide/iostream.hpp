@@ -55,7 +55,6 @@ namespace nowide {
             winconsole_istream();
             ~winconsole_istream();
         private:
-            struct data;
             boost::scoped_ptr<console_input_buffer> d;
         };
     } // details 

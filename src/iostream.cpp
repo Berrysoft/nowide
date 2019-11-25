@@ -12,8 +12,6 @@
 #include <vector>
 #include <iostream>
 
-#ifdef BOOST_WINDOWS
-
 #ifndef NOMINMAX
 # define NOMINMAX
 #endif
@@ -238,10 +236,10 @@ namespace details {
     
 } // details
     
-BOOST_NOWIDE_DECL details::winconsole_istream cin;
-BOOST_NOWIDE_DECL details::winconsole_ostream cout(1);
-BOOST_NOWIDE_DECL details::winconsole_ostream cerr(2);
-BOOST_NOWIDE_DECL details::winconsole_ostream clog(2);
+details::winconsole_istream cin;
+details::winconsole_ostream cout(1);
+details::winconsole_ostream cerr(2);
+details::winconsole_ostream clog(2);
     
 namespace {
     struct initialize {
@@ -259,6 +257,5 @@ namespace {
 } // nowide
 } // namespace boost
 
-#endif
 ///
 // vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
