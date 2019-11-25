@@ -191,7 +191,7 @@ namespace details {
         std::vector<char> pback_buffer_;
     };
 
-    winconsole_ostream::winconsole_ostream(int fd) : std::ostream(0)
+    winconsole_ostream::winconsole_ostream(int fd, winconsole_ostream* tieStream) : std::ostream(0)
     {
         HANDLE h = 0;
         switch(fd) {
@@ -209,6 +209,8 @@ namespace details {
 		else {
 			std::ostream::rdbuf( fd == 1 ? std::cout.rdbuf() : std::cerr.rdbuf() );
 		}
+        if(tieStream)
+            tie(tieStream);
     }
     winconsole_ostream::~winconsole_ostream()
     {
@@ -218,7 +220,7 @@ namespace details {
 		catch(...){}
     }
 
-    winconsole_istream::winconsole_istream() : std::istream(0)
+    winconsole_istream::winconsole_istream(winconsole_ostream* tieStream) : std::istream(0)
     {
         HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
 		if(is_atty_handle(h)) {
@@ -228,6 +230,8 @@ namespace details {
 		else {
 			std::istream::rdbuf(std::cin.rdbuf());
 		}
+        if(tieStream)
+            tie(tieStream);
     }
     
     winconsole_istream::~winconsole_istream()
@@ -236,24 +240,10 @@ namespace details {
     
 } // details
     
-details::winconsole_istream cin;
-details::winconsole_ostream cout(1);
-details::winconsole_ostream cerr(2);
-details::winconsole_ostream clog(2);
-    
-namespace {
-    struct initialize {
-        initialize()
-        {
-            boost::nowide::cin.tie(&boost::nowide::cout);
-            boost::nowide::cerr.tie(&boost::nowide::cout);
-            boost::nowide::clog.tie(&boost::nowide::cout);
-        }
-    } inst;
-}
-
-
-    
+details::winconsole_ostream cout(1, NULL);
+details::winconsole_istream cin(&cout);
+details::winconsole_ostream cerr(2, &cout);
+details::winconsole_ostream clog(2, &cout);    
 } // nowide
 } // namespace boost
 

@@ -37,11 +37,11 @@ namespace nowide {
         class console_output_buffer;
         class console_input_buffer;
         
-        class BOOST_NOWIDE_DECL winconsole_ostream : public std::ostream {
-            winconsole_ostream(winconsole_ostream const &);
-            void operator=(winconsole_ostream const &);
+        class BOOST_NOWIDE_DECL winconsole_ostream: public std::ostream {
+            winconsole_ostream(winconsole_ostream const&);
+            void operator=(winconsole_ostream const&);
         public:
-            winconsole_ostream(int fd);
+            winconsole_ostream(int fd, winconsole_ostream* tieStream);
             ~winconsole_ostream();
         private:
             boost::scoped_ptr<console_output_buffer> d;
@@ -52,7 +52,7 @@ namespace nowide {
             void operator=(winconsole_istream const &);
         public:
             
-            winconsole_istream();
+            winconsole_istream(winconsole_ostream* tieStream);
             ~winconsole_istream();
         private:
             boost::scoped_ptr<console_input_buffer> d;
