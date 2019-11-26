@@ -2,6 +2,8 @@
 
 ![](https://github.com/Flamefire/nowide/workflows/CI%20Tests/badge.svg?branch=master)
 ![](https://github.com/Flamefire/nowide/workflows/CI%20Tests/badge.svg?branch=develop)
+[![Build status](https://ci.appveyor.com/api/projects/status/p5tt7txqmq8h2qb1/branch/master?svg=true)](https://ci.appveyor.com/project/Flamefire/nowide/branch/master)
+
 
 Library for cross-platform, unicode aware programming.
 
