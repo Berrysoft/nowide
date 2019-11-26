@@ -1,6 +1,7 @@
 @PACKAGE_INIT@
 
 set(NOWIDE_STANDALONE @NOWIDE_STANDALONE@)
+set(NOWIDE_USE_FILESYSTEM @NOWIDE_USE_FILESYSTEM@)
 
 if(NOT NOWIDE_STANDALONE)
   # Default boost libs are static on windows and dynamic on linux
@@ -8,7 +9,11 @@ if(NOT NOWIDE_STANDALONE)
     set(Boost_USE_STATIC_LIBS ON)
   endif()
   include(CMakeFindDependencyMacro)
-  find_dependency(Boost 1.55)
+  if(NOWIDE_USE_FILESYSTEM)
+    find_dependency(Boost 1.55 COMPONENTS system)
+  else()
+    find_dependency(Boost 1.55)
+  endif()
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")

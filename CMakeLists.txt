@@ -14,7 +14,7 @@
 # When not using CMake to link against this on windows define
 # -DBOOST_NOWIDE_DYN_LINK (non-standalone) or -DNOWIDE_EXPORT (standalone)
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.9)
 project(nowide VERSION 1.0.0 LANGUAGES CXX)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
@@ -83,11 +83,15 @@ if(NOT NOWIDE_STANDALONE)
   if(WIN32 AND "${Boost_USE_STATIC_LIBS}" STREQUAL "")
     set(Boost_USE_STATIC_LIBS ON)
   endif()
-  # We don't really need Boost::filesystem as we only use its headers
-  find_package(Boost 1.55 REQUIRED)
-  target_link_libraries(${libName} ${argScope} Boost::boost)
   if(NOWIDE_USE_FILESYSTEM)
+    # We don't really need Boost::filesystem as we only use its headers
+    # but we need Boost::system until Boost 1.69 from where it is header only
+    find_package(Boost 1.55 REQUIRED COMPONENTS system)
+    target_link_libraries(${libName} ${argScope} Boost::boost Boost::system)
     target_compile_definitions(${libName} ${argScope} BOOST_NOWIDE_USE_FILESYSTEM BOOST_FILESYSTEM_NO_LIB)
+  else()
+    find_package(Boost 1.55 REQUIRED)
+    target_link_libraries(${libName} ${argScope} Boost::boost)
   endif()
 else()
   target_compile_features(${libName} ${argScope} cxx_std_11)

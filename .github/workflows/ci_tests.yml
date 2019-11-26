@@ -20,11 +20,17 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
     - uses: actions/checkout@v1
+    # Install newer CMake to be able to find Boost
     - name: install cmake
-      if: runner.os == 'ubuntu-16.04'
+      if: runner.os == 'Linux' && ! matrix.standalone
+      run: wget -O- https://cmake.org/files/v3.14/cmake-3.14.0-Linux-x86_64.tar.gz | sudo tar --strip-components=1 -xzC /usr/local
+    - name: Build Boost
+      if: matrix.generator == 'MinGW Makefiles'
+      shell: bash
       run: |
-        pip install cmake==3.13.3
-        echo "::set-env name=PATH::$HOME/.local/bin:$PATH"
+        cd "${BOOST_ROOT}"
+        ./bootstrap.sh --with-libraries=system,filesystem threading=multi
+        ./b2 link=static variant=release -j$(nproc)
     - name: create standalone
       if: matrix.standalone
       shell: bash
@@ -35,15 +41,15 @@ jobs:
         mkdir build
     - name: configure
       working-directory: build
-      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
+      run: cmake .. -DBoost_ARCHITECTURE=-x64 -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
     - name: build
       run: cmake --build build --config ${{matrix.buildType}}
     # Run test with both bash and powershell and watch for "Using std::cin" on bash but not on powershell
-    - name: test
+    - name: Test
       working-directory: build
       shell: bash
       run: ctest --output-on-failure -C ${{matrix.buildType}} --verbose
-    - name: test
+    - name: Test on PowerShell
       working-directory: build
       shell: powershell
       if: runner.os == 'windows-latest'
