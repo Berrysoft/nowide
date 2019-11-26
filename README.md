@@ -1,5 +1,8 @@
 # Boost.Nowide
 
+![](https://github.com/Flamefire/nowide/workflows/CI%20Tests/badge.svg?branch=master)
+![](https://github.com/Flamefire/nowide/workflows/CI%20Tests/badge.svg?branch=develop)
+
 Library for cross-platform, unicode aware programming.
 
 The library provides an implementation of standard C and C++ library functions, such that their inputs are UTF-8 aware on Windows without requiring to use Wide API.
