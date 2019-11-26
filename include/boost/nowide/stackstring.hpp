@@ -24,7 +24,7 @@ namespace nowide {
 /// It uses a stack buffer if the string is short enough
 /// otherwise allocates a buffer on the heap.
 ///
-/// If invalid UTF characters are detected they are replaced with the replacement character, see \ref BOOST_NOWIDE_REPLACEMENT_CHARACTER
+/// If invalid UTF characters are detected they are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
 ///    
 template<typename CharOut=wchar_t,typename CharIn = char,size_t BufferSize = 256>
 class basic_stackstring {

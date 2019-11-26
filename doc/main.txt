@@ -28,7 +28,6 @@ Table of Contents:
     - \ref technical_cio 
 - \ref qna
 - \ref standalone_version
-- \ref sources
 
 \section main What is Boost.Nowide
 
@@ -367,16 +366,6 @@ int main(int argc,char **argv)
     return 0;
 }
 \endcode
-\endcode
-
-\subsection sources Sources and Downloads
-
-The upstream sources can be found at GitHub: <a href="https://github.com/artyom-beilis/nowide">https://github.com/artyom-beilis/nowide</a>
-
-You can download the latest sources there:
-
-- Standard Version: <a href="https://github.com/artyom-beilis/nowide/archive/master.zip">nowide-master.zip</a>
-- Standalone Boost independent version <a href="../nowide_standalone.zip">nowide_standalone.zip</a>
 
 */
 
