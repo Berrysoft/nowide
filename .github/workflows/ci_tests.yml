@@ -72,3 +72,10 @@ jobs:
         run: |
             sudo apt-get install -y doxygen
             bash doc/gendoc.sh
+  CheckFormatting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: DoozyX/clang-format-lint-action@v0.3.1
+      with:
+        exclude: './standalone'

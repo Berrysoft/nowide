@@ -18,24 +18,24 @@ static char const *utf8_name = "\xf0\x9d\x92\x9e-\xD0\xBF\xD1\x80\xD0\xB8\xD0\xB
 static wchar_t const *wide_name = L"\U0001D49E-\u043F\u0440\u0438\u0432\u0435\u0442-\u3084\u3042.txt";
 
 int main()
-{   
-    try {
+{
+    try
+    {
+        boost::nowide::nowide_filesystem();
 
-        boost::nowide::nowide_filesystem();        
-        
         TEST(boost::nowide::widen(utf8_name) == wide_name);
         TEST(boost::nowide::narrow(wide_name) == utf8_name);
-        
+
         boost::nowide::ofstream f(utf8_name);
         TEST(f);
         f << "Test" << std::endl;
         f.close();
-        TEST(boost::filesystem::is_regular_file(wide_name)==true);
-        TEST(boost::filesystem::is_regular_file(utf8_name)==true);
+        TEST(boost::filesystem::is_regular_file(wide_name) == true);
+        TEST(boost::filesystem::is_regular_file(utf8_name) == true);
         boost::nowide::remove(utf8_name);
-        TEST(boost::filesystem::is_regular_file(utf8_name)==false);
-        TEST(boost::filesystem::is_regular_file(wide_name)==false);
-        
+        TEST(boost::filesystem::is_regular_file(utf8_name) == false);
+        TEST(boost::filesystem::is_regular_file(wide_name) == false);
+
         boost::filesystem::path txtPath(utf8_name);
         TEST(txtPath == boost::filesystem::path(wide_name));
         {
@@ -62,8 +62,8 @@ int main()
         TEST(boost::filesystem::is_regular_file(utf8_name) == true);
         boost::nowide::remove(utf8_name);
         TEST(boost::filesystem::is_regular_file(utf8_name) == false);
-    }
-    catch(std::exception const &e) {
+    } catch(std::exception const &e)
+    {
         std::cerr << "Failed : " << e.what() << std::endl;
         return 1;
     }

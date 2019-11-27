@@ -18,46 +18,50 @@
 #endif
 
 #ifdef BOOST_MSVC
-#  pragma warning(push)
-#  pragma warning(disable : 4251)
+#pragma warning(push)
+#pragma warning(disable : 4251)
 #endif
-
 
 namespace boost {
 namespace nowide {
-    #if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
     using std::cout;
     using std::cerr;
     using std::cin;
     using std::clog;
-    #else
+#else
 
     /// \cond INTERNAL
     namespace details {
         class console_output_buffer;
         class console_input_buffer;
 
-        class BOOST_NOWIDE_DECL winconsole_ostream: public std::ostream {
-            winconsole_ostream(winconsole_ostream const&);
-            void operator=(winconsole_ostream const&);
+        class BOOST_NOWIDE_DECL winconsole_ostream : public std::ostream
+        {
+            winconsole_ostream(winconsole_ostream const &);
+            void operator=(winconsole_ostream const &);
+
         public:
-            winconsole_ostream(int fd, winconsole_ostream* tieStream);
+            winconsole_ostream(int fd, winconsole_ostream *tieStream);
             ~winconsole_ostream();
+
         private:
             boost::scoped_ptr<console_output_buffer> d;
         };
 
-        class BOOST_NOWIDE_DECL winconsole_istream : public std::istream {
+        class BOOST_NOWIDE_DECL winconsole_istream : public std::istream
+        {
             winconsole_istream(winconsole_istream const &);
             void operator=(winconsole_istream const &);
-        public:
 
-            winconsole_istream(winconsole_ostream* tieStream);
+        public:
+            winconsole_istream(winconsole_ostream *tieStream);
             ~winconsole_istream();
+
         private:
             boost::scoped_ptr<console_input_buffer> d;
         };
-    } // details
+    } // namespace details
 
     /// \endcond
 
@@ -86,15 +90,14 @@ namespace nowide {
     ///
     extern BOOST_NOWIDE_DECL details::winconsole_ostream clog;
 
-    #endif
+#endif
 
-} // nowide
+} // namespace nowide
 } // namespace boost
 
 #ifdef BOOST_MSVC
-#  pragma warning(pop)
+#pragma warning(pop)
 #endif
-
 
 #endif
 ///

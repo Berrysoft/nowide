@@ -11,14 +11,15 @@
 #include <stdexcept>
 #include <sstream>
 
-#define TEST(x) do {                        \
-    if(x)                                   \
-        break;                              \
-    std::ostringstream ss;                  \
-    ss<< "Error " #x " in " << __FILE__     \
-      <<':'<<__LINE__<<" "<< __FUNCTION__;  \
-    throw std::runtime_error(ss.str());     \
-}while(0)
+#define TEST(x)                                                                         \
+    do                                                                                  \
+    {                                                                                   \
+        if(x)                                                                           \
+            break;                                                                      \
+        std::ostringstream ss;                                                          \
+        ss << "Error " #x " in " << __FILE__ << ':' << __LINE__ << " " << __FUNCTION__; \
+        throw std::runtime_error(ss.str());                                             \
+    } while(0)
 
 #endif
 ///
