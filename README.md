@@ -51,9 +51,6 @@ A CMake-Config file will be installed alongside Boost.Nowide so `find_package(no
 Note that only on Windows there is an actual library to be linked.
 On Linux the target is a simple `INTERFACE` target with no actual linking done.
 
-The installed targets on Windows are designed, that both the static and shared library can be installed into the same prefix (choose via `-DBUILD_SHARED=ON/OFF`) and can be used as `nowide::static`/`nowide::shared` targets.
-On Linux both are aliases for the interface target ensuring full cross-platform compatibility.
-
 # Boost.Filesystem integration
 
 Boost.Nowide cleanly integrates with Boost.Filesystem:

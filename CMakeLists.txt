@@ -6,10 +6,7 @@
 # NOWIDE_BUILD_TESTS
 # NOWIDE_SYSTEM_INCLUDE
 #
-# Created targets:
-# nowide::nowide ALIAS target to default build type
-# nowide::static Static library if built, ALIAS on non-WIN32
-# nowide::shared Shared library if built, ALIAS on non-WIN32
+# Created target: nowide::nowide
 #
 # When not using CMake to link against this on windows define
 # -DBOOST_NOWIDE_DYN_LINK (non-standalone) or -DNOWIDE_EXPORT (standalone)
@@ -59,28 +56,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 # but the user can overwrite this by setting BUILD_SHARED=ON
 set(argScope PUBLIC)
 if(NOT WIN32)
-  set(libName nowide)
   set(argScope INTERFACE)
   add_library(nowide INTERFACE)
-  add_library(nowide::shared ALIAS nowide)
-  add_library(nowide::static ALIAS nowide)
 elseif(BUILD_SHARED)
-  set(libName nowide-shared)
-  add_library(nowide-shared SHARED)
-  add_library(nowide::shared ALIAS nowide-shared)
-  set_target_properties(nowide-shared PROPERTIES EXPORT_NAME shared)
+  add_library(nowide SHARED)
   if(NOWIDE_STANDALONE)
-    target_compile_definitions(nowide-shared PUBLIC NOWIDE_EXPORT)
+    target_compile_definitions(nowide PUBLIC NOWIDE_EXPORT)
   else()
-    target_compile_definitions(nowide-shared PUBLIC BOOST_NOWIDE_DYN_LINK)
+    target_compile_definitions(nowide PUBLIC BOOST_NOWIDE_DYN_LINK)
   endif()
 else()
-  set(libName nowide-static)
-  add_library(nowide-static STATIC)
-  add_library(nowide::static ALIAS nowide-static)
-  set_target_properties(nowide-static PROPERTIES EXPORT_NAME static)
+  add_library(nowide STATIC)
 endif()
-add_library(nowide::nowide ALIAS ${libName})
+add_library(nowide::nowide ALIAS nowide)
 
 if(NOT NOWIDE_STANDALONE)
   # Default boost libs are static on windows and dynamic on linux
@@ -91,22 +79,22 @@ if(NOT NOWIDE_STANDALONE)
     # We don't really need Boost::filesystem as we only use its headers
     # but we need Boost::system until Boost 1.69 from where it is header only
     find_package(Boost 1.55 REQUIRED COMPONENTS system)
-    target_link_libraries(${libName} ${argScope} Boost::boost Boost::system)
-    target_compile_definitions(${libName} ${argScope} BOOST_NOWIDE_USE_FILESYSTEM BOOST_FILESYSTEM_NO_LIB)
+    target_link_libraries(nowide ${argScope} Boost::boost Boost::system)
+    target_compile_definitions(nowide ${argScope} BOOST_NOWIDE_USE_FILESYSTEM BOOST_FILESYSTEM_NO_LIB)
   else()
     find_package(Boost 1.55 REQUIRED)
-    target_link_libraries(${libName} ${argScope} Boost::boost)
+    target_link_libraries(nowide ${argScope} Boost::boost)
   endif()
 else()
-  target_compile_features(${libName} ${argScope} cxx_std_11)
+  target_compile_features(nowide ${argScope} cxx_std_11)
 endif()
 
 if(WIN32)
   # Using glob here is ok as it is only for headers
   file(GLOB_RECURSE NOWIDE_HEADERS include/*.hpp)
-  target_sources(${libName} PRIVATE src/iostream.cpp ${NOWIDE_HEADERS})
-  set_target_properties(${libName} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  target_compile_options(${libName} PRIVATE ${warningFlags})
+  target_sources(nowide PRIVATE src/iostream.cpp ${NOWIDE_HEADERS})
+  set_target_properties(nowide PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  target_compile_options(nowide PRIVATE ${warningFlags})
 endif()
 
 if(NOWIDE_SYSTEM_INCLUDE)
@@ -114,7 +102,7 @@ if(NOWIDE_SYSTEM_INCLUDE)
 else()
   set(nowideSystem "")
 endif()
-target_include_directories(${libName} ${nowideSystem} ${argScope}
+target_include_directories(nowide ${nowideSystem} ${argScope}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
@@ -128,7 +116,7 @@ if(NOWIDE_INSTALL)
   include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
   
-  install(TARGETS ${libName}
+  install(TARGETS nowide
     EXPORT nowideTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
