@@ -41,7 +41,7 @@ namespace nowide {
     using BOOST_NOWIDE_FS_NS::filebuf;
 #undef BOOST_NOWIDE_FS_NS
 #else // Windows
-    
+
     ///
     /// \brief This forward declaration defines the basic_filebuf type.
     ///
@@ -50,7 +50,7 @@ namespace nowide {
     ///
     template<typename CharType,typename Traits = std::char_traits<CharType> >
     class basic_filebuf;
-    
+
     ///
     /// \brief This is the implementation of std::filebuf
     ///
@@ -63,7 +63,7 @@ namespace nowide {
         ///
         /// Creates new filebuf
         ///
-        basic_filebuf() : 
+        basic_filebuf() :
             buffer_size_(BUFSIZ),
             buffer_(0),
             file_(0),
@@ -74,7 +74,7 @@ namespace nowide {
             setg(0,0,0);
             setp(0,0);
         }
-        
+
         virtual ~basic_filebuf()
         {
             if(file_) {
@@ -84,7 +84,7 @@ namespace nowide {
             if(own_ && buffer_)
                 delete [] buffer_;
         }
-        
+
         ///
         /// Same as std::filebuf::open but s is UTF-8 string
         ///
@@ -156,7 +156,7 @@ namespace nowide {
             }
         }
     protected:
-        
+
         virtual std::streambuf *setbuf(char *s,std::streamsize n)
         {
             if(!buffer_ && n>=0) {
@@ -166,12 +166,12 @@ namespace nowide {
             }
             return this;
         }
-        
+
         int overflow(int c)
-        {           
+        {
             if(!file_)
                 return EOF;
-            
+
             if(fixg() < 0)
                 return EOF;
 
@@ -195,15 +195,15 @@ namespace nowide {
             }
             return 0;
         }
-        
-        
+
+
         int sync()
         {
             return overflow(EOF);
         }
 
         int underflow()
-        {          
+        {
             if(!file_)
                 return EOF;
             if(fixp() < 0)
@@ -234,7 +234,7 @@ namespace nowide {
         std::streampos seekoff(std::streamoff off,
                             std::ios_base::seekdir seekdir,
                             std::ios_base::openmode /*m*/)
-        {           
+        {
             if(!file_)
                 return EOF;
             if(fixp() < 0 || fixg() < 0)
@@ -271,7 +271,7 @@ namespace nowide {
             setg(0,0,0);
             return 0;
         }
-        
+
         int fixp()
         {
             if(pptr()!=0) {
@@ -291,8 +291,8 @@ namespace nowide {
             }
             file_ = f;
         }
-        
-        
+
+
         static wchar_t const *get_mode(std::ios_base::openmode mode)
         {
             // Flag out ate
@@ -339,9 +339,9 @@ namespace nowide {
                 return L"a+b";
             if(mode == (std::ios_base::binary | std::ios_base::in | std::ios_base::app))
                 return L"a+b";
-            return 0;    
+            return 0;
         }
-        
+
         size_t buffer_size_;
         char *buffer_;
         FILE *file_;
@@ -349,14 +349,14 @@ namespace nowide {
         char last_char_;
         std::ios::openmode mode_;
     };
-    
+
     ///
     /// \brief Convenience typedef
     ///
     typedef basic_filebuf<char> filebuf;
-    
+
     #endif // windows
-    
+
 } // nowide
 } // namespace boost
 

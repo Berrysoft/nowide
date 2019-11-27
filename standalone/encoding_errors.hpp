@@ -14,7 +14,7 @@
 namespace nowide {
     namespace conv {
         ///
-        /// \addtogroup codepage 
+        /// \addtogroup codepage
         ///
         /// @{
 

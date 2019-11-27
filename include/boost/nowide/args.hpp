@@ -29,7 +29,7 @@ namespace nowide {
     #else
 
     ///
-    /// \brief args is a class that fixes standard main() function arguments and changes them to UTF-8 under 
+    /// \brief args is a class that fixes standard main() function arguments and changes them to UTF-8 under
     /// Microsoft Windows.
     ///
     /// The class uses \c GetCommandLineW(), \c CommandLineToArgvW() and \c GetEnvironmentStringsW()
@@ -42,9 +42,9 @@ namespace nowide {
     ///
     class args {
     public:
-        
+
         ///
-        /// Fix command line agruments 
+        /// Fix command line agruments
         ///
         args(int &argc,char **&argv) :
             old_argc_(argc),
@@ -79,20 +79,20 @@ namespace nowide {
                 *old_argc_ptr_ = old_argc_;
             if(old_argv_ptr_)
                 *old_argv_ptr_ = old_argv_;
-            if(old_env_ptr_) 
+            if(old_env_ptr_)
                 *old_env_ptr_ = old_env_;
         }
-    private:    
+    private:
         void fix_args(int &argc,char **&argv)
         {
             int wargc;
             wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(),&wargc);
             if(!wargv)
                 throw std::runtime_error("Could not get command line!");
-            try{ 
+            try{
                 args_.resize(wargc+1,0);
                 arg_values_.resize(wargc);
-                for(int i=0;i<wargc;i++) 
+                for(int i=0;i<wargc;i++)
                     args_[i] = arg_values_[i].convert(wargv[i]);
                 argc = wargc;
                 argv = &args_[0];
