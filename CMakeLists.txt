@@ -133,7 +133,7 @@ if(NOWIDE_INSTALL)
   install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
   set(configFile ${CMAKE_CURRENT_BINARY_DIR}/nowideConfig.cmake)
-  set(versionFile ${CMAKE_CURRENT_BINARY_DIR}/nowideVersion.cmake)
+  set(versionFile ${CMAKE_CURRENT_BINARY_DIR}/nowideConfigVersion.cmake)
   set(configInstallDestination share/nowide)
 
   configure_package_config_file(
