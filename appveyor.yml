@@ -16,7 +16,7 @@ platform:
   - x64
 
 environment:
-  BOOST_DIR: C:\Libraries\boost_1_65_1
+  BOOST_ROOT: C:\Libraries\boost_1_65_1
   GENERATOR: Visual Studio 14 2015
 
 matrix:
@@ -27,7 +27,7 @@ for:
       only:
         - image: Visual Studio 2017
     environment:
-      BOOST_DIR: C:\Libraries\boost_1_67_0
+      BOOST_ROOT: C:\Libraries\boost_1_67_0
       GENERATOR: Visual Studio 15 2017
 
 before_build:
@@ -37,7 +37,7 @@ before_build:
   - mkdir build
   - cd build
   - if %platform% == x64 (set "GENERATOR=%GENERATOR% Win64")
-  - cmake -G "%GENERATOR%" -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DBOOST_ROOT="%BOOST_DIR%" ..
+  - cmake -G "%GENERATOR%" -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ..
 
 build:
   project: build/nowide.sln

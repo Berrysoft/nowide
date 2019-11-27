@@ -17,6 +17,10 @@
 cmake_minimum_required(VERSION 3.9)
 project(nowide VERSION 1.0.0 LANGUAGES CXX)
 
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(is_root_project ON)
   set(is_sub_project OFF)
