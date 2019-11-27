@@ -19,23 +19,23 @@ namespace nowide {
 
 #if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
 
-using ::system;
+    using ::system;
 
 #else // Windows
 
-///
-/// Same as std::system but cmd is UTF-8.
-///
-inline int system(char const *cmd)
-{
-    if(!cmd)
-        return _wsystem(0);
-    wstackstring const wcmd(cmd);
-    return _wsystem(wcmd.c_str());
-}
+    ///
+    /// Same as std::system but cmd is UTF-8.
+    ///
+    inline int system(char const *cmd)
+    {
+        if(!cmd)
+            return _wsystem(0);
+        wstackstring const wcmd(cmd);
+        return _wsystem(wcmd.c_str());
+    }
 
 #endif
-} // nowide
+} // namespace nowide
 } // namespace boost
 
 #endif

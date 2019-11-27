@@ -18,15 +18,14 @@
 #include <cstdlib>
 #endif
 
-
 namespace boost {
 namespace nowide {
-    #if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
     using ::getenv;
     using ::setenv;
     using ::unsetenv;
     using ::putenv;
-    #else
+#else
     ///
     /// \brief UTF-8 aware getenv. Returns 0 if the variable is not set.
     ///
@@ -35,19 +34,20 @@ namespace nowide {
     inline char *getenv(char const *key)
     {
         static stackstring value;
-        
+
         wshort_stackstring const name(key);
 
         static const size_t buf_size = 64;
         wchar_t buf[buf_size];
         std::vector<wchar_t> tmp;
         wchar_t *ptr = buf;
-        size_t n = GetEnvironmentVariableW(name.c_str(),buf,buf_size);
+        size_t n = GetEnvironmentVariableW(name.c_str(), buf, buf_size);
         if(n == 0 && GetLastError() == 203) // ERROR_ENVVAR_NOT_FOUND
             return 0;
-        if(n >= buf_size) {
-            tmp.resize(n+1,L'\0');
-            n = GetEnvironmentVariableW(name.c_str(),&tmp[0],static_cast<unsigned>(tmp.size() - 1));
+        if(n >= buf_size)
+        {
+            tmp.resize(n + 1, L'\0');
+            n = GetEnvironmentVariableW(name.c_str(), &tmp[0], static_cast<unsigned>(tmp.size() - 1));
             // The size may have changed
             if(n >= tmp.size() - 1)
                 return 0;
@@ -58,20 +58,21 @@ namespace nowide {
     }
     ///
     /// \brief  UTF-8 aware setenv, \a key - the variable name, \a value is a new UTF-8 value,
-    /// 
+    ///
     /// if override is not 0, that the old value is always overridded, otherwise,
     /// if the variable exists it remains unchanged
     ///
-    inline int setenv(char const *key,char const *value,int override)
+    inline int setenv(char const *key, char const *value, int override)
     {
         wshort_stackstring const name(key);
-        if(!override) {
+        if(!override)
+        {
             wchar_t unused[2];
-            if(!(GetEnvironmentVariableW(name.c_str(),unused,2)==0 && GetLastError() == 203)) // ERROR_ENVVAR_NOT_FOUND
+            if(!(GetEnvironmentVariableW(name.c_str(), unused, 2) == 0 && GetLastError() == 203)) // ERROR_ENVVAR_NOT_FOUND
                 return 0;
         }
         wstackstring const wval(value);
-        if(SetEnvironmentVariableW(name.c_str(),wval.c_str()))
+        if(SetEnvironmentVariableW(name.c_str(), wval.c_str()))
             return 0;
         return -1;
     }
@@ -81,7 +82,7 @@ namespace nowide {
     inline int unsetenv(char const *key)
     {
         wshort_stackstring const name(key);
-        if(SetEnvironmentVariableW(name.c_str(),0))
+        if(SetEnvironmentVariableW(name.c_str(), 0))
             return 0;
         return -1;
     }
@@ -92,19 +93,19 @@ namespace nowide {
     {
         char const *key = string;
         char const *key_end = string;
-        while(*key_end!='=' && *key_end!='\0')
+        while(*key_end != '=' && *key_end != '\0')
             key_end++;
         if(*key_end == '\0')
             return -1;
         wshort_stackstring const wkey(key, key_end);
         wstackstring const wvalue(key_end + 1);
 
-        if(SetEnvironmentVariableW(wkey.c_str(),wvalue.c_str()))
+        if(SetEnvironmentVariableW(wkey.c_str(), wvalue.c_str()))
             return 0;
         return -1;
     }
-    #endif
-} // nowide
+#endif
+} // namespace nowide
 } // namespace boost
 
 #endif

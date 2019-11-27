@@ -11,19 +11,19 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/nowide/utf8_codecvt.hpp>
 namespace boost {
-    namespace nowide {
-        ///
-        /// \brief Install utf8_codecvt facet into boost::filesystem::path so all char strings are interpreted as utf-8 strings
-        ///
-        /// Returns the old locale of boost::filesystem::path
-        ///
-        inline std::locale nowide_filesystem()
-        {
-            std::locale tmp = std::locale(std::locale(),new boost::nowide::utf8_codecvt<wchar_t>());
-            return boost::filesystem::path::imbue(tmp);
-        }
-    } // nowide
-} // boost
+namespace nowide {
+    ///
+    /// \brief Install utf8_codecvt facet into boost::filesystem::path so all char strings are interpreted as utf-8 strings
+    ///
+    /// Returns the old locale of boost::filesystem::path
+    ///
+    inline std::locale nowide_filesystem()
+    {
+        std::locale tmp = std::locale(std::locale(), new boost::nowide::utf8_codecvt<wchar_t>());
+        return boost::filesystem::path::imbue(tmp);
+    }
+} // namespace nowide
+} // namespace boost
 
 #endif
 ///

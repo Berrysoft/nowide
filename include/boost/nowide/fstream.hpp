@@ -11,19 +11,19 @@
 #include <boost/config.hpp>
 #include <boost/nowide/filebuf.hpp>
 #ifdef BOOST_WINDOWS
-#  include <boost/scoped_ptr.hpp>
-#  include <iosfwd>
-#  include <streambuf>
-#  include <cstdio>
-#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
-#    include <boost/filesystem/path.hpp>
-#  endif
+#include <boost/scoped_ptr.hpp>
+#include <iosfwd>
+#include <streambuf>
+#include <cstdio>
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#include <boost/filesystem/path.hpp>
+#endif
 #else
-#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
-#    include <boost/filesystem/fstream.hpp>
-#  else
-#    include <fstream>
-#  endif
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#include <boost/filesystem/fstream.hpp>
+#else
+#include <fstream>
+#endif
 #endif
 
 namespace boost {
@@ -51,46 +51,45 @@ namespace nowide {
     ///
     /// \brief Same as std::basic_ifstream<char> but accepts UTF-8 strings under Windows
     ///
-    template<typename CharType,typename Traits = std::char_traits<CharType> >
-    class basic_ifstream : public std::basic_istream<CharType,Traits>
+    template<typename CharType, typename Traits = std::char_traits<CharType> >
+    class basic_ifstream : public std::basic_istream<CharType, Traits>
     {
     public:
-        typedef basic_filebuf<CharType,Traits> internal_buffer_type;
-        typedef std::basic_istream<CharType,Traits> internal_stream_type;
+        typedef basic_filebuf<CharType, Traits> internal_buffer_type;
+        typedef std::basic_istream<CharType, Traits> internal_stream_type;
 
-        basic_ifstream() : 
-            internal_stream_type(0)
+        basic_ifstream() : internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
-        }
-        
-        explicit basic_ifstream(char const *file_name,std::ios_base::openmode mode = std::ios_base::in) : 
-            internal_stream_type(0) 
-        {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
-            open(file_name,mode);
         }
 
-        explicit basic_ifstream(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::in) : 
-            internal_stream_type(0) 
+        explicit basic_ifstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::in) : internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
-            open(file_name,mode);
+            open(file_name, mode);
         }
-        
+
+        explicit basic_ifstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in) : internal_stream_type(0)
+        {
+            buf_.reset(new internal_buffer_type());
+            std::ios::rdbuf(buf_.get());
+            open(file_name, mode);
+        }
+
         void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
-            if(!buf_->open(file_name, mode | std::ios_base::in)) {
+            if(!buf_->open(file_name, mode | std::ios_base::in))
+            {
                 this->setstate(std::ios_base::failbit);
-            } else {
+            } else
+            {
                 this->clear();
             }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
-        explicit basic_ifstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in):
+        explicit basic_ifstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
@@ -103,16 +102,17 @@ namespace nowide {
         }
 #endif
 
-        void open(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::in)
+        void open(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
-            open(file_name.c_str(),mode);
+            open(file_name.c_str(), mode);
         }
-        void open(char const *file_name,std::ios_base::openmode mode = std::ios_base::in)
+        void open(char const *file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
-            if(!buf_->open(file_name,mode | std::ios_base::in)) {
+            if(!buf_->open(file_name, mode | std::ios_base::in))
+            {
                 this->setstate(std::ios_base::failbit);
-            }
-            else {
+            } else
+            {
                 this->clear();
             }
         }
@@ -136,7 +136,7 @@ namespace nowide {
         {
             buf_->close();
         }
-            
+
     private:
         boost::scoped_ptr<internal_buffer_type> buf_;
     };
@@ -145,45 +145,43 @@ namespace nowide {
     /// \brief Same as std::basic_ofstream<char> but accepts UTF-8 strings under Windows
     ///
 
-    template<typename CharType,typename Traits = std::char_traits<CharType> >
-    class basic_ofstream : public std::basic_ostream<CharType,Traits>
+    template<typename CharType, typename Traits = std::char_traits<CharType> >
+    class basic_ofstream : public std::basic_ostream<CharType, Traits>
     {
     public:
-        typedef basic_filebuf<CharType,Traits> internal_buffer_type;
-        typedef std::basic_ostream<CharType,Traits> internal_stream_type;
+        typedef basic_filebuf<CharType, Traits> internal_buffer_type;
+        typedef std::basic_ostream<CharType, Traits> internal_stream_type;
 
-        basic_ofstream() : 
-            internal_stream_type(0)
+        basic_ofstream() : internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
         }
-        explicit basic_ofstream(char const *file_name,std::ios_base::openmode mode = std::ios_base::out) :
-            internal_stream_type(0)
+        explicit basic_ofstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::out) : internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
-            open(file_name,mode);
+            open(file_name, mode);
         }
-        explicit basic_ofstream(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::out) :
-            internal_stream_type(0)
+        explicit basic_ofstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::out) : internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
-            open(file_name,mode);
+            open(file_name, mode);
         }
 
-        void open(wchar_t const *file_name,std::ios_base::openmode mode = std::ios_base::out)
+        void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
-            if(!buf_->open(file_name,mode | std::ios_base::out)) {
+            if(!buf_->open(file_name, mode | std::ios_base::out))
+            {
                 this->setstate(std::ios_base::failbit);
-            }
-            else {
+            } else
+            {
                 this->clear();
             }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
-        explicit basic_ofstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out):
+        explicit basic_ofstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
@@ -196,16 +194,17 @@ namespace nowide {
         }
 #endif
 
-        void open(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::out)
+        void open(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
-            open(file_name.c_str(),mode);
+            open(file_name.c_str(), mode);
         }
-        void open(char const *file_name,std::ios_base::openmode mode = std::ios_base::out)
+        void open(char const *file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
-            if(!buf_->open(file_name,mode | std::ios_base::out)) {
+            if(!buf_->open(file_name, mode | std::ios_base::out))
+            {
                 this->setstate(std::ios_base::failbit);
-            }
-            else {
+            } else
+            {
                 this->clear();
             }
         }
@@ -229,7 +228,7 @@ namespace nowide {
         {
             buf_->close();
         }
-            
+
     private:
         boost::scoped_ptr<internal_buffer_type> buf_;
     };
@@ -238,45 +237,46 @@ namespace nowide {
     /// \brief Same as std::basic_fstream<char> but accepts UTF-8 strings under Windows
     ///
 
-    template<typename CharType,typename Traits = std::char_traits<CharType> >
-    class basic_fstream : public std::basic_iostream<CharType,Traits>
+    template<typename CharType, typename Traits = std::char_traits<CharType> >
+    class basic_fstream : public std::basic_iostream<CharType, Traits>
     {
     public:
-        typedef basic_filebuf<CharType,Traits> internal_buffer_type;
-        typedef std::basic_iostream<CharType,Traits> internal_stream_type;
+        typedef basic_filebuf<CharType, Traits> internal_buffer_type;
+        typedef std::basic_iostream<CharType, Traits> internal_stream_type;
 
-        basic_fstream() : 
-            internal_stream_type(0)
+        basic_fstream() : internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
         }
-        explicit basic_fstream(char const *file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
+        explicit basic_fstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
-            open(file_name,mode);
+            open(file_name, mode);
         }
-        explicit basic_fstream(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
+        explicit basic_fstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
             std::ios::rdbuf(buf_.get());
-            open(file_name,mode);
+            open(file_name, mode);
         }
 
-        void open(wchar_t const *file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+        void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
-            if(!buf_->open(file_name,mode)) {
+            if(!buf_->open(file_name, mode))
+            {
                 this->setstate(std::ios_base::failbit);
-            }
-            else {
+            } else
+            {
                 this->clear();
             }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
-        explicit basic_fstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out):
+        explicit basic_fstream(boost::filesystem::path const &file_path,
+                               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
             internal_stream_type(0)
         {
             buf_.reset(new internal_buffer_type());
@@ -289,16 +289,17 @@ namespace nowide {
         }
 #endif
 
-        void open(std::string const &file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+        void open(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
-            open(file_name.c_str(),mode);
+            open(file_name.c_str(), mode);
         }
-        void open(char const *file_name,std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+        void open(char const *file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
-            if(!buf_->open(file_name,mode)) {
+            if(!buf_->open(file_name, mode))
+            {
                 this->setstate(std::ios_base::failbit);
-            }
-            else {
+            } else
+            {
                 this->clear();
             }
         }
@@ -322,11 +323,10 @@ namespace nowide {
         {
             buf_->close();
         }
-            
+
     private:
         boost::scoped_ptr<internal_buffer_type> buf_;
     };
-
 
     ///
     /// \brief Same as std::filebuf but accepts UTF-8 strings under Windows
@@ -346,10 +346,8 @@ namespace nowide {
     typedef basic_fstream<char> fstream;
 
 #endif
-} // nowide
+} // namespace nowide
 } // namespace boost
-
-
 
 #endif
 // vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

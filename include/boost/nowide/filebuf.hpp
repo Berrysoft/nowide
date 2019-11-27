@@ -10,23 +10,24 @@
 
 #include <boost/config.hpp>
 #ifdef BOOST_WINDOWS
-#  include <boost/nowide/stackstring.hpp>
-#  include <streambuf>
-#  include <cstdio>
-#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
-#    include <boost/filesystem/path.hpp>
-#  endif
+#include <boost/nowide/stackstring.hpp>
+#include <streambuf>
+#include <ios>
+#include <cstdio>
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#include <boost/filesystem/path.hpp>
+#endif
 #else
-#  ifdef BOOST_NOWIDE_USE_FILESYSTEM
-#    include <boost/filesystem/fstream.hpp>
-#  else
-#    include <fstream>
-#  endif
+#ifdef BOOST_NOWIDE_USE_FILESYSTEM
+#include <boost/filesystem/fstream.hpp>
+#else
+#include <fstream>
+#endif
 #endif
 
 #ifdef BOOST_MSVC
-#  pragma warning(push)
-#  pragma warning(disable : 4996 4244 4800)
+#pragma warning(push)
+#pragma warning(disable : 4996 4244 4800)
 #endif
 
 namespace boost {
@@ -41,16 +42,16 @@ namespace nowide {
     using BOOST_NOWIDE_FS_NS::filebuf;
 #undef BOOST_NOWIDE_FS_NS
 #else // Windows
-    
+
     ///
     /// \brief This forward declaration defines the basic_filebuf type.
     ///
     /// it is implemented and specialized for CharType = char, it
     /// implements std::filebuf over standard C I/O
     ///
-    template<typename CharType,typename Traits = std::char_traits<CharType> >
+    template<typename CharType, typename Traits = std::char_traits<CharType> >
     class basic_filebuf;
-    
+
     ///
     /// \brief This is the implementation of std::filebuf
     ///
@@ -58,49 +59,45 @@ namespace nowide {
     /// implements std::filebuf over standard C I/O
     ///
     template<>
-    class basic_filebuf<char> : public std::basic_streambuf<char> {
+    class basic_filebuf<char> : public std::basic_streambuf<char>
+    {
     public:
         ///
         /// Creates new filebuf
         ///
-        basic_filebuf() : 
-            buffer_size_(BUFSIZ),
-            buffer_(0),
-            file_(0),
-            own_(true),
-            last_char_(EOF),
-            mode_(std::ios::in | std::ios::out)
+        basic_filebuf() : buffer_size_(BUFSIZ), buffer_(0), file_(0), own_(true), last_char_(EOF), mode_(std::ios::in | std::ios::out)
         {
-            setg(0,0,0);
-            setp(0,0);
+            setg(0, 0, 0);
+            setp(0, 0);
         }
-        
+
         virtual ~basic_filebuf()
         {
-            if(file_) {
+            if(file_)
+            {
                 ::fclose(file_);
                 file_ = 0;
             }
             if(own_ && buffer_)
-                delete [] buffer_;
+                delete[] buffer_;
         }
-        
+
         ///
         /// Same as std::filebuf::open but s is UTF-8 string
         ///
-        basic_filebuf *open(std::string const &s,std::ios_base::openmode mode)
+        basic_filebuf *open(std::string const &s, std::ios_base::openmode mode)
         {
-            return open(s.c_str(),mode);
+            return open(s.c_str(), mode);
         }
         ///
         /// Same as std::filebuf::open but s is UTF-8 string
         ///
-        basic_filebuf *open(char const *s,std::ios_base::openmode mode)
+        basic_filebuf *open(char const *s, std::ios_base::openmode mode)
         {
             wstackstring const name(s);
-            return open(name.c_str(),mode);
+            return open(name.c_str(), mode);
         }
-        basic_filebuf *open(wchar_t const *s,std::ios_base::openmode mode)
+        basic_filebuf *open(wchar_t const *s, std::ios_base::openmode mode)
         {
             if(is_open())
                 return NULL;
@@ -108,10 +105,11 @@ namespace nowide {
             wchar_t const *smode = get_mode(mode);
             if(!smode)
                 return 0;
-            FILE *f = ::_wfopen(s,smode);
+            FILE *f = ::_wfopen(s, smode);
             if(!f)
                 return 0;
-            if(ate && fseek(f,0,SEEK_END)!=0) {
+            if(ate && fseek(f, 0, SEEK_END) != 0)
+            {
                 fclose(f);
                 return 0;
             }
@@ -130,8 +128,9 @@ namespace nowide {
         basic_filebuf *close()
         {
             bool res = sync() == 0;
-            if(file_) {
-                if(::fclose(file_)!=0)
+            if(file_)
+            {
+                if(::fclose(file_) != 0)
                     res = false;
                 file_ = 0;
             }
@@ -150,76 +149,81 @@ namespace nowide {
         {
             if(buffer_)
                 return;
-            if(buffer_size_ > 0) {
-                buffer_ = new char [buffer_size_];
+            if(buffer_size_ > 0)
+            {
+                buffer_ = new char[buffer_size_];
                 own_ = true;
             }
         }
+
     protected:
-        
-        virtual std::streambuf *setbuf(char *s,std::streamsize n)
+        virtual std::streambuf *setbuf(char *s, std::streamsize n)
         {
-            if(!buffer_ && n>=0) {
+            if(!buffer_ && n >= 0)
+            {
                 buffer_ = s;
                 buffer_size_ = n;
                 own_ = false;
             }
             return this;
         }
-        
+
         int overflow(int c)
-        {           
+        {
             if(!file_)
                 return EOF;
-            
+
             if(fixg() < 0)
                 return EOF;
 
             size_t n = pptr() - pbase();
-            if(n > 0) {
-                if(::fwrite(pbase(),1,n,file_) < n)
+            if(n > 0)
+            {
+                if(::fwrite(pbase(), 1, n, file_) < n)
                     return -1;
                 fflush(file_);
             }
 
-            if(buffer_size_ > 0) {
+            if(buffer_size_ > 0)
+            {
                 make_buffer();
-                setp(buffer_,buffer_+buffer_size_);
-                if(c!=EOF)
+                setp(buffer_, buffer_ + buffer_size_);
+                if(c != EOF)
                     sputc(c);
-            }
-            else if(c!=EOF) {
-                if(::fputc(c,file_)==EOF)
+            } else if(c != EOF)
+            {
+                if(::fputc(c, file_) == EOF)
                     return EOF;
                 fflush(file_);
             }
             return 0;
         }
-        
-        
+
         int sync()
         {
             return overflow(EOF);
         }
 
         int underflow()
-        {          
+        {
             if(!file_)
                 return EOF;
             if(fixp() < 0)
                 return EOF;
-            if(buffer_size_ == 0) {
+            if(buffer_size_ == 0)
+            {
                 int c = ::fgetc(file_);
-                if(c==EOF) {
+                if(c == EOF)
+                {
                     return EOF;
                 }
                 last_char_ = c;
-                setg(&last_char_,&last_char_,&last_char_ + 1);
-            }
-            else {
+                setg(&last_char_, &last_char_, &last_char_ + 1);
+            } else
+            {
                 make_buffer();
-                size_t n = ::fread(buffer_,1,buffer_size_,file_);
-                setg(buffer_,buffer_,buffer_+n);
+                size_t n = ::fread(buffer_, 1, buffer_size_, file_);
+                setg(buffer_, buffer_, buffer_ + n);
                 if(n == 0)
                     return EOF;
             }
@@ -228,55 +232,56 @@ namespace nowide {
 
         int pbackfail(int)
         {
-            return pubseekoff(-1,std::ios::cur);
+            return pubseekoff(-1, std::ios::cur);
         }
 
-        std::streampos seekoff(std::streamoff off,
-                            std::ios_base::seekdir seekdir,
-                            std::ios_base::openmode /*m*/)
-        {           
+        std::streampos seekoff(std::streamoff off, std::ios_base::seekdir seekdir, std::ios_base::openmode /*m*/)
+        {
             if(!file_)
                 return EOF;
             if(fixp() < 0 || fixg() < 0)
                 return EOF;
-            if(seekdir == std::ios_base::cur) {
-                if( ::fseek(file_,off,SEEK_CUR) < 0)
+            if(seekdir == std::ios_base::cur)
+            {
+                if(::fseek(file_, off, SEEK_CUR) < 0)
                     return EOF;
-            }
-            else if(seekdir == std::ios_base::beg) {
-                if( ::fseek(file_,off,SEEK_SET) < 0)
+            } else if(seekdir == std::ios_base::beg)
+            {
+                if(::fseek(file_, off, SEEK_SET) < 0)
                     return EOF;
-            }
-            else if(seekdir == std::ios_base::end) {
-                if( ::fseek(file_,off,SEEK_END) < 0)
+            } else if(seekdir == std::ios_base::end)
+            {
+                if(::fseek(file_, off, SEEK_END) < 0)
                     return EOF;
-            }
-            else
+            } else
                 return -1;
             return ftell(file_);
         }
-        std::streampos seekpos(std::streampos off,std::ios_base::openmode m)
+        std::streampos seekpos(std::streampos off, std::ios_base::openmode m)
         {
-            return seekoff(std::streamoff(off),std::ios_base::beg,m);
+            return seekoff(std::streamoff(off), std::ios_base::beg, m);
         }
+
     private:
         int fixg()
         {
-            if(gptr()!=egptr()) {
+            if(gptr() != egptr())
+            {
                 std::streamsize off = gptr() - egptr();
-                setg(0,0,0);
-                if(fseek(file_,off,SEEK_CUR) != 0)
+                setg(0, 0, 0);
+                if(fseek(file_, off, SEEK_CUR) != 0)
                     return -1;
             }
-            setg(0,0,0);
+            setg(0, 0, 0);
             return 0;
         }
-        
+
         int fixp()
         {
-            if(pptr()!=0) {
+            if(pptr() != 0)
+            {
                 int r = sync();
-                setp(0,0);
+                setp(0, 0);
                 return r;
             }
             return 0;
@@ -285,14 +290,14 @@ namespace nowide {
         void reset(FILE *f = 0)
         {
             sync();
-            if(file_) {
+            if(file_)
+            {
                 fclose(file_);
                 file_ = 0;
             }
             file_ = f;
         }
-        
-        
+
         static wchar_t const *get_mode(std::ios_base::openmode mode)
         {
             // Flag out ate
@@ -339,9 +344,9 @@ namespace nowide {
                 return L"a+b";
             if(mode == (std::ios_base::binary | std::ios_base::in | std::ios_base::app))
                 return L"a+b";
-            return 0;    
+            return 0;
         }
-        
+
         size_t buffer_size_;
         char *buffer_;
         FILE *file_;
@@ -349,21 +354,20 @@ namespace nowide {
         char last_char_;
         std::ios::openmode mode_;
     };
-    
+
     ///
     /// \brief Convenience typedef
     ///
     typedef basic_filebuf<char> filebuf;
-    
-    #endif // windows
-    
-} // nowide
+
+#endif // windows
+
+} // namespace nowide
 } // namespace boost
 
 #ifdef BOOST_MSVC
-#  pragma warning(pop)
+#pragma warning(pop)
 #endif
-
 
 #endif
 
