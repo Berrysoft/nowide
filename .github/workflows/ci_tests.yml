@@ -15,13 +15,15 @@ jobs:
             generator: MinGW Makefiles
           - os: ubuntu-16.04
             generator: Visual Studio 16 2019
+          - os: ubuntu-16.04
+            buildType: Debug
           - os: windows-latest
             generator: Unix Makefiles
     runs-on: ${{matrix.os}}
     steps:
     - uses: actions/checkout@v1
     # Install newer CMake to be able to find Boost
-    - name: install cmake
+    - name: Install CMake
       if: runner.os == 'Linux' && ! matrix.standalone
       run: wget -O- https://cmake.org/files/v3.14/cmake-3.14.0-Linux-x86_64.tar.gz | sudo tar --strip-components=1 -xzC /usr/local
     - name: Build Boost
@@ -31,7 +33,7 @@ jobs:
         cd "${BOOST_ROOT}"
         ./bootstrap.sh --with-libraries=system,filesystem threading=multi
         ./b2 link=static variant=release -j$(nproc)
-    - name: create standalone
+    - name: Create standalone
       if: matrix.standalone
       shell: bash
       run: |
@@ -39,10 +41,10 @@ jobs:
         rm -rf *
         cp -r ../nowide_standalone/* .
         mkdir build
-    - name: configure
+    - name: Configure
       working-directory: build
       run: cmake .. -DBoost_ARCHITECTURE=-x64 -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/../install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
-    - name: build
+    - name: Build & Install
       run: cmake --build build --config ${{matrix.buildType}} --target install
     # Run test with both bash and powershell and watch for "Using std::cin" on bash but not on powershell
     - name: Test
@@ -52,7 +54,7 @@ jobs:
     - name: Test on PowerShell
       working-directory: build
       shell: powershell
-      if: runner.os == 'windows-latest'
+      if: runner.os == 'Windows'
       run: ctest --output-on-failure -C ${{matrix.buildType}} --verbose
     - name: Test consumption
       working-directory: build
