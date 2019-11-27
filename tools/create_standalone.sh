@@ -47,4 +47,4 @@ sed 's/<boost\//<nowide\//g' -i $SOURCES
 
 cp standalone/*.hpp "$targetFolder"/include/nowide
 cp CMakeLists.txt Config.cmake.in "$targetFolder"
-cp test/CMakeLists.txt "$targetFolder"/test
+cp -r test/CMakeLists.txt test/exampleProject "$targetFolder"/test

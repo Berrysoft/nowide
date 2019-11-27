@@ -41,9 +41,9 @@ jobs:
         mkdir build
     - name: configure
       working-directory: build
-      run: cmake .. -DBoost_ARCHITECTURE=-x64 -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/build/install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
+      run: cmake .. -DBoost_ARCHITECTURE=-x64 -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/../install -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
     - name: build
-      run: cmake --build build --config ${{matrix.buildType}}
+      run: cmake --build build --config ${{matrix.buildType}} --target install
     # Run test with both bash and powershell and watch for "Using std::cin" on bash but not on powershell
     - name: Test
       working-directory: build
@@ -54,10 +54,14 @@ jobs:
       shell: powershell
       if: runner.os == 'windows-latest'
       run: ctest --output-on-failure -C ${{matrix.buildType}} --verbose
-    - name: install
+    - name: Test consumption
+      working-directory: build
+      shell: bash
       run: |
-        cmake --build build --config ${{matrix.buildType}} --target install
-        cat ${{runner.workspace}}/build/install/share/nowide/*
+        rm -r *
+        cmake ../test/exampleProject -DBoost_ARCHITECTURE=-x64 -DCMAKE_PREFIX_PATH="${{runner.workspace}}/../install" -G "${{matrix.generator}}" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
+        cmake --build . --config ${{matrix.buildType}}
+        ctest --output-on-failure -C ${{matrix.buildType}}
   CreateDocuTest:
     runs-on: ubuntu-latest
     steps:
