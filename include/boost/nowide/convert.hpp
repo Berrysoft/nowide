@@ -8,8 +8,9 @@
 #ifndef BOOST_NOWIDE_CONVERT_H_INCLUDED
 #define BOOST_NOWIDE_CONVERT_H_INCLUDED
 
+#include <iterator>
 #include <string>
-#include <boost/locale/encoding_utf.hpp>
+#include <boost/locale/utf.hpp>
 #include <boost/nowide/replacement.hpp>
 
 namespace boost {
