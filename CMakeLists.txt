@@ -67,6 +67,7 @@ elseif(BUILD_SHARED)
   endif()
 else()
   add_library(nowide STATIC)
+  set_target_properties(nowide PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 add_library(nowide::nowide ALIAS nowide)
 
