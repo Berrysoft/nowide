@@ -126,7 +126,11 @@ if(NOWIDE_INSTALL)
 
   set(configFile ${CMAKE_CURRENT_BINARY_DIR}/nowideConfig.cmake)
   set(versionFile ${CMAKE_CURRENT_BINARY_DIR}/nowideConfigVersion.cmake)
-  set(configInstallDestination share/nowide)
+  if(WIN32)
+    set(configInstallDestination cmake)
+  else()
+    set(configInstallDestination share/nowide)
+  endif()
 
   configure_package_config_file(
     Config.cmake.in
