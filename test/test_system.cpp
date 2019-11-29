@@ -6,9 +6,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/nowide/system.hpp>
 #include <boost/nowide/args.hpp>
-#include <boost/nowide/cenv.hpp>
+#include <boost/nowide/cstdlib.hpp>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
