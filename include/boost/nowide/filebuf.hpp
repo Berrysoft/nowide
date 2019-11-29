@@ -77,11 +77,7 @@ namespace nowide {
 
         virtual ~basic_filebuf()
         {
-            if(file_)
-            {
-                ::fclose(file_);
-                file_ = 0;
-            }
+            close();
             if(own_ && buffer_)
                 delete[] buffer_;
         }
