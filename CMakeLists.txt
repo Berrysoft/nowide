@@ -94,7 +94,6 @@ if(WIN32)
   # Using glob here is ok as it is only for headers
   file(GLOB_RECURSE NOWIDE_HEADERS include/*.hpp)
   target_sources(nowide PRIVATE src/iostream.cpp ${NOWIDE_HEADERS})
-  set_target_properties(nowide PROPERTIES POSITION_INDEPENDENT_CODE ON)
   target_compile_options(nowide PRIVATE ${warningFlags})
 endif()
 
