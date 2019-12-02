@@ -27,6 +27,8 @@ nowide_add_test_ext(test_env_win test_env.cpp "" NOWIDE_TEST_INCLUDE_WINDOWS)
 nowide_add_test_ext(test_system_n test_system.cpp "" NOWIDE_TEST_USE_NARROW=1)
 if(WIN32)
   nowide_add_test_ext(test_system_w test_system.cpp "" NOWIDE_TEST_USE_NARROW=0)
+else()
+  nowide_add_test_ext(test_fstream_win_fstream test_fstream.cpp "" BOOST_NOWIDE_USE_WIN_FSTREAM=1)
 endif()
 
 if(NOT NOWIDE_STANDALONE)
