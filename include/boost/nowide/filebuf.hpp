@@ -9,8 +9,8 @@
 #ifndef BOOST_NOWIDE_FILEBUF_HPP
 #define BOOST_NOWIDE_FILEBUF_HPP
 
-#include <boost/config.hpp>
-#ifdef BOOST_WINDOWS
+#include <boost/nowide/config.hpp>
+#if BOOST_NOWIDE_USE_WIN_FSTREAM
 #include <boost/nowide/stackstring.hpp>
 #include <cassert>
 #include <limits>
@@ -36,7 +36,7 @@
 
 namespace boost {
 namespace nowide {
-#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !BOOST_NOWIDE_USE_WIN_FSTREAM && !defined(BOOST_NOWIDE_DOXYGEN)
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
 #define BOOST_NOWIDE_FS_NS boost::filesystem
 #else
