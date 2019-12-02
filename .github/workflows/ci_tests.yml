@@ -82,3 +82,15 @@ jobs:
     - uses: DoozyX/clang-format-lint-action@v0.3.1
       with:
         exclude: './standalone'
+    - name: Check line endings
+      run: |
+        if grep -r -l $'\r' --exclude-dir="\.git"; then
+            echo "Found files windows style line endings (CRLF). Please fix!"
+            exit 1
+        fi
+    - name: Check for tabs
+      run: |
+        if grep -r -l $'\t' --exclude-dir="\.git"; then
+            echo "Found files with TABs. Please fix!"
+            exit 1
+        fi
