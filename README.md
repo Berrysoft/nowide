@@ -26,8 +26,8 @@ To also convert your input arguments to UTF-8 on Windows use:
 ```
 int main(int argc, char **argv)
 {
-	boost::nowide::args _(argc, argv); // Must use an instance!
-	...
+    boost::nowide::args _(argc, argv); // Must use an instance!
+    ...
 }
 ```
 
