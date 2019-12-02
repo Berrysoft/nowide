@@ -6,6 +6,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 #include <boost/nowide/integration/filesystem.hpp>
+#include <boost/nowide/convert.hpp>
 #include <boost/nowide/fstream.hpp>
 #include <boost/nowide/cstdio.hpp>
 #include <boost/filesystem/fstream.hpp>

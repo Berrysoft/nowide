@@ -1,47 +1,37 @@
 option(NOWIDE_RUN_WITH_WINE "Use wine to run tests" OFF)
 
-set(NOWIDE_TESTS
-  test_codecvt
-  test_convert
-  test_env
-  test_fstream
-  test_iostream
-  test_stdio
-)
-
-function(nowide_add_test name target)
+function(nowide_add_test_ext name srcFile extraLibs defs)
+  add_executable(${name} ${srcFile})
+  target_link_libraries(${name} PRIVATE nowide::nowide ${extraLibs})
+  target_compile_options(${name} PRIVATE ${warningFlags})
+  target_compile_definitions(${name} PRIVATE ${defs})
   if(NOWIDE_RUN_WITH_WINE)
-    add_test(NAME ${name} COMMAND wine $<TARGET_FILE:${target}> ${ARGN})
+    add_test(NAME ${name} COMMAND wine $<TARGET_FILE:${name}>)
   else()
-    add_test(NAME ${name} COMMAND ${target} ${ARGN})
+    add_test(NAME ${name} COMMAND ${name})
   endif()
 endfunction()
 
-foreach(TEST ${NOWIDE_TESTS})
-  add_executable(${TEST} ${TEST}.cpp)
-  target_link_libraries(${TEST} PRIVATE nowide::nowide)
-  target_compile_options(${TEST} PRIVATE ${warningFlags})
-  nowide_add_test(${TEST} ${TEST})
-endforeach()
+function(nowide_add_test name)
+  nowide_add_test_ext(${name} ${name}.cpp "" "")
+endfunction()
 
-add_executable(test_env_win test_env.cpp)
-target_link_libraries(test_env_win PRIVATE nowide::nowide)
-target_compile_options(test_env_win PRIVATE ${warningFlags})
-target_compile_definitions(test_env_win PRIVATE NOWIDE_TEST_INCLUDE_WINDOWS)
-nowide_add_test(test_env_win test_env_win)
+nowide_add_test(test_codecvt)
+nowide_add_test(test_convert)
+nowide_add_test(test_env)
+nowide_add_test(test_fstream)
+nowide_add_test(test_iostream)
+nowide_add_test(test_stdio)
 
-add_executable(test_system test_system.cpp)
-target_link_libraries(test_system PRIVATE nowide::nowide)
-target_compile_options(test_system PRIVATE ${warningFlags})
-nowide_add_test(test_system_n test_system "-n")
-nowide_add_test(test_system_w test_system "-w")
+nowide_add_test_ext(test_env_win test_env.cpp "" NOWIDE_TEST_INCLUDE_WINDOWS)
+nowide_add_test_ext(test_system_n test_system.cpp "" NOWIDE_TEST_USE_NARROW=1)
+if(WIN32)
+  nowide_add_test_ext(test_system_w test_system.cpp "" NOWIDE_TEST_USE_NARROW=0)
+endif()
 
 if(NOT NOWIDE_STANDALONE)
   find_package(Boost 1.55 COMPONENTS filesystem system)
-  if(BOOST_FOUND)
-    add_executable(test_fs test_fs.cpp)
-    target_link_libraries(test_fs nowide::nowide Boost::filesystem)
-    target_compile_options(test_fs PRIVATE ${warningFlags})
-    nowide_add_test(test_fs test_fs)
+  if(Boost_FOUND)
+    nowide_add_test_ext(test_fs test_fs.cpp Boost::filesystem "")
   endif()
 endif()
