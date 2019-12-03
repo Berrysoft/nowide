@@ -8,10 +8,9 @@
 #ifndef BOOST_NOWIDE_FSTREAM_INCLUDED_HPP
 #define BOOST_NOWIDE_FSTREAM_INCLUDED_HPP
 
-#include <boost/config.hpp>
+#include <boost/nowide/config.hpp>
 #include <boost/nowide/filebuf.hpp>
-#ifdef BOOST_WINDOWS
-#include <boost/scoped_ptr.hpp>
+#if BOOST_NOWIDE_USE_WIN_FSTREAM
 #include <iosfwd>
 #include <streambuf>
 #include <cstdio>
@@ -33,7 +32,7 @@ namespace boost {
 /// of std namespace (i.e. not on Windows)
 ///
 namespace nowide {
-#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !BOOST_NOWIDE_USE_WIN_FSTREAM && !defined(BOOST_NOWIDE_DOXYGEN)
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
 #define BOOST_NOWIDE_FS_NS boost::filesystem
 #else
@@ -58,42 +57,35 @@ namespace nowide {
         typedef basic_filebuf<CharType, Traits> internal_buffer_type;
         typedef std::basic_istream<CharType, Traits> internal_stream_type;
 
-        basic_ifstream() : internal_stream_type(0)
+        basic_ifstream() : internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
         }
 
-        explicit basic_ifstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::in) : internal_stream_type(0)
+        explicit basic_ifstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::in) : internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_name, mode);
         }
 
-        explicit basic_ifstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in) : internal_stream_type(0)
+        explicit basic_ifstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in) : internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_name, mode);
         }
 
         void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
-            if(!buf_->open(file_name, mode | std::ios_base::in))
-            {
+            if(!buf_.open(file_name, mode | std::ios_base::in))
                 this->setstate(std::ios_base::failbit);
-            } else
-            {
+            else
                 this->clear();
-            }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         explicit basic_ifstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in) :
-            internal_stream_type(0)
+            internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_path, mode);
         }
         void open(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in)
@@ -108,37 +100,28 @@ namespace nowide {
         }
         void open(char const *file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
-            if(!buf_->open(file_name, mode | std::ios_base::in))
-            {
-                this->setstate(std::ios_base::failbit);
-            } else
-            {
-                this->clear();
-            }
-        }
-        bool is_open() const
-        {
-            return buf_->is_open();
-        }
-        void close()
-        {
-            if(!buf_->close())
+            if(!buf_.open(file_name, mode | std::ios_base::in))
                 this->setstate(std::ios_base::failbit);
             else
                 this->clear();
         }
+        bool is_open() const
+        {
+            return buf_.is_open();
+        }
+        void close()
+        {
+            if(!buf_.close())
+                this->setstate(std::ios_base::failbit);
+        }
 
         internal_buffer_type *rdbuf() const
         {
-            return buf_.get();
-        }
-        ~basic_ifstream()
-        {
-            buf_->close();
+            return const_cast<internal_buffer_type *>(&buf_);
         }
 
     private:
-        boost::scoped_ptr<internal_buffer_type> buf_;
+        internal_buffer_type buf_;
     };
 
     ///
@@ -152,40 +135,35 @@ namespace nowide {
         typedef basic_filebuf<CharType, Traits> internal_buffer_type;
         typedef std::basic_ostream<CharType, Traits> internal_stream_type;
 
-        basic_ofstream() : internal_stream_type(0)
+        basic_ofstream() : internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
         }
-        explicit basic_ofstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::out) : internal_stream_type(0)
+        explicit basic_ofstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::out) : internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_name, mode);
         }
-        explicit basic_ofstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::out) : internal_stream_type(0)
+        explicit basic_ofstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::out) :
+            internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_name, mode);
         }
 
         void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
-            if(!buf_->open(file_name, mode | std::ios_base::out))
-            {
+            if(!buf_.open(file_name, mode | std::ios_base::out))
+
                 this->setstate(std::ios_base::failbit);
-            } else
-            {
+            else
                 this->clear();
-            }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         explicit basic_ofstream(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out) :
-            internal_stream_type(0)
+            internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_path, mode);
         }
         void open(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::out)
@@ -200,37 +178,28 @@ namespace nowide {
         }
         void open(char const *file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
-            if(!buf_->open(file_name, mode | std::ios_base::out))
-            {
-                this->setstate(std::ios_base::failbit);
-            } else
-            {
-                this->clear();
-            }
-        }
-        bool is_open() const
-        {
-            return buf_->is_open();
-        }
-        void close()
-        {
-            if(!buf_->close())
+            if(!buf_.open(file_name, mode | std::ios_base::out))
                 this->setstate(std::ios_base::failbit);
             else
                 this->clear();
         }
+        bool is_open() const
+        {
+            return buf_.is_open();
+        }
+        void close()
+        {
+            if(!buf_.close())
+                this->setstate(std::ios_base::failbit);
+        }
 
         internal_buffer_type *rdbuf() const
         {
-            return buf_.get();
-        }
-        ~basic_ofstream()
-        {
-            buf_->close();
+            return const_cast<internal_buffer_type *>(&buf_);
         }
 
     private:
-        boost::scoped_ptr<internal_buffer_type> buf_;
+        internal_buffer_type buf_;
     };
 
     ///
@@ -244,43 +213,36 @@ namespace nowide {
         typedef basic_filebuf<CharType, Traits> internal_buffer_type;
         typedef std::basic_iostream<CharType, Traits> internal_stream_type;
 
-        basic_fstream() : internal_stream_type(0)
+        basic_fstream() : internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
         }
         explicit basic_fstream(char const *file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
-            internal_stream_type(0)
+            internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_name, mode);
         }
         explicit basic_fstream(std::string const &file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
-            internal_stream_type(0)
+            internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_name, mode);
         }
 
         void open(wchar_t const *file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
-            if(!buf_->open(file_name, mode))
-            {
+            if(!buf_.open(file_name, mode))
                 this->setstate(std::ios_base::failbit);
-            } else
-            {
+            else
                 this->clear();
-            }
         }
 #ifdef BOOST_NOWIDE_USE_FILESYSTEM
         explicit basic_fstream(boost::filesystem::path const &file_path,
                                std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) :
-            internal_stream_type(0)
+            internal_stream_type(NULL)
         {
-            buf_.reset(new internal_buffer_type());
-            std::ios::rdbuf(buf_.get());
+            this->init(&buf_);
             open(file_path, mode);
         }
         void open(boost::filesystem::path const &file_path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
@@ -295,37 +257,28 @@ namespace nowide {
         }
         void open(char const *file_name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
-            if(!buf_->open(file_name, mode))
-            {
-                this->setstate(std::ios_base::failbit);
-            } else
-            {
-                this->clear();
-            }
-        }
-        bool is_open() const
-        {
-            return buf_->is_open();
-        }
-        void close()
-        {
-            if(!buf_->close())
+            if(!buf_.open(file_name, mode))
                 this->setstate(std::ios_base::failbit);
             else
                 this->clear();
         }
+        bool is_open() const
+        {
+            return buf_.is_open();
+        }
+        void close()
+        {
+            if(!buf_.close())
+                this->setstate(std::ios_base::failbit);
+        }
 
         internal_buffer_type *rdbuf() const
         {
-            return buf_.get();
-        }
-        ~basic_fstream()
-        {
-            buf_->close();
+            return const_cast<internal_buffer_type *>(&buf_);
         }
 
     private:
-        boost::scoped_ptr<internal_buffer_type> buf_;
+        internal_buffer_type buf_;
     };
 
     ///

@@ -34,9 +34,8 @@ namespace nowide {
     ///
     inline FILE *freopen(char const *file_name, char const *mode, FILE *stream)
     {
-        wstackstring const wname(file_name);
         wshort_stackstring const wmode(mode);
-        return _wfreopen(wname.c_str(), wmode.c_str(), stream);
+        return _wfreopen(file_name ? wstackstring(file_name).c_str() : NULL, wmode.c_str(), stream);
     }
     ///
     /// \brief Same as fopen but file_name and mode are UTF-8 strings

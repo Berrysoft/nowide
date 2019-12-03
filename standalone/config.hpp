@@ -31,6 +31,14 @@
 #   define NOWIDE_DECL
 #endif
 
+#if defined(NOWIDE_WINDOWS)
+#  ifdef NOWIDE_USE_WIN_FSTREAM
+#    undef NOWIDE_USE_WIN_FSTREAM
+#  endif
+#  define NOWIDE_USE_WIN_FSTREAM 1
+#elif !defined(NOWIDE_USE_WIN_FSTREAM)
+#  define NOWIDE_USE_WIN_FSTREAM 0
+#endif
 
 #endif
 ///
