@@ -23,7 +23,7 @@ int main()
 {
     try
     {
-        std::string example = "\xd7\xa9-\xd0\xbc-\xce\xbd";
+        std::string example = "env-\xd7\xa9-\xd0\xbc-\xce\xbd";
         char penv[256] = {0};
         strncpy(penv, ("BOOST_TEST2=" + example + "x").c_str(), sizeof(penv) - 1);
 

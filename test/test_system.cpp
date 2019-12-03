@@ -17,8 +17,7 @@ int main(int argc, char **argv, char **env)
 {
     try
     {
-        std::string example = "\xd7\xa9-\xd0\xbc-\xce\xbd";
-        std::wstring wexample = L"\u05e9-\u043c-\u03bd";
+        std::string example = "system-\xd7\xa9-\xd0\xbc-\xce\xbd";
         boost::nowide::args a(argc, argv, env);
         if(argc == 2 && argv[1][0] != '-')
         {
@@ -57,11 +56,9 @@ int main(int argc, char **argv, char **env)
             TEST(boost::nowide::system(command.c_str()) == 0);
             std::cout << "Parent ok" << std::endl;
 #else
-            std::wstring env = L"BOOST_NOWIDE_TEST=" + wexample;
+            std::wstring env = L"BOOST_NOWIDE_TEST=" + boost::nowide::widen(example);
             TEST(_wputenv(env.c_str()) == 0);
-            std::wstring wcommand = boost::nowide::widen(argv[0]);
-            wcommand += L" ";
-            wcommand += wexample;
+            std::wstring wcommand = boost::nowide::widen(argv[0]) + L" " + boost::nowide::widen(example);
             TEST(_wsystem(wcommand.c_str()) == 0);
             std::cout << "Wide Parent ok" << std::endl;
 #endif

@@ -146,9 +146,6 @@ void test_perf(char *file)
     test_io<io_fstream<nw::fstream> >(file, "nowide::fstream");
 }
 
-char const *example = "\xd7\xa9-\xd0\xbc-\xce\xbd"
-                      ".txt";
-
 void make_empty_file(const char *filepath)
 {
     nw::ofstream f(filepath, std::ios_base::out | std::ios::trunc);
@@ -184,10 +181,8 @@ bool file_contents_equal(const char *filepath, const char (&contents)[N], bool b
 }
 
 template<typename FStream>
-void test_with_different_buffer_sizes()
+void test_with_different_buffer_sizes(const char *filepath)
 {
-    // Don't use chars the std stream can't properly handle
-    const char *filepath = "bufferSizeTest.txt";
     /* Important part of the standard for mixing input with output:
        However, output shall not be directly followed by input without an intervening call to the fflush function
        or to a file positioning function (fseek, fsetpos, or rewind),
@@ -259,29 +254,28 @@ void test_with_different_buffer_sizes()
 }
 
 template<typename FileBuf>
-void test_close()
+void test_close(const char *filepath)
 {
-    const char *filepath = "closeTest.txt";
-    const char *filepath2 = "closeTest2.txt";
+    const std::string filepath2 = std::string(filepath) + ".2";
     // Make sure file does not exist yet
-    nw::remove(filepath2);
-    TEST(!file_exists(filepath2));
+    nw::remove(filepath2.c_str());
+    TEST(!file_exists(filepath2.c_str()));
     FileBuf buf;
     TEST(buf.open(filepath, std::ios_base::out) == &buf);
     TEST(buf.is_open());
     // Opening when already open fails
-    TEST(buf.open(filepath2, std::ios_base::out) == NULL);
+    TEST(buf.open(filepath2.c_str(), std::ios_base::out) == NULL);
     // Still open
     TEST(buf.is_open());
     TEST(buf.close() == &buf);
     // Failed opening did not create file
-    TEST(!file_exists(filepath2));
+    TEST(!file_exists(filepath2.c_str()));
     // But it should work now:
-    TEST(buf.open(filepath2, std::ios_base::out) == &buf);
+    TEST(buf.open(filepath2.c_str(), std::ios_base::out) == &buf);
     TEST(buf.close() == &buf);
-    TEST(file_exists(filepath2));
+    TEST(file_exists(filepath2.c_str()));
     TEST(nw::remove(filepath) == 0);
-    TEST(nw::remove(filepath2) == 0);
+    TEST(nw::remove(filepath2.c_str()) == 0);
 }
 
 template<typename IFStream, typename OFStream>
@@ -308,97 +302,97 @@ void test_flush(const char *filepath)
     }
 }
 
-void test_ofstream_creates_file()
+void test_ofstream_creates_file(const char *filename)
 {
-    nw::remove(example);
-    TEST(!file_exists(example));
+    nw::remove(filename);
+    TEST(!file_exists(filename));
     // Ctor
     {
-        nw::ofstream fo(example);
+        nw::ofstream fo(filename);
         TEST(fo);
     }
-    TEST(file_exists(example));
-    TEST(file_contents_equal(example, ""));
-    nw::remove(example);
+    TEST(file_exists(filename));
+    TEST(file_contents_equal(filename, ""));
+    nw::remove(filename);
     // Open
     {
         nw::ofstream fo;
-        fo.open(example);
+        fo.open(filename);
         TEST(fo);
     }
-    TEST(file_exists(example));
-    TEST(file_contents_equal(example, ""));
-    nw::remove(example);
+    TEST(file_exists(filename));
+    TEST(file_contents_equal(filename, ""));
+    nw::remove(filename);
 }
 
-// Create example file with content "test\n"
-void test_ofstream_write()
+// Create filename file with content "test\n"
+void test_ofstream_write(const char *filename)
 {
     // char* ctor
     {
-        nw::ofstream fo(example);
+        nw::ofstream fo(filename);
         TEST(fo << "test" << 2 << std::endl);
     }
     // char* open
-    TEST(file_contents_equal(example, "test2\n"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test2\n"));
+    TEST(nw::remove(filename) == 0);
     {
         nw::ofstream fo;
-        fo.open(example);
+        fo.open(filename);
         TEST(fo << "test" << 2 << std::endl);
     }
-    TEST(file_contents_equal(example, "test2\n"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test2\n"));
+    TEST(nw::remove(filename) == 0);
     // C++11 interfaces aren't enabled at all platforms so need to skip std::string arg for std::*fstream
 #if defined(BOOST_WINDOWS)
     // string ctor
     {
-        std::string name = example;
+        std::string name = filename;
         nw::ofstream fo(name);
         TEST(fo << "test" << 2 << std::endl);
     }
-    TEST(file_contents_equal(example, "test2\n"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test2\n"));
+    TEST(nw::remove(filename) == 0);
     // string open
     {
         nw::ofstream fo;
-        fo.open(std::string(example));
+        fo.open(std::string(filename));
         TEST(fo << "test" << 2 << std::endl);
     }
-    TEST(file_contents_equal(example, "test2\n"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test2\n"));
+    TEST(nw::remove(filename) == 0);
 #endif
     // Binary mode
     {
-        nw::ofstream fo(example, std::ios::binary);
+        nw::ofstream fo(filename, std::ios::binary);
         TEST(fo << "test" << 2 << std::endl);
     }
-    TEST(file_contents_equal(example, "test2\n", true));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test2\n", true));
+    TEST(nw::remove(filename) == 0);
     // At end
     {
         {
-            nw::ofstream fo(example);
+            nw::ofstream fo(filename);
             TEST(fo << "test" << 2 << std::endl);
         }
-        nw::ofstream fo(example, std::ios::ate | std::ios::in);
+        nw::ofstream fo(filename, std::ios::ate | std::ios::in);
         fo << "second" << 2 << std::endl;
     }
-    TEST(file_contents_equal(example, "test2\nsecond2\n"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test2\nsecond2\n"));
+    TEST(nw::remove(filename) == 0);
 }
 
-void test_ifstream_open_read()
+void test_ifstream_open_read(const char *filename)
 {
     // Create test file
     {
-        nw::ofstream fo(example);
+        nw::ofstream fo(filename);
         TEST(fo << "test" << std::endl);
     }
 
     // char* Ctor
     {
-        nw::ifstream fi(example);
+        nw::ifstream fi(filename);
         TEST(fi);
         std::string tmp;
         TEST(fi >> tmp);
@@ -407,7 +401,7 @@ void test_ifstream_open_read()
     // char* open
     {
         nw::ifstream fi;
-        fi.open(example);
+        fi.open(filename);
         TEST(fi);
         std::string tmp;
         TEST(fi >> tmp);
@@ -417,7 +411,7 @@ void test_ifstream_open_read()
 #if defined(BOOST_WINDOWS)
     // string ctor
     {
-        std::string name = example;
+        std::string name = filename;
         nw::ifstream fi(name);
         TEST(fi);
         std::string tmp;
@@ -427,7 +421,7 @@ void test_ifstream_open_read()
     // string open
     {
         nw::ifstream fi;
-        fi.open(std::string(example));
+        fi.open(std::string(filename));
         TEST(fi);
         std::string tmp;
         TEST(fi >> tmp);
@@ -436,7 +430,7 @@ void test_ifstream_open_read()
 #endif
     // Binary mode
     {
-        nw::ifstream fi(example, std::ios::binary);
+        nw::ifstream fi(filename, std::ios::binary);
         TEST(fi);
         std::string tmp;
         TEST(fi >> tmp);
@@ -446,10 +440,10 @@ void test_ifstream_open_read()
     {
         // Need binary file or position check might be throw off by newline conversion
         {
-            nw::ofstream fo(example, nw::fstream::binary);
+            nw::ofstream fo(filename, nw::fstream::binary);
             TEST(fo << "test");
         }
-        nw::ifstream fi(example, nw::fstream::ate | nw::fstream::binary);
+        nw::ifstream fi(filename, nw::fstream::ate | nw::fstream::binary);
         TEST(fi);
         TEST(fi.tellg() == std::streampos(4));
         fi.seekg(-2, std::ios_base::cur);
@@ -458,37 +452,37 @@ void test_ifstream_open_read()
         TEST(tmp == "st");
     }
     // Fail on non-existing file
-    TEST(nw::remove(example) == 0);
+    TEST(nw::remove(filename) == 0);
     {
-        nw::ifstream fi(example);
+        nw::ifstream fi(filename);
         TEST(!fi);
     }
 }
 
-void test_fstream()
+void test_fstream(const char *filename)
 {
-    nw::remove(example);
-    TEST(!file_exists(example));
+    nw::remove(filename);
+    TEST(!file_exists(filename));
     // Fail on non-existing file
     {
-        nw::fstream f(example);
+        nw::fstream f(filename);
         TEST(!f);
     }
     {
         nw::fstream f;
-        f.open(example);
+        f.open(filename);
         TEST(!f);
     }
-    TEST(!file_exists(example));
+    TEST(!file_exists(filename));
     // Create empty file (Ctor)
     {
-        nw::fstream f(example, std::ios::out);
+        nw::fstream f(filename, std::ios::out);
         TEST(f);
     }
-    TEST(file_contents_equal(example, ""));
+    TEST(file_contents_equal(filename, ""));
     // Ctor
     {
-        nw::fstream f(example);
+        nw::fstream f(filename);
         TEST(f);
         TEST(f << "test");
         std::string tmp;
@@ -496,19 +490,19 @@ void test_fstream()
         TEST(f >> tmp);
         TEST(tmp == "test");
     }
-    TEST(file_contents_equal(example, "test"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "test"));
+    TEST(nw::remove(filename) == 0);
     // Create empty file (open)
     {
         nw::fstream f;
-        f.open(example, std::ios::out);
+        f.open(filename, std::ios::out);
         TEST(f);
     }
-    TEST(file_contents_equal(example, ""));
+    TEST(file_contents_equal(filename, ""));
     // Open
     {
         nw::fstream f;
-        f.open(example);
+        f.open(filename);
         TEST(f);
         TEST(f << "test");
         std::string tmp;
@@ -516,10 +510,10 @@ void test_fstream()
         TEST(f >> tmp);
         TEST(tmp == "test");
     }
-    TEST(file_contents_equal(example, "test"));
+    TEST(file_contents_equal(filename, "test"));
     // Ctor existing file
     {
-        nw::fstream f(example);
+        nw::fstream f(filename);
         TEST(f);
         std::string tmp;
         TEST(f >> tmp);
@@ -528,10 +522,10 @@ void test_fstream()
         f.clear();
         TEST(f << "second");
     }
-    TEST(file_contents_equal(example, "testsecond"));
+    TEST(file_contents_equal(filename, "testsecond"));
     // Trunc & binary
     {
-        nw::fstream f(example, std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
+        nw::fstream f(filename, std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
         TEST(f);
         TEST(f << "test2");
         std::string tmp;
@@ -539,10 +533,10 @@ void test_fstream()
         TEST(f >> tmp);
         TEST(tmp == "test2");
     }
-    TEST(file_contents_equal(example, "test2"));
+    TEST(file_contents_equal(filename, "test2"));
     // Reading in write mode fails (existing file!)
     {
-        nw::fstream f(example, std::ios::out);
+        nw::fstream f(filename, std::ios::out);
         std::string tmp;
         TEST(!(f >> tmp));
         f.clear();
@@ -550,44 +544,47 @@ void test_fstream()
         TEST(f.seekg(0));
         TEST(!(f >> tmp));
     }
-    TEST(file_contents_equal(example, "foo"));
+    TEST(file_contents_equal(filename, "foo"));
     // Writing in read mode fails (existing file!)
     {
-        nw::fstream f(example, std::ios::in);
+        nw::fstream f(filename, std::ios::in);
         TEST(!(f << "bar"));
         f.clear();
         std::string tmp;
         TEST(f >> tmp);
         TEST(tmp == "foo");
     }
-    TEST(file_contents_equal(example, "foo"));
-    TEST(nw::remove(example) == 0);
+    TEST(file_contents_equal(filename, "foo"));
+    TEST(nw::remove(filename) == 0);
 }
 
 int main(int argc, char **argv)
 {
+    const std::string exampleFilename = std::string(argv[0]) + "-\xd7\xa9-\xd0\xbc-\xce\xbd.txt";
     try
     {
         std::cout << "Testing fstream" << std::endl;
-        test_ofstream_creates_file();
-        test_ofstream_write();
-        test_ifstream_open_read();
-        test_fstream();
+        test_ofstream_creates_file(exampleFilename.c_str());
+        test_ofstream_write(exampleFilename.c_str());
+        test_ifstream_open_read(exampleFilename.c_str());
+        test_fstream(exampleFilename.c_str());
 
         std::cout << "Complex IO - Sanity Check" << std::endl;
-        test_with_different_buffer_sizes<std::fstream>();
+        // Don't use chars the std stream can't properly handle
+        test_with_different_buffer_sizes<std::fstream>((std::string(argv[0]) + "-bufferSize.txt").c_str());
         std::cout << "Complex IO - Test" << std::endl;
-        test_with_different_buffer_sizes<nw::fstream>();
+        test_with_different_buffer_sizes<nw::fstream>(exampleFilename.c_str());
 
         std::cout << "filebuf::close - Sanity Check" << std::endl;
-        test_close<std::filebuf>();
+        // Don't use chars the std stream can't properly handle
+        test_close<std::filebuf>((std::string(argv[0]) + "-bufferSize.txt").c_str());
         std::cout << "filebuf::close - Test" << std::endl;
-        test_close<nw::filebuf>();
+        test_close<nw::filebuf>(exampleFilename.c_str());
 
         std::cout << "Flush - Sanity Check" << std::endl;
-        test_flush<std::ifstream, std::ofstream>(example);
+        test_flush<std::ifstream, std::ofstream>(exampleFilename.c_str());
         std::cout << "Flush - Test" << std::endl;
-        test_flush<nw::ifstream, nw::ofstream>(example);
+        test_flush<nw::ifstream, nw::ofstream>(exampleFilename.c_str());
 
         if(argc == 2)
         {
