@@ -38,3 +38,8 @@ if(NOT NOWIDE_STANDALONE)
     nowide_add_test_ext(test_fs test_fs.cpp Boost::filesystem "")
   endif()
 endif()
+
+add_executable(benchmark_fstream benchmark_fstream.cpp)
+target_link_libraries(benchmark_fstream PRIVATE nowide::nowide)
+target_compile_options(benchmark_fstream PRIVATE ${warningFlags})
+target_compile_definitions(benchmark_fstream PRIVATE BOOST_NOWIDE_USE_WIN_FSTREAM=1)
