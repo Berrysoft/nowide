@@ -21,6 +21,7 @@ nowide_add_test(test_convert)
 nowide_add_test(test_env)
 nowide_add_test(test_fstream)
 nowide_add_test(test_iostream)
+nowide_add_test(test_stackstring)
 nowide_add_test(test_stdio)
 
 nowide_add_test_ext(test_env_win test_env.cpp "" NOWIDE_TEST_INCLUDE_WINDOWS)
