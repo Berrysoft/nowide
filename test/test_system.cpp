@@ -45,7 +45,7 @@ int main(int argc, char **argv, char **env)
             std::cout << "Subprocess ok" << std::endl;
         } else if(argc == 1)
         {
-#if NOWIDE_TEST_USE_NARROW
+#if BOOST_NOWIDE_TEST_USE_NARROW
             TEST(boost::nowide::setenv("BOOST_NOWIDE_TEST", example.c_str(), 1) == 0);
             TEST(boost::nowide::setenv("BOOST_NOWIDE_TEST_NONE", example.c_str(), 1) == 0);
             TEST(boost::nowide::unsetenv("BOOST_NOWIDE_TEST_NONE") == 0);
