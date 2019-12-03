@@ -21,11 +21,11 @@
 namespace boost {
 namespace nowide {
 #if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
-    using ::getenv;
+    using std::getenv;
     using ::setenv;
     using ::unsetenv;
     using ::putenv;
-    using ::system;
+    using std::system;
 #else
     ///
     /// \brief UTF-8 aware getenv. Returns 0 if the variable is not set.
