@@ -46,26 +46,26 @@ std::string narrow_buf_range(const std::wstring& s)
 
 std::wstring widen_raw_string(const std::string& s)
 {
-    return boost::nowide::widen(s.c_str());
+    return boost::nowide::widen(s);
 }
 
 std::string narrow_raw_string(const std::wstring& s)
 {
-    return boost::nowide::narrow(s.c_str());
+    return boost::nowide::narrow(s);
 }
 
 std::wstring widen_raw_string_and_size(const std::string& s)
 {
     // Remove NULL
     const std::string s2 = s + "DummyData";
-    return boost::nowide::widen(s2.c_str(), s.size());
+    return boost::nowide::widen(s2);
 }
 
 std::string narrow_raw_string_and_size(const std::wstring& s)
 {
     // Remove NULL
     const std::wstring s2 = s + L"DummyData";
-    return boost::nowide::narrow(s2.c_str(), s.size());
+    return boost::nowide::narrow(s2);
 }
 
 void test_main(int, char**, char**)

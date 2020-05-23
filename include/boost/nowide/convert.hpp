@@ -63,65 +63,37 @@ namespace nowide {
     ///
     /// Convert wide string (UTF-16/32) to narrow string (UTF-8).
     ///
-    /// \param s Input string
-    /// \param count Number of characters to convert
+    /// \param s Input string view
+    /// \param alloc Output string allocator
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline std::string narrow(const wchar_t* s, size_t count)
+    template<typename Char = char,
+             typename Traits = std::char_traits<Char>,
+             typename Alloc = std::allocator<Char>,
+             typename CharIn = wchar_t,
+             typename TraitsIn = std::char_traits<CharIn> >
+    inline std::basic_string<Char, Traits, Alloc> narrow(std::basic_string_view<CharIn, TraitsIn> s,
+                                                         Alloc const& alloc = {})
     {
-        return detail::convert_string<char>(s, s + count);
-    }
-    ///
-    /// Convert wide string (UTF-16/32) to narrow string (UTF-8).
-    ///
-    /// \param s NULL terminated input string
-    /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
-    ///
-    inline std::string narrow(const wchar_t* s)
-    {
-        return narrow(s, detail::strlen(s));
-    }
-    ///
-    /// Convert wide string (UTF-16/32) to narrow string (UTF-8).
-    ///
-    /// \param s Input string
-    /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
-    ///
-    inline std::string narrow(const std::wstring& s)
-    {
-        return narrow(s.c_str(), s.size());
+        return detail::convert_string<Char>(s.data(), s.data() + s.size(), alloc);
     }
 
     ///
     /// Convert narrow string (UTF-8) to wide string (UTF-16/32).
     ///
-    /// \param s Input string
-    /// \param count Number of characters to convert
+    /// \param s Input string view
+    /// \param alloc Output string allocator
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline std::wstring widen(const char* s, size_t count)
+    template<typename Char = wchar_t,
+             typename Traits = std::char_traits<Char>,
+             typename Alloc = std::allocator<Char>,
+             typename CharIn = char,
+             typename TraitsIn = std::char_traits<CharIn> >
+    inline std::basic_string<Char, Traits, Alloc> widen(std::basic_string_view<CharIn, TraitsIn> s,
+                                                        Alloc const& alloc = {})
     {
-        return detail::convert_string<wchar_t>(s, s + count);
-    }
-    ///
-    /// Convert narrow string (UTF-8) to wide string (UTF-16/32).
-    ///
-    /// \param s NULL terminated input string
-    /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
-    ///
-    inline std::wstring widen(const char* s)
-    {
-        return widen(s, detail::strlen(s));
-    }
-    ///
-    /// Convert narrow string (UTF-8) to wide string (UTF-16/32).
-    ///
-    /// \param s Input string
-    /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
-    ///
-    inline std::wstring widen(const std::string& s)
-    {
-        return widen(s.c_str(), s.size());
+        return detail::convert_string<Char>(s.data(), s.data() + s.size(), alloc);
     }
 } // namespace nowide
 } // namespace boost
