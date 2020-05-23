@@ -15,7 +15,7 @@
 
 cmake_minimum_required(VERSION 3.9)
 # Version number starts at 10 to avoid conflicts with Boost version
-set(_version 11.0.0)
+set(_version 12.0.0)
 if(BOOST_SUPERPROJECT_SOURCE_DIR)
   set(_version ${BOOST_SUPERPROJECT_VERSION})
 endif()
@@ -52,9 +52,13 @@ if(BUILD_SHARED_LIBS)
   target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_DYN_LINK)
 endif()
 target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_NO_LIB)
-target_include_directories(boost_nowide PUBLIC include)
+target_include_directories(boost_nowide
+    PUBLIC 
+        $<INSTALL_INTERFACE:include>    
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 boost_add_warnings(boost_nowide pedantic ${Boost_NOWIDE_WERROR})
-target_compile_features(boost_nowide PUBLIC cxx_std_11)
+target_compile_features(boost_nowide PUBLIC cxx_std_20)
 
 if(BOOST_SUPERPROJECT_SOURCE_DIR)
   target_link_libraries(boost_nowide PUBLIC Boost::config)

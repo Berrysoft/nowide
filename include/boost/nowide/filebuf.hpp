@@ -15,6 +15,7 @@
 #include <boost/nowide/stackstring.hpp>
 #include <cassert>
 #include <cstdio>
+#include <ios>
 #include <iosfwd>
 #include <limits>
 #include <locale>

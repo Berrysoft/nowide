@@ -5,3 +5,4 @@
 /doc/html
 # Don't ignore Jamfiles, also in subfolders
 !Jamfile.*
+/out
