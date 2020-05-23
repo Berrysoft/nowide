@@ -61,12 +61,14 @@ namespace nowide {
         ///
         /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
         ///
-        template<typename CharOut, typename CharIn>
-        std::basic_string<CharOut> convert_string(const CharIn* begin, const CharIn* end)
+        template<typename CharOut,
+                 typename CharIn,
+                 typename TraitsOut = std::char_traits<CharOut>,
+                 typename AllocOut = std::allocator<CharOut>>
+        std::basic_string<CharOut> convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {})
         {
-            std::basic_string<CharOut> result;
-            result.reserve(end - begin);
-            typedef std::back_insert_iterator<std::basic_string<CharOut>> inserter_type;
+            std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
+            typedef std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>> inserter_type;
             inserter_type inserter(result);
             using namespace detail::utf;
             code_point c;
@@ -86,12 +88,9 @@ namespace nowide {
         /// That is the number of characters until the first NULL character
         /// Equivalent to `std::strlen(s)` but can handle wide-strings
         template<typename Char>
-        size_t strlen(const Char* s)
+        constexpr size_t strlen(const Char* s)
         {
-            const Char* end = s;
-            while(*end)
-                end++;
-            return end - s;
+            return std::char_traits<Char>::length(s);
         }
 
     } // namespace detail
