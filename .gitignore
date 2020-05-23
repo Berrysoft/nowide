@@ -6,3 +6,4 @@
 # Don't ignore Jamfiles, also in subfolders
 !Jamfile.*
 /out
+CMakeSettings.json
