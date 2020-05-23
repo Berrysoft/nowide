@@ -6,22 +6,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 #define BOOST_NOWIDE_SOURCE
-#include <boost/nowide/iostream.hpp>
-
-#ifndef BOOST_WINDOWS
-
-namespace boost {
-namespace nowide {
-    /// Avoid empty compilation unit warnings
-    /// \internal
-    BOOST_NOWIDE_DECL void dummy_exported_function()
-    {}
-} // namespace nowide
-} // namespace boost
-
-#else
-
 #include <boost/nowide/convert.hpp>
+#include <boost/nowide/iostream.hpp>
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -290,5 +276,3 @@ namespace nowide {
     detail::winconsole_ostream clog(2, &cout);
 } // namespace nowide
 } // namespace boost
-
-#endif
