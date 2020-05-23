@@ -13,87 +13,126 @@
 
 namespace boost {
 namespace nowide {
-
-    ///
-    /// Convert wide string (UTF-16/32) in range [begin,end) to NULL terminated narrow string (UTF-8)
+    /// Convert string view to NULL terminated string
     /// stored in \a output of size \a output_size (including NULL)
     ///
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline char* narrow(char* output, size_t output_size, const wchar_t* begin, const wchar_t* end)
+    template<typename Char, typename CharIn, typename TraitsIn = std::char_traits<CharIn> >
+    inline Char* convert(Char* output, std::size_t output_size, std::basic_string_view<CharIn, TraitsIn> source)
     {
-        return detail::convert_buffer(output, output_size, begin, end);
+        return detail::convert_buffer(output, output_size, source.data(), source.data() + source.size());
     }
-    ///
-    /// Convert NULL terminated wide string (UTF-16/32) to NULL terminated narrow string (UTF-8)
+
+    /// Convert string to NULL terminated string
     /// stored in \a output of size \a output_size (including NULL)
     ///
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline char* narrow(char* output, size_t output_size, const wchar_t* source)
+    template<typename Char, typename CharIn>
+    inline Char* convert(Char* output, std::size_t output_size, const CharIn* source)
     {
-        return narrow(output, output_size, source, source + detail::strlen(source));
+        return convert<Char, CharIn>(output, output_size, std::basic_string_view<CharIn>{source});
     }
 
-    ///
-    /// Convert narrow string (UTF-8) in range [begin,end) to NULL terminated wide string (UTF-16/32)
+    /// Convert string to NULL terminated string
     /// stored in \a output of size \a output_size (including NULL)
     ///
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline wchar_t* widen(wchar_t* output, size_t output_size, const char* begin, const char* end)
+    template<typename Char, typename CharIn>
+    inline Char* convert(Char* output, std::size_t output_size, const CharIn* source, std::size_t source_size)
     {
-        return detail::convert_buffer(output, output_size, begin, end);
+        return convert<Char, CharIn>(output, output_size, std::basic_string_view<CharIn>{source, source_size});
     }
-    ///
-    /// Convert NULL terminated narrow string (UTF-8) to NULL terminated wide string (UTF-16/32)
-    /// most output_size (including NULL)
+
+    /// Convert string to NULL terminated string
+    /// stored in \a output of size \a output_size (including NULL)
     ///
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline wchar_t* widen(wchar_t* output, size_t output_size, const char* source)
+    template<typename Char,
+             typename CharIn,
+             typename TraitsIn = std::char_traits<CharIn>,
+             typename AllocIn = std::allocator<CharIn> >
+    inline Char*
+    convert(Char* output, std::size_t output_size, const std::basic_string<CharIn, TraitsIn, AllocIn>& source)
     {
-        return widen(output, output_size, source, source + detail::strlen(source));
+        return convert<Char, CharIn, TraitsIn>(output, output_size, std::basic_string_view<CharIn, TraitsIn>{source});
     }
 
     ///
-    /// Convert wide string (UTF-16/32) to narrow string (UTF-8).
+    /// Convert string.
     ///
     /// \param s Input string view
     /// \param alloc Output string allocator
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    template<typename Char = char,
+    template<typename Char,
+             typename CharIn,
              typename Traits = std::char_traits<Char>,
              typename Alloc = std::allocator<Char>,
-             typename CharIn = wchar_t,
              typename TraitsIn = std::char_traits<CharIn> >
-    inline std::basic_string<Char, Traits, Alloc> narrow(std::basic_string_view<CharIn, TraitsIn> s,
-                                                         Alloc const& alloc = {})
+    inline std::basic_string<Char, Traits, Alloc> convert(std::basic_string_view<CharIn, TraitsIn> s,
+                                                          Alloc const& alloc = {})
     {
         return detail::convert_string<Char>(s.data(), s.data() + s.size(), alloc);
     }
 
     ///
-    /// Convert narrow string (UTF-8) to wide string (UTF-16/32).
+    /// Convert string.
     ///
-    /// \param s Input string view
+    /// \param s Input string
     /// \param alloc Output string allocator
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    template<typename Char = wchar_t,
+    template<typename Char,
+             typename CharIn,
+             typename Traits = std::char_traits<Char>,
+             typename Alloc = std::allocator<Char> >
+    inline std::basic_string<Char, Traits, Alloc> convert(const CharIn* s, Alloc const& alloc = {})
+    {
+        return convert<Char, CharIn, Traits, Alloc>(std::basic_string_view<CharIn>{s}, alloc);
+    }
+
+    ///
+    /// Convert string.
+    ///
+    /// \param s Input string
+    /// \param size Intput string size
+    /// \param alloc Output string allocator
+    /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+    ///
+    template<typename Char,
+             typename CharIn,
+             typename Traits = std::char_traits<Char>,
+             typename Alloc = std::allocator<Char> >
+    inline std::basic_string<Char, Traits, Alloc> convert(const CharIn* s, std::size_t size, Alloc const& alloc = {})
+    {
+        return convert<Char, CharIn, Traits, Alloc>(std::basic_string_view<CharIn>{s, size}, alloc);
+    }
+
+    ///
+    /// Convert string.
+    ///
+    /// \param s Input string
+    /// \param alloc Output string allocator
+    /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+    ///
+    template<typename Char,
+             typename CharIn,
              typename Traits = std::char_traits<Char>,
              typename Alloc = std::allocator<Char>,
-             typename CharIn = char,
-             typename TraitsIn = std::char_traits<CharIn> >
-    inline std::basic_string<Char, Traits, Alloc> widen(std::basic_string_view<CharIn, TraitsIn> s,
-                                                        Alloc const& alloc = {})
+             typename TraitsIn = std::char_traits<CharIn>,
+             typename AllocIn = std::allocator<CharIn> >
+    inline std::basic_string<Char, Traits, Alloc> convert(const std::basic_string<CharIn, TraitsIn, AllocIn>& s,
+                                                          Alloc const& alloc = {})
     {
-        return detail::convert_string<Char>(s.data(), s.data() + s.size(), alloc);
+        return convert<Char, CharIn, Traits, Alloc, TraitsIn>(std::basic_string_view<CharIn, TraitsIn>{s}, alloc);
     }
 } // namespace nowide
 } // namespace boost

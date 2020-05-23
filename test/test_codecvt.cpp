@@ -20,7 +20,7 @@
 
 static const char* utf8_name =
   "\xf0\x9d\x92\x9e-\xD0\xBF\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82-\xE3\x82\x84\xE3\x81\x82.txt";
-static const std::wstring wide_name_str = boost::nowide::widen(utf8_name);
+static const std::wstring wide_name_str = boost::nowide::convert<wchar_t, char>(utf8_name);
 static const wchar_t* wide_name = wide_name_str.c_str();
 
 typedef std::codecvt<wchar_t, char, std::mbstate_t> cvt_type;
@@ -191,7 +191,7 @@ void test_codecvt_err()
             TEST(cvt.in(mb, from, from_end, from_next, to, to_end, to_next) == cvt_type::ok);
             TEST(from_next == from + 5);
             TEST(to_next == to + 4);
-            TEST(std::wstring(to, to_end) == boost::nowide::widen(err_utf));
+            TEST((std::wstring(to, to_end) == boost::nowide::convert<wchar_t, char>(err_utf)));
         }
         {
             wchar_t buf[4];
@@ -234,7 +234,7 @@ void test_codecvt_err()
                 TEST(from_next == from_end);
                 TEST(to_next == to + 3);
                 // surrogate is invalid
-                TEST(std::string(to, to_next) == boost::nowide::narrow(wreplacement_str));
+                TEST((std::string(to, to_next) == boost::nowide::convert<char, wchar_t>(wreplacement_str)));
             }
         }
     }
@@ -255,7 +255,7 @@ void test_codecvt_err()
             TEST(cvt.out(mb, from, from_end, from_next, to, to_end, to_next) == cvt_type::ok);
             TEST(from_next == from + 2);
             TEST(to_next == to + 4);
-            TEST(std::string(to, to_next) == "1" + boost::nowide::narrow(wreplacement_str));
+            TEST((std::string(to, to_next) == "1" + boost::nowide::convert<char, wchar_t>(wreplacement_str)));
         }
     }
 }
@@ -307,7 +307,7 @@ std::string codecvt_to_narrow(const std::wstring& s)
     if(res == cvt_type::partial)
     {
         TEST(to_next < to_end);
-        return std::string(to, to_next) + boost::nowide::narrow(wreplacement_str);
+        return std::string(to, to_next) + boost::nowide::convert<char, wchar_t>(wreplacement_str);
     } else
         TEST(res == cvt_type::ok);
 

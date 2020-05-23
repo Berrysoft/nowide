@@ -66,7 +66,7 @@ std::string heap_stackstring_to_narrow(const std::wstring& s)
 void test_main(int, char**, char**)
 {
     std::string hello = "\xd7\xa9\xd7\x9c\xd7\x95\xd7\x9d";
-    std::wstring whello = boost::nowide::widen(hello);
+    std::wstring whello = boost::nowide::convert<wchar_t, char>(hello);
     const wchar_t* wempty = L"";
 
     {
@@ -153,8 +153,8 @@ void test_main(int, char**, char**)
         typedef test_basic_stackstring<wchar_t, char, 6> stackstring;
         const std::wstring heapVal = L"heapValue";
         const std::wstring stackVal = L"stack";
-        const stackstring heap(boost::nowide::narrow(heapVal).c_str());
-        const stackstring stack(boost::nowide::narrow(stackVal).c_str());
+        const stackstring heap(boost::nowide::convert<char, wchar_t>(heapVal).c_str());
+        const stackstring stack(boost::nowide::convert<char, wchar_t>(stackVal).c_str());
         TEST(heap.uses_heap_memory());
         TEST(stack.uses_stack_memory());
 

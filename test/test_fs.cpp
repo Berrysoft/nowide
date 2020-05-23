@@ -28,12 +28,12 @@ void test_main(int, char**, char**)
         f << "Test" << std::endl;
     }
 
-    TEST(boost::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
+    TEST(boost::filesystem::is_regular_file(boost::nowide::convert<wchar_t, char>(utf8_name)));
     TEST(boost::filesystem::is_regular_file(utf8_name));
 
     TEST(boost::nowide::remove(utf8_name.c_str()) == 0);
 
-    TEST(!boost::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
+    TEST(!boost::filesystem::is_regular_file(boost::nowide::convert<wchar_t, char>(utf8_name)));
     TEST(!boost::filesystem::is_regular_file(utf8_name));
 
     const boost::filesystem::path path = utf8_name;

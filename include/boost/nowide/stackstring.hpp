@@ -91,7 +91,7 @@ namespace nowide {
         output_char* convert(const input_char* input)
         {
             if(input)
-                return convert(input, input + detail::strlen(input));
+                return convert(input, input + std::char_traits<input_char>::length(input));
             clear();
             return get();
         }

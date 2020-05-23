@@ -19,7 +19,7 @@
 bool file_exists(const std::string& filename)
 {
 #ifdef BOOST_WINDOWS
-    FILE* f = boost::nowide::detail::wfopen(boost::nowide::widen(filename).c_str(), L"r");
+    FILE* f = boost::nowide::detail::wfopen(boost::nowide::convert<wchar_t, char>(filename).c_str(), L"r");
 #else
     FILE* f = std::fopen(filename.c_str(), "r");
 #endif
@@ -35,7 +35,7 @@ bool file_exists(const std::string& filename)
 void create_test_file(const std::string& filename)
 {
 #ifdef BOOST_WINDOWS
-    FILE* f = boost::nowide::detail::wfopen(boost::nowide::widen(filename).c_str(), L"w");
+    FILE* f = boost::nowide::detail::wfopen(boost::nowide::convert<wchar_t, char>(filename).c_str(), L"w");
 #else
     FILE* f = std::fopen(filename.c_str(), "w");
 #endif

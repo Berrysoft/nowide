@@ -234,19 +234,19 @@ that converts the UTF-8 string to UTF-16 and use another Wide API function to wr
 
 Of course, this simple set of functions does not cover all needs. If you need
 to access Wide API from a Windows application that uses UTF-8 internally you can use
-the functions \c boost::nowide::widen and \c boost::nowide::narrow.
+the functions \c boost::nowide::convert<wchar_t, char> and \c boost::nowide::convert<char, wchar_t>.
 
 For example:
 \code
-CopyFileW(  boost::nowide::widen(existing_file).c_str(),
-            boost::nowide::widen(new_file).c_str(),
+CopyFileW(  boost::nowide::convert<wchar_t, char>(existing_file).c_str(),
+            boost::nowide::convert<wchar_t, char>(new_file).c_str(),
             TRUE);
 \endcode
 
 The conversion is done at the last stage, and you continue using UTF-8
 strings everywhere else. You only switch to the Wide API at glue points.
 
-\c boost::nowide::widen returns \c std::string. Sometimes
+\c boost::nowide::convert<wchar_t, char> returns \c std::string. Sometimes
 it is useful to prevent allocation and use on-stack buffers
 instead. Boost.Nowide provides the \c boost::nowide::basic_stackstring
 class for this purpose.

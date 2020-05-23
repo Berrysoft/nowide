@@ -143,9 +143,10 @@ void run_parent(const char* exe_path)
     TEST(boost::nowide::system(command.c_str()) == 0);
     std::cout << "Parent ok" << std::endl;
 #else
-    std::wstring envVar = L"BOOST_NOWIDE_TEST=" + boost::nowide::widen(example);
+    std::wstring envVar = L"BOOST_NOWIDE_TEST=" + boost::nowide::convert<wchar_t, char>(example);
     TEST(_wputenv(envVar.c_str()) == 0);
-    std::wstring wcommand = boost::nowide::widen(exe_path) + L" " + boost::nowide::widen(example);
+    std::wstring wcommand =
+      boost::nowide::convert<wchar_t, char>(exe_path) + L" " + boost::nowide::convert<wchar_t, char>(example);
     TEST(_wsystem(wcommand.c_str()) == 0);
     std::cout << "Wide Parent ok" << std::endl;
 #endif
