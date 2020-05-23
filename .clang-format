@@ -120,7 +120,7 @@ SpacesInContainerLiterals: false
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard:        Cpp03
+Standard:        Cpp11
 StatementMacros: []
 TabWidth:        4
 UseTab:          Never
