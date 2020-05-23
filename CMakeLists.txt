@@ -1,4 +1,5 @@
 # Copyright 2019 - 2020 Alexander Grund
+# Copyright 2020 Berrysoft
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -15,7 +16,7 @@
 
 cmake_minimum_required(VERSION 3.9)
 # Version number starts at 10 to avoid conflicts with Boost version
-set(_version 11.0.0)
+set(_version 12.0.0)
 if(BOOST_SUPERPROJECT_SOURCE_DIR)
   set(_version ${BOOST_SUPERPROJECT_VERSION})
 endif()
@@ -40,28 +41,53 @@ endif()
 
 # Using glob here is ok as it is only for headers
 file(GLOB_RECURSE headers include/*.hpp)
-add_library(boost_nowide src/cstdio.cpp src/cstdlib.cpp src/iostream.cpp ${headers})
-add_library(Boost::nowide ALIAS boost_nowide)
-set_target_properties(boost_nowide PROPERTIES
+if(WIN32)
+  add_library(boost_nowide src/cstdio.cpp src/cstdlib.cpp src/iostream.cpp ${headers})
+  if(BUILD_SHARED_LIBS)
+    target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_DYN_LINK)
+  endif()
+  target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_NO_LIB)
+  target_include_directories(boost_nowide
+      PUBLIC 
+          $<INSTALL_INTERFACE:include>    
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  )
+  target_compile_features(boost_nowide PUBLIC cxx_std_17)
+  
+  if(BOOST_SUPERPROJECT_SOURCE_DIR)
+    target_link_libraries(boost_nowide PUBLIC Boost::config)
+  else()
+    find_package(Boost 1.56 REQUIRED)
+    target_link_libraries(boost_nowide PUBLIC Boost::boost)
+  endif()
+  set_target_properties(boost_nowide PROPERTIES
     CXX_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN ON
     VERSION ${PROJECT_VERSION}
     EXPORT_NAME nowide
-)
-if(BUILD_SHARED_LIBS)
-  target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_DYN_LINK)
-endif()
-target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_NO_LIB)
-target_include_directories(boost_nowide PUBLIC include)
-boost_add_warnings(boost_nowide pedantic ${Boost_NOWIDE_WERROR})
-target_compile_features(boost_nowide PUBLIC cxx_std_11)
-
-if(BOOST_SUPERPROJECT_SOURCE_DIR)
-  target_link_libraries(boost_nowide PUBLIC Boost::config)
+  )
 else()
-  find_package(Boost 1.56 REQUIRED)
-  target_link_libraries(boost_nowide PUBLIC Boost::boost)
+  add_library(boost_nowide INTERFACE)
+  target_compile_definitions(boost_nowide INTERFACE BOOST_NOWIDE_NO_LIB)
+  target_include_directories(boost_nowide
+      INTERFACE 
+          $<INSTALL_INTERFACE:include>    
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  )
+  target_compile_features(boost_nowide INTERFACE cxx_std_17)
+  
+  if(BOOST_SUPERPROJECT_SOURCE_DIR)
+    target_link_libraries(boost_nowide INTERFACE Boost::config)
+  else()
+    find_package(Boost 1.56 REQUIRED)
+    target_link_libraries(boost_nowide INTERFACE Boost::boost)
+  endif()
+  set_target_properties(boost_nowide PROPERTIES
+    EXPORT_NAME nowide
+  )
 endif()
+
+add_library(Boost::nowide ALIAS boost_nowide)
 
 if(BUILD_TESTING)
   add_subdirectory(test)
