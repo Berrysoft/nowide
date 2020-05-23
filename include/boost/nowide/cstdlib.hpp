@@ -18,6 +18,11 @@ namespace nowide {
 #if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
     using std::getenv;
     using std::system;
+#ifndef __STRICT_ANSI__
+    using ::setenv;
+    using ::unsetenv;
+    using ::putenv;
+#endif // !__STRICT_ANSI__
 #else
     ///
     /// \brief UTF-8 aware getenv. Returns 0 if the variable is not set.
@@ -31,7 +36,6 @@ namespace nowide {
     ///
     BOOST_NOWIDE_DECL int system(const char* cmd);
 
-#endif
     ///
     /// \brief Set environment variable \a key to \a value
     ///
@@ -60,6 +64,7 @@ namespace nowide {
     /// \return zero on success, else nonzero
     ///
     BOOST_NOWIDE_DECL int putenv(char* string);
+#endif
 
 } // namespace nowide
 } // namespace boost

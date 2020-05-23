@@ -18,26 +18,6 @@
 
 #include <boost/nowide/cstdlib.hpp>
 
-#if !defined(BOOST_WINDOWS)
-namespace boost {
-namespace nowide {
-    int setenv(const char* key, const char* value, int overwrite)
-    {
-        return ::setenv(key, value, overwrite);
-    }
-
-    int unsetenv(const char* key)
-    {
-        return ::unsetenv(key);
-    }
-
-    int putenv(char* string)
-    {
-        return ::putenv(string);
-    }
-} // namespace nowide
-} // namespace boost
-#else
 #include <boost/nowide/stackstring.hpp>
 #include <vector>
 #include <windows.h>
@@ -118,4 +98,3 @@ namespace nowide {
     }
 } // namespace nowide
 } // namespace boost
-#endif

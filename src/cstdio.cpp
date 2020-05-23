@@ -24,17 +24,10 @@ namespace nowide {
     namespace detail {
         FILE* wfopen(const wchar_t* filename, const wchar_t* mode)
         {
-#ifdef BOOST_WINDOWS
             return ::_wfopen(filename, mode);
-#else
-            const stackstring name(filename);
-            const short_stackstring smode2(mode);
-            return std::fopen(name.get(), smode2.get());
-#endif
         }
     } // namespace detail
 
-#ifdef BOOST_WINDOWS
     ///
     /// \brief Same as freopen but file_name and mode are UTF-8 strings
     ///
@@ -69,6 +62,5 @@ namespace nowide {
         const wstackstring wname(name);
         return _wremove(wname.get());
     }
-#endif
 } // namespace nowide
 } // namespace boost

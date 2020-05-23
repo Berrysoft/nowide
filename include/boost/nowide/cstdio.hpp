@@ -37,10 +37,11 @@ namespace nowide {
     /// \brief Same as rename but name is UTF-8 string
     ///
     BOOST_NOWIDE_DECL int remove(const char* name);
-#endif
+
     namespace detail {
         BOOST_NOWIDE_DECL FILE* wfopen(const wchar_t* filename, const wchar_t* mode);
     }
+#endif
 } // namespace nowide
 } // namespace boost
 
