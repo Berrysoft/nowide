@@ -6,19 +6,15 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/nowide/filesystem.hpp>
-
 #include <boost/nowide/convert.hpp>
 #include <boost/nowide/cstdio.hpp>
 #include <boost/nowide/fstream.hpp>
-#include <boost/filesystem/operations.hpp>
 
 #include "test.hpp"
 
 void test_main(int, char**, char**)
 {
-    boost::nowide::nowide_filesystem();
-    const std::string prefix = boost::filesystem::unique_path("nowide-%%%%-%%%%-").string();
+    const std::string prefix = "nowide-";
     const std::string utf8_name =
       prefix + "\xf0\x9d\x92\x9e-\xD0\xBF\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82-\xE3\x82\x84\xE3\x81\x82.txt";
 
@@ -28,15 +24,26 @@ void test_main(int, char**, char**)
         f << "Test" << std::endl;
     }
 
-    TEST(boost::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
-    TEST(boost::filesystem::is_regular_file(utf8_name));
+#ifdef BOOST_WINDOWS
+    TEST(std::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
+#else
+    TEST(std::filesystem::is_regular_file(utf8_name));
+#endif // BOOST_WINDOWS
 
     TEST(boost::nowide::remove(utf8_name.c_str()) == 0);
 
-    TEST(!boost::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
-    TEST(!boost::filesystem::is_regular_file(utf8_name));
+#ifdef BOOST_WINDOWS
+    TEST(!std::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
+#else
+    TEST(!std::filesystem::is_regular_file(utf8_name));
+#endif // BOOST_WINDOWS
 
-    const boost::filesystem::path path = utf8_name;
+#ifdef BOOST_WINDOWS
+    const std::filesystem::path path = boost::nowide::widen(utf8_name);
+#else
+    const std::filesystem::path path = utf8_name;
+#endif // BOOST_WINDOWS
+
     {
         boost::nowide::ofstream f(path);
         TEST(f);
@@ -57,5 +64,5 @@ void test_main(int, char**, char**)
         f >> test;
         TEST(test == "Test");
     }
-    boost::filesystem::remove(path);
+    std::filesystem::remove(path);
 }
