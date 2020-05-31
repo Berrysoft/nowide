@@ -13,6 +13,7 @@
 #if BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT
 #include <boost/nowide/cstdio.hpp>
 #include <boost/nowide/stackstring.hpp>
+#include <filesystem>
 #endif
 #include <fstream>
 

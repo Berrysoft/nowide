@@ -10,7 +10,6 @@
 
 #include <boost/nowide/config.hpp>
 #include <boost/nowide/filebuf.hpp>
-#include <filesystem>
 #include <istream>
 #include <ostream>
 
