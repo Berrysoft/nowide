@@ -65,7 +65,8 @@ namespace nowide {
                  typename CharIn,
                  typename TraitsOut = std::char_traits<CharOut>,
                  typename AllocOut = std::allocator<CharOut>>
-        std::basic_string<CharOut> convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {})
+        std::basic_string<CharOut, TraitsOut, AllocOut>
+        convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {})
         {
             std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
             typedef std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>> inserter_type;
