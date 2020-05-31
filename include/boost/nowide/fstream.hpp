@@ -16,6 +16,17 @@
 
 namespace boost {
 namespace nowide {
+#if !BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT && !defined(BOOST_NOWIDE_DOXYGEN)
+    using std::basic_ifstream;
+    using std::basic_ofstream;
+    using std::basic_fstream;
+    using std::ifstream;
+    using std::ofstream;
+    using std::fstream;
+    using std::wifstream;
+    using std::wofstream;
+    using std::wfstream;
+#else
     /// \cond INTERNAL
     namespace detail {
         // clang-format off
@@ -231,24 +242,23 @@ namespace nowide {
     }
 
     ///
-    /// Same as std::filebuf but accepts UTF-8 strings under Windows
-    ///
-    typedef basic_filebuf<char> filebuf;
-    ///
     /// Same as std::ifstream but accepts UTF-8 strings under Windows
     /// and *\::filesystem::path on all systems
     ///
     typedef basic_ifstream<char> ifstream;
+    typedef basic_ifstream<wchar_t> wifstream;
     ///
     /// Same as std::ofstream but accepts UTF-8 strings under Windows
     /// and *\::filesystem::path on all systems
     ///
     typedef basic_ofstream<char> ofstream;
+    typedef basic_ofstream<wchar_t> wofstream;
     ///
     /// Same as std::fstream but accepts UTF-8 strings under Windows
     /// and *\::filesystem::path on all systems
     ///
     typedef basic_fstream<char> fstream;
+    typedef basic_fstream<wchar_t> wfstream;
 
     // Implementation
     namespace detail {
@@ -344,6 +354,9 @@ namespace nowide {
 #pragma warning(pop)
 #endif
     } // namespace detail
+
+#endif // windows
+
 } // namespace nowide
 } // namespace boost
 
