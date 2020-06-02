@@ -27,7 +27,7 @@
 
 namespace boost {
 namespace nowide {
-#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#ifndef BOOST_WINDOWS
     using std::cout;
     using std::cerr;
     using std::cin;

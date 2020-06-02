@@ -15,7 +15,7 @@
 
 namespace boost {
 namespace nowide {
-#if !BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT && !defined(BOOST_NOWIDE_DOXYGEN)
+#if !BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT
     using std::basic_ifstream;
     using std::basic_ofstream;
     using std::basic_fstream;

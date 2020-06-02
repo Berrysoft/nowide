@@ -15,7 +15,7 @@
 
 namespace boost {
 namespace nowide {
-#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#ifndef BOOST_WINDOWS
     using std::getenv;
     using std::system;
 #ifndef __STRICT_ANSI__

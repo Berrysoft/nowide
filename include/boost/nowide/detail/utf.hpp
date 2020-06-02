@@ -50,88 +50,6 @@ namespace nowide {
                 return true;
             }
 
-#ifdef BOOST_NOWIDE_DOXYGEN
-            ///
-            /// \brief UTF Traits class - functions to convert UTF sequences to and from Unicode code points
-            ///
-            template<typename CharType, int size = sizeof(CharType)>
-            struct utf_traits
-            {
-                ///
-                /// The type of the character
-                ///
-                using char_type = CharType;
-                ///
-                /// Read one code point from the range [p,e) and return it.
-                ///
-                /// - If the sequence that was read is incomplete sequence returns \ref incomplete,
-                /// - If illegal sequence detected returns \ref illegal
-                ///
-                /// Requirements
-                ///
-                /// - Iterator is valid input iterator
-                ///
-                /// Postconditions
-                ///
-                /// - p points to the last consumed character
-                ///
-                template<typename Iterator>
-                static code_point decode(Iterator& p, Iterator e);
-
-                ///
-                /// Maximal width of valid sequence in the code units:
-                ///
-                /// - UTF-8  - 4
-                /// - UTF-16 - 2
-                /// - UTF-32 - 1
-                ///
-                static const int max_width;
-                ///
-                /// The width of specific code point in the code units.
-                ///
-                /// Requirement: value is a valid Unicode code point
-                /// Returns value in range [1..max_width]
-                ///
-                static int width(code_point value);
-
-                ///
-                /// Get the size of the trail part of variable length encoded sequence.
-                ///
-                /// Returns -1 if C is not valid lead character
-                ///
-                static int trail_length(char_type c);
-                ///
-                /// Returns true if c is trail code unit, always false for UTF-32
-                ///
-                static bool is_trail(char_type c);
-                ///
-                /// Returns true if c is lead code unit, always true of UTF-32
-                ///
-                static bool is_lead(char_type c);
-
-                ///
-                /// Convert valid Unicode code point \a value to the UTF sequence.
-                ///
-                /// Requirements:
-                ///
-                /// - \a value is valid code point
-                /// - \a out is an output iterator should be able to accept at least width(value) units
-                ///
-                /// Returns the iterator past the last written code unit.
-                ///
-                template<typename Iterator>
-                static Iterator encode(code_point value, Iterator out);
-                ///
-                /// Decodes valid UTF sequence that is pointed by p into code point.
-                ///
-                /// If the sequence is invalid or points to end the behavior is undefined
-                ///
-                template<typename Iterator>
-                static code_point decode_valid(Iterator& p);
-            };
-
-#else
-
             template<typename CharType, int size = sizeof(CharType)>
             struct utf_traits;
 
@@ -445,8 +363,6 @@ namespace nowide {
                 }
 
             }; // utf32
-
-#endif
 
         } // namespace utf
     }     // namespace detail

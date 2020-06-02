@@ -14,7 +14,7 @@
 
 namespace boost {
 namespace nowide {
-#if !defined(BOOST_WINDOWS) && !defined(BOOST_NOWIDE_DOXYGEN)
+#ifndef BOOST_WINDOWS
     using std::fopen;
     using std::freopen;
     using std::remove;
