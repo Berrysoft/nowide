@@ -53,16 +53,12 @@ void test_codecvt_in_n_m(const cvt_type& cvt, size_t n, size_t m)
         std::codecvt_base::result r = cvt.in(mb, from, end, from_next, to, to_end, to_next);
 
         int count = cvt.length(mb2, from, end, to_end - to);
-#ifndef BOOST_NOWIDE_DO_LENGTH_MBSTATE_CONST
         TEST(std::memcmp(&mb, &mb2, sizeof(mb)) == 0);
         if(count != from_next - from)
         {
             std::cout << count << " " << from_next - from << std::endl;
         }
         TEST(count == from_next - from);
-#else
-        TEST(count == to_next - to);
-#endif
 
         if(r == cvt_type::partial)
         {
