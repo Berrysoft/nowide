@@ -12,6 +12,7 @@
 #include <boost/nowide/detail/utf.hpp>
 #include <boost/nowide/replacement.hpp>
 #include <cstdint>
+#include <cstring>
 #include <locale>
 
 namespace boost {
@@ -19,23 +20,15 @@ namespace nowide {
 
     static_assert(sizeof(std::mbstate_t) >= 2, "mbstate_t is to small to store an UTF-16 codepoint");
     namespace detail {
-        // Avoid including cstring for std::memcpy
-        inline void copy_uint16_t(void* dst, const void* src)
-        {
-            unsigned char* cdst = static_cast<unsigned char*>(dst);
-            const unsigned char* csrc = static_cast<const unsigned char*>(src);
-            cdst[0] = csrc[0];
-            cdst[1] = csrc[1];
-        }
         inline std::uint16_t read_state(const std::mbstate_t& src)
         {
             std::uint16_t dst;
-            copy_uint16_t(&dst, &src);
+            std::memcpy(&dst, &src, 2);
             return dst;
         }
         inline void write_state(std::mbstate_t& dst, const std::uint16_t src)
         {
-            copy_uint16_t(&dst, &src);
+            std::memcpy(&dst, &src, 2);
         }
     } // namespace detail
 

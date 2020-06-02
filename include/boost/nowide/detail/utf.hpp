@@ -31,17 +31,17 @@ namespace nowide {
             ///
             /// \brief Special constant that defines illegal code point
             ///
-            static const code_point illegal = 0xFFFFFFFFu;
+            static constexpr code_point illegal = 0xFFFFFFFFu;
 
             ///
             /// \brief Special constant that defines incomplete code point
             ///
-            static const code_point incomplete = 0xFFFFFFFEu;
+            static constexpr code_point incomplete = 0xFFFFFFFEu;
 
             ///
             /// \brief the function checks if \a v is a valid code point
             ///
-            inline bool is_valid_codepoint(code_point v)
+            constexpr bool is_valid_codepoint(code_point v)
             {
                 if(v > 0x10FFFF)
                     return false;
@@ -74,7 +74,7 @@ namespace nowide {
                     return -1;
                 }
 
-                static const int max_width = 4;
+                static constexpr int max_width = 4;
 
                 static int width(code_point value)
                 {
@@ -294,7 +294,7 @@ namespace nowide {
                     return combine_surrogate(w1, w2);
                 }
 
-                static const int max_width = 2;
+                static constexpr int max_width = 2;
                 static int width(code_point u)
                 {
                     return u >= 0x10000 ? 2 : 1;
@@ -350,7 +350,7 @@ namespace nowide {
                         return illegal;
                     return c;
                 }
-                static const int max_width = 1;
+                static constexpr int max_width = 1;
                 static int width(code_point /*u*/)
                 {
                     return 1;

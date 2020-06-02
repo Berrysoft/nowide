@@ -137,8 +137,8 @@ std::vector<char> get_rand_data(int size)
     return data;
 }
 
-static const int MIN_BLOCK_SIZE = 32;
-static const int MAX_BLOCK_SIZE = 8192;
+static constexpr int MIN_BLOCK_SIZE = 32;
+static constexpr int MAX_BLOCK_SIZE = 8192;
 
 template<typename FStream>
 perf_data test_io(const char* file)

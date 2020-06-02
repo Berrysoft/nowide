@@ -29,7 +29,7 @@ namespace nowide {
 
         const wshort_stackstring name(key);
 
-        static const size_t buf_size = 64;
+        static constexpr size_t buf_size = 64;
         wchar_t buf[buf_size];
         std::vector<wchar_t> tmp;
         wchar_t* ptr = buf;

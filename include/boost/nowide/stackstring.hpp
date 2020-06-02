@@ -32,7 +32,7 @@ namespace nowide {
     {
     public:
         /// Size of the stack buffer
-        static const size_t buffer_size = BufferSize;
+        static constexpr size_t buffer_size = BufferSize;
         /// Type of the output character (converted to)
         using output_char = CharOut;
         /// Type of the input character (converted from)

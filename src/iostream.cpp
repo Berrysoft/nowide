@@ -94,8 +94,8 @@ namespace nowide {
                 return static_cast<int>(decoded);
             }
 
-            static const int buffer_size = 1024;
-            static const int wbuffer_size = buffer_size * encoder::max_width;
+            static constexpr int buffer_size = 1024;
+            static constexpr int wbuffer_size = buffer_size * encoder::max_width;
             char buffer_[buffer_size];
             wchar_t wbuffer_[wbuffer_size];
             HANDLE handle_;
@@ -212,8 +212,8 @@ namespace nowide {
                 return out - buffer_;
             }
 
-            static const size_t wbuffer_size = 1024;
-            static const size_t buffer_size = wbuffer_size * encoder::max_width;
+            static constexpr size_t wbuffer_size = 1024;
+            static constexpr size_t buffer_size = wbuffer_size * encoder::max_width;
             char buffer_[buffer_size];
             wchar_t wbuffer_[wbuffer_size];
             HANDLE handle_;
