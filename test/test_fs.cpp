@@ -9,6 +9,7 @@
 #include <boost/nowide/convert.hpp>
 #include <boost/nowide/cstdio.hpp>
 #include <boost/nowide/fstream.hpp>
+#include <filesystem>
 
 #include "test.hpp"
 
