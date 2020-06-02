@@ -28,8 +28,10 @@ namespace nowide {
         /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
         ///
         template<typename CharOut, typename CharIn>
-        CharOut*
-        convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, const CharIn* source_end)
+        CharOut* convert_buffer(CharOut* buffer,
+                                size_t buffer_size,
+                                const CharIn* source_begin,
+                                const CharIn* source_end) noexcept
         {
             CharOut* rv = buffer;
             if(buffer_size == 0)

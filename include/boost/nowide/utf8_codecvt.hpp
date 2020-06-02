@@ -20,13 +20,13 @@ namespace nowide {
 
     static_assert(sizeof(std::mbstate_t) >= 2, "mbstate_t is to small to store an UTF-16 codepoint");
     namespace detail {
-        inline std::uint16_t read_state(const std::mbstate_t& src)
+        inline char16_t read_state(const std::mbstate_t& src)
         {
-            std::uint16_t dst;
+            char16_t dst;
             std::memcpy(&dst, &src, 2);
             return dst;
         }
-        inline void write_state(std::mbstate_t& dst, const std::uint16_t src)
+        inline void write_state(std::mbstate_t& dst, const char16_t src)
         {
             std::memcpy(&dst, &src, 2);
         }
@@ -76,12 +76,12 @@ namespace nowide {
 
         int do_length(std::mbstate_t& std_state, const char* from, const char* from_end, size_t max) const override
         {
-            std::uint16_t state = detail::read_state(std_state);
+            char16_t state = detail::read_state(std_state);
             const char* save_from = from;
             while(max > 0 && from < from_end)
             {
                 const char* prev_from = from;
-                std::uint32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
+                char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
                 if(ch == detail::utf::illegal)
                 {
                     ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
@@ -122,12 +122,12 @@ namespace nowide {
             //
             // if 0 no code above >0xFFFF observed, of 1 a code above 0xFFFF observed
             // and first pair is written, but no input consumed
-            std::uint16_t state = detail::read_state(std_state);
+            char16_t state = detail::read_state(std_state);
             while(to < to_end && from < from_end)
             {
                 const char* from_saved = from;
 
-                uint32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
+                char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
 
                 if(ch == detail::utf::illegal)
                 {
@@ -154,10 +154,10 @@ namespace nowide {
                     //    once again and then we would consume our input together with writing
                     //    second surrogate pair
                     ch -= 0x10000;
-                    std::uint16_t vh = static_cast<std::uint16_t>(ch >> 10);
-                    std::uint16_t vl = ch & 0x3FF;
-                    std::uint16_t w1 = vh + 0xD800;
-                    std::uint16_t w2 = vl + 0xDC00;
+                    char16_t vh = static_cast<char16_t>(ch >> 10);
+                    char16_t vl = ch & 0x3FF;
+                    char16_t w1 = vh + 0xD800;
+                    char16_t w2 = vl + 0xDC00;
                     if(state == 0)
                     {
                         from = from_saved;
@@ -194,24 +194,24 @@ namespace nowide {
             // State: state!=0 - a first surrogate pair was observed (state = first pair),
             // we expect the second one to come and then zero the state
             ///
-            std::uint16_t state = detail::read_state(std_state);
+            char16_t state = detail::read_state(std_state);
             while(to < to_end && from < from_end)
             {
-                std::uint32_t ch = 0;
+                char32_t ch = 0;
                 if(state != 0)
                 {
                     // if the state indicates that 1st surrogate pair was written
                     // we should make sure that the second one that comes is actually
                     // second surrogate
-                    std::uint16_t w1 = state;
-                    std::uint16_t w2 = *from;
+                    char16_t w1 = state;
+                    char16_t w2 = *from;
                     // we don't forward from as writing may fail to incomplete or
                     // partial conversion
                     if(0xDC00 <= w2 && w2 <= 0xDFFF)
                     {
-                        std::uint16_t vh = w1 - 0xD800;
-                        std::uint16_t vl = w2 - 0xDC00;
-                        ch = ((uint32_t(vh) << 10) | vl) + 0x10000;
+                        char16_t vh = w1 - 0xD800;
+                        char16_t vl = w2 - 0xDC00;
+                        ch = ((char32_t(vh) << 10) | vl) + 0x10000;
                     } else
                     {
                         ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
@@ -225,7 +225,7 @@ namespace nowide {
                         // it into the state and consume it, note we don't
                         // go forward as it should be illegal so we increase
                         // the from pointer manually
-                        state = static_cast<std::uint16_t>(ch);
+                        state = static_cast<char16_t>(ch);
                         from++;
                         continue;
                     } else if(0xDC00 <= ch && ch <= 0xDFFF)
@@ -296,7 +296,7 @@ namespace nowide {
             while(max > 0 && from < from_end)
             {
                 const char* save_from = from;
-                std::uint32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
+                char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
                 if(ch == detail::utf::incomplete)
                 {
                     from = save_from;
@@ -324,7 +324,7 @@ namespace nowide {
             {
                 const char* from_saved = from;
 
-                uint32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
+                char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
 
                 if(ch == detail::utf::illegal)
                 {
@@ -355,7 +355,7 @@ namespace nowide {
             std::codecvt_base::result r = std::codecvt_base::ok;
             while(to < to_end && from < from_end)
             {
-                std::uint32_t ch = 0;
+                char32_t ch = 0;
                 ch = *from;
                 if(!detail::utf::is_valid_codepoint(ch))
                 {

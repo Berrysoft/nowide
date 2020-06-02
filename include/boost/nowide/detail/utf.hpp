@@ -10,7 +10,7 @@
 #define BOOST_NOWIDE_UTF_HPP_INCLUDED
 
 #include <boost/nowide/config.hpp>
-#include <cstdint>
+#include <cstddef>
 
 namespace boost {
 namespace nowide {
@@ -26,7 +26,7 @@ namespace nowide {
             ///
             /// \brief The integral type that can hold a Unicode code point
             ///
-            using code_point = uint32_t;
+            using code_point = char32_t;
 
             ///
             /// \brief Special constant that defines illegal code point
@@ -50,7 +50,7 @@ namespace nowide {
                 return true;
             }
 
-            template<typename CharType, int size = sizeof(CharType)>
+            template<typename CharType, std::size_t size = sizeof(CharType)>
             struct utf_traits;
 
             template<typename CharType>
@@ -58,7 +58,7 @@ namespace nowide {
             {
                 using char_type = CharType;
 
-                static int trail_length(char_type ci)
+                static constexpr int trail_length(char_type ci) noexcept
                 {
                     unsigned char c = ci;
                     if(c < 128)
@@ -76,7 +76,7 @@ namespace nowide {
 
                 static constexpr int max_width = 4;
 
-                static int width(code_point value)
+                static constexpr int width(code_point value) noexcept
                 {
                     if(value <= 0x7F)
                     {
@@ -93,19 +93,19 @@ namespace nowide {
                     }
                 }
 
-                static bool is_trail(char_type ci)
+                static constexpr bool is_trail(char_type ci) noexcept
                 {
                     unsigned char c = ci;
                     return (c & 0xC0) == 0x80;
                 }
 
-                static bool is_lead(char_type ci)
+                static constexpr bool is_lead(char_type ci) noexcept
                 {
                     return !is_trail(ci);
                 }
 
                 template<typename Iterator>
-                static code_point decode(Iterator& p, Iterator e)
+                static constexpr code_point decode(Iterator& p, Iterator e) noexcept(noexcept(*p++))
                 {
                     if(BOOST_UNLIKELY(p == e))
                         return incomplete;
@@ -169,7 +169,7 @@ namespace nowide {
                 }
 
                 template<typename Iterator>
-                static code_point decode_valid(Iterator& p)
+                static constexpr code_point decode_valid(Iterator& p) noexcept(noexcept(*p++))
                 {
                     unsigned char lead = *p++;
                     if(lead < 192)
@@ -197,7 +197,7 @@ namespace nowide {
                 }
 
                 template<typename Iterator>
-                static Iterator encode(code_point value, Iterator out)
+                static Iterator encode(code_point value, Iterator out) noexcept(noexcept(*out++))
                 {
                     if(value <= 0x7F)
                     {
@@ -228,19 +228,19 @@ namespace nowide {
                 using char_type = CharType;
 
                 // See RFC 2781
-                static bool is_first_surrogate(uint16_t x)
+                static constexpr bool is_first_surrogate(char_type x) noexcept
                 {
                     return 0xD800 <= x && x <= 0xDBFF;
                 }
-                static bool is_second_surrogate(uint16_t x)
+                static constexpr bool is_second_surrogate(char_type x) noexcept
                 {
                     return 0xDC00 <= x && x <= 0xDFFF;
                 }
-                static code_point combine_surrogate(uint16_t w1, uint16_t w2)
+                static constexpr code_point combine_surrogate(char_type w1, char_type w2) noexcept
                 {
                     return ((code_point(w1 & 0x3FF) << 10) | (w2 & 0x3FF)) + 0x10000;
                 }
-                static int trail_length(char_type c)
+                static constexpr int trail_length(char_type c) noexcept
                 {
                     if(is_first_surrogate(c))
                         return 1;
@@ -251,24 +251,24 @@ namespace nowide {
                 ///
                 /// Returns true if c is trail code unit, always false for UTF-32
                 ///
-                static bool is_trail(char_type c)
+                static constexpr bool is_trail(char_type c) noexcept
                 {
                     return is_second_surrogate(c);
                 }
                 ///
                 /// Returns true if c is lead code unit, always true of UTF-32
                 ///
-                static bool is_lead(char_type c)
+                static constexpr bool is_lead(char_type c) noexcept
                 {
                     return !is_second_surrogate(c);
                 }
 
                 template<typename It>
-                static code_point decode(It& current, It last)
+                static constexpr code_point decode(It& current, It last) noexcept(noexcept(*current++))
                 {
                     if(BOOST_UNLIKELY(current == last))
                         return incomplete;
-                    uint16_t w1 = *current++;
+                    char16_t w1 = *current++;
                     if(BOOST_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
                     {
                         return w1;
@@ -277,30 +277,30 @@ namespace nowide {
                         return illegal;
                     if(current == last)
                         return incomplete;
-                    uint16_t w2 = *current++;
+                    char16_t w2 = *current++;
                     if(w2 < 0xDC00 || 0xDFFF < w2)
                         return illegal;
                     return combine_surrogate(w1, w2);
                 }
                 template<typename It>
-                static code_point decode_valid(It& current)
+                static constexpr code_point decode_valid(It& current) noexcept(noexcept(*current++))
                 {
-                    uint16_t w1 = *current++;
+                    char16_t w1 = *current++;
                     if(BOOST_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
                     {
                         return w1;
                     }
-                    uint16_t w2 = *current++;
+                    char16_t w2 = *current++;
                     return combine_surrogate(w1, w2);
                 }
 
                 static constexpr int max_width = 2;
-                static int width(code_point u)
+                static constexpr int width(code_point u) noexcept
                 {
                     return u >= 0x10000 ? 2 : 1;
                 }
                 template<typename It>
-                static It encode(code_point u, It out)
+                static It encode(code_point u, It out) noexcept(noexcept(*out++))
                 {
                     if(BOOST_LIKELY(u <= 0xFFFF))
                     {
@@ -319,29 +319,29 @@ namespace nowide {
             struct utf_traits<CharType, 4>
             {
                 using char_type = CharType;
-                static int trail_length(char_type c)
+                static constexpr int trail_length(char_type c) noexcept
                 {
                     if(is_valid_codepoint(c))
                         return 0;
                     return -1;
                 }
-                static bool is_trail(char_type /*c*/)
+                static constexpr bool is_trail(char_type /*c*/) noexcept
                 {
                     return false;
                 }
-                static bool is_lead(char_type /*c*/)
+                static constexpr bool is_lead(char_type /*c*/) noexcept
                 {
                     return true;
                 }
 
                 template<typename It>
-                static code_point decode_valid(It& current)
+                static constexpr code_point decode_valid(It& current) noexcept(noexcept(*current++))
                 {
                     return *current++;
                 }
 
                 template<typename It>
-                static code_point decode(It& current, It last)
+                static constexpr code_point decode(It& current, It last) noexcept(noexcept(*current++))
                 {
                     if(BOOST_UNLIKELY(current == last))
                         return incomplete;
@@ -351,12 +351,12 @@ namespace nowide {
                     return c;
                 }
                 static constexpr int max_width = 1;
-                static int width(code_point /*u*/)
+                static constexpr int width(code_point /*u*/) noexcept
                 {
                     return 1;
                 }
                 template<typename It>
-                static It encode(code_point u, It out)
+                static It encode(code_point u, It out) noexcept(noexcept(*out++))
                 {
                     *out++ = static_cast<char_type>(u);
                     return out;

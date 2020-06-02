@@ -23,7 +23,8 @@ namespace nowide {
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
     template<typename CharOut, typename CharIn, typename TraitsIn = std::char_traits<CharIn>>
-    inline CharOut* convert(CharOut* output, std::size_t output_size, std::basic_string_view<CharIn, TraitsIn> source)
+    inline CharOut*
+    convert(CharOut* output, std::size_t output_size, std::basic_string_view<CharIn, TraitsIn> source) noexcept
     {
         return detail::convert_buffer(output, output_size, source.data(), source.data() + source.length());
     }
@@ -35,7 +36,7 @@ namespace nowide {
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline char* narrow(char* output, size_t output_size, const wchar_t* begin, const wchar_t* end)
+    inline char* narrow(char* output, size_t output_size, const wchar_t* begin, const wchar_t* end) noexcept
     {
         return detail::convert_buffer(output, output_size, begin, end);
     }
@@ -46,7 +47,7 @@ namespace nowide {
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline char* narrow(char* output, size_t output_size, std::wstring_view source)
+    inline char* narrow(char* output, size_t output_size, std::wstring_view source) noexcept
     {
         return narrow(output, output_size, source.data(), source.data() + source.length());
     }
@@ -58,7 +59,7 @@ namespace nowide {
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline wchar_t* widen(wchar_t* output, size_t output_size, const char* begin, const char* end)
+    inline wchar_t* widen(wchar_t* output, size_t output_size, const char* begin, const char* end) noexcept
     {
         return detail::convert_buffer(output, output_size, begin, end);
     }
@@ -69,7 +70,7 @@ namespace nowide {
     /// If there is not enough room NULL is returned, else output is returned.
     /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
     ///
-    inline wchar_t* widen(wchar_t* output, size_t output_size, std::string_view source)
+    inline wchar_t* widen(wchar_t* output, size_t output_size, std::string_view source) noexcept
     {
         return widen(output, output_size, source.data(), source.data() + source.length());
     }
