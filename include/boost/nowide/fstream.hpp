@@ -35,7 +35,7 @@ namespace nowide {
             static std::ios_base::openmode mode_modifier() { return mode(); }
             template<typename CharType, typename Traits>
             struct stream_base{
-                typedef std::basic_istream<CharType, Traits> type;
+                using type=std::basic_istream<CharType, Traits>;
             };
         };
         struct StreamTypeOut
@@ -44,7 +44,7 @@ namespace nowide {
             static std::ios_base::openmode mode_modifier() { return mode(); }
             template<typename CharType, typename Traits>
             struct stream_base{
-                typedef std::basic_ostream<CharType, Traits> type;
+                using type=std::basic_ostream<CharType, Traits>;
             };
         };
         struct StreamTypeInOut
@@ -53,7 +53,7 @@ namespace nowide {
             static std::ios_base::openmode mode_modifier() { return std::ios_base::openmode(); }
             template<typename CharType, typename Traits>
             struct stream_base{
-                typedef std::basic_iostream<CharType, Traits> type;
+                using type=std::basic_iostream<CharType, Traits>;
             };
         };
         // clang-format on
@@ -75,7 +75,7 @@ namespace nowide {
     template<typename CharType, typename Traits = std::char_traits<CharType>>
     class basic_ifstream : public detail::fstream_impl<CharType, Traits, detail::StreamTypeIn>
     {
-        typedef detail::fstream_impl<CharType, Traits, detail::StreamTypeIn> fstream_impl;
+        using fstream_impl = detail::fstream_impl<CharType, Traits, detail::StreamTypeIn>;
 
     public:
         basic_ifstream()
@@ -125,7 +125,7 @@ namespace nowide {
     template<typename CharType, typename Traits = std::char_traits<CharType>>
     class basic_ofstream : public detail::fstream_impl<CharType, Traits, detail::StreamTypeOut>
     {
-        typedef detail::fstream_impl<CharType, Traits, detail::StreamTypeOut> fstream_impl;
+        using fstream_impl = detail::fstream_impl<CharType, Traits, detail::StreamTypeOut>;
 
     public:
         basic_ofstream()
@@ -176,7 +176,7 @@ namespace nowide {
     template<typename CharType, typename Traits = std::char_traits<CharType>>
     class basic_fstream : public detail::fstream_impl<CharType, Traits, detail::StreamTypeInOut>
     {
-        typedef detail::fstream_impl<CharType, Traits, detail::StreamTypeInOut> fstream_impl;
+        using fstream_impl = detail::fstream_impl<CharType, Traits, detail::StreamTypeInOut>;
 
     public:
         basic_fstream()
@@ -244,20 +244,20 @@ namespace nowide {
     /// Same as std::ifstream but accepts UTF-8 strings under Windows
     /// and *\::filesystem::path on all systems
     ///
-    typedef basic_ifstream<char> ifstream;
-    typedef basic_ifstream<wchar_t> wifstream;
+    using ifstream = basic_ifstream<char>;
+    using wifstream = basic_ifstream<wchar_t>;
     ///
     /// Same as std::ofstream but accepts UTF-8 strings under Windows
     /// and *\::filesystem::path on all systems
     ///
-    typedef basic_ofstream<char> ofstream;
-    typedef basic_ofstream<wchar_t> wofstream;
+    using ofstream = basic_ofstream<char>;
+    using wofstream = basic_ofstream<wchar_t>;
     ///
     /// Same as std::fstream but accepts UTF-8 strings under Windows
     /// and *\::filesystem::path on all systems
     ///
-    typedef basic_fstream<char> fstream;
-    typedef basic_fstream<wchar_t> wfstream;
+    using fstream = basic_fstream<char>;
+    using wfstream = basic_fstream<wchar_t>;
 
     // Implementation
     namespace detail {
@@ -272,9 +272,9 @@ namespace nowide {
         class fstream_impl : private buf_holder<basic_filebuf<CharType, Traits>>, // must be first due to init order
                              public T_StreamType::template stream_base<CharType, Traits>::type
         {
-            typedef basic_filebuf<CharType, Traits> internal_buffer_type;
-            typedef buf_holder<internal_buffer_type> base_buf_holder;
-            typedef typename T_StreamType::template stream_base<CharType, Traits>::type stream_base;
+            using internal_buffer_type = basic_filebuf<CharType, Traits>;
+            using base_buf_holder = buf_holder<internal_buffer_type>;
+            using stream_base = typename T_StreamType::template stream_base<CharType, Traits>::type;
 
         public:
             using stream_base::setstate;

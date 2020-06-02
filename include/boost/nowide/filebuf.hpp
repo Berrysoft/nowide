@@ -63,9 +63,9 @@ namespace nowide {
     ///
     /// \brief Convenience typedef
     ///
-    typedef basic_filebuf<char> filebuf;
+    using filebuf = basic_filebuf<char>;
 
-    typedef basic_filebuf<wchar_t> wfilebuf;
+    using wfilebuf = basic_filebuf<wchar_t>;
 
 #endif // windows
 

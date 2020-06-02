@@ -67,8 +67,8 @@ namespace nowide {
             }
 
         private:
-            typedef detail::utf::utf_traits<char> decoder;
-            typedef detail::utf::utf_traits<wchar_t> encoder;
+            using decoder = detail::utf::utf_traits<char>;
+            using encoder = detail::utf::utf_traits<wchar_t>;
 
             int write(const char* p, int n)
             {
@@ -166,8 +166,8 @@ namespace nowide {
             }
 
         private:
-            typedef detail::utf::utf_traits<wchar_t> decoder;
-            typedef detail::utf::utf_traits<char> encoder;
+            using decoder = detail::utf::utf_traits<wchar_t>;
+            using encoder = detail::utf::utf_traits<char>;
 
             size_t read()
             {

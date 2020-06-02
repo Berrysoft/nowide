@@ -26,7 +26,7 @@ namespace nowide {
             ///
             /// \brief The integral type that can hold a Unicode code point
             ///
-            typedef uint32_t code_point;
+            using code_point = uint32_t;
 
             ///
             /// \brief Special constant that defines illegal code point
@@ -60,7 +60,7 @@ namespace nowide {
                 ///
                 /// The type of the character
                 ///
-                typedef CharType char_type;
+                using char_type = CharType;
                 ///
                 /// Read one code point from the range [p,e) and return it.
                 ///
@@ -138,7 +138,7 @@ namespace nowide {
             template<typename CharType>
             struct utf_traits<CharType, 1>
             {
-                typedef CharType char_type;
+                using char_type = CharType;
 
                 static int trail_length(char_type ci)
                 {
@@ -307,7 +307,7 @@ namespace nowide {
             template<typename CharType>
             struct utf_traits<CharType, 2>
             {
-                typedef CharType char_type;
+                using char_type = CharType;
 
                 // See RFC 2781
                 static bool is_first_surrogate(uint16_t x)
@@ -400,7 +400,7 @@ namespace nowide {
             template<typename CharType>
             struct utf_traits<CharType, 4>
             {
-                typedef CharType char_type;
+                using char_type = CharType;
                 static int trail_length(char_type c)
                 {
                     if(is_valid_codepoint(c))

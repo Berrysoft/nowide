@@ -70,7 +70,7 @@ namespace nowide {
         convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {})
         {
             std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
-            typedef std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>> inserter_type;
+            using inserter_type = std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>>;
             inserter_type inserter(result);
             using namespace detail::utf;
             code_point c;

@@ -59,7 +59,7 @@ namespace nowide {
         {}
 
     protected:
-        typedef CharType uchar;
+        using uchar = CharType;
 
         std::codecvt_base::result do_unshift(std::mbstate_t& s, char* from, char* /*to*/, char*& next) const override
         {
@@ -276,7 +276,7 @@ namespace nowide {
         {}
 
     protected:
-        typedef CharType uchar;
+        using uchar = CharType;
 
         std::codecvt_base::result
         do_unshift(std::mbstate_t& /*s*/, char* from, char* /*to*/, char*& next) const override
