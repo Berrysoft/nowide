@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2012 Artyom Beilis (Tonkikh)
 //  Copyright (c) 2019 - 2020 Alexander Grund
+//  Copyright (c) 2020 Berrysoft
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE or copy at
@@ -127,7 +128,7 @@ struct perf_data
 char rand_char()
 {
     // coverity[dont_call]
-    return static_cast<char>(std::rand());
+    return static_cast<char>(rand() % 20 + 32);
 }
 
 std::vector<char> get_rand_data(int size)
