@@ -12,33 +12,19 @@
 #include <boost/nowide/convert.hpp>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 
 #include "test.hpp"
 
 bool file_exists(const std::string& filename)
 {
-#ifdef BOOST_WINDOWS
-    FILE* f = boost::nowide::detail::wfopen(boost::nowide::widen(filename).c_str(), L"r");
-#else
-    FILE* f = std::fopen(filename.c_str(), "r");
-#endif
-    bool result = false;
-    if(f)
-    {
-        std::fclose(f);
-        result = true;
-    }
-    return result;
+    return std::filesystem::exists(std::filesystem::u8path(filename));
 }
 
 void create_test_file(const std::string& filename)
 {
-#ifdef BOOST_WINDOWS
-    FILE* f = boost::nowide::detail::wfopen(boost::nowide::widen(filename).c_str(), L"w");
-#else
-    FILE* f = std::fopen(filename.c_str(), "w");
-#endif
+    FILE* f = boost::nowide::fopen(filename.c_str(), "w");
     TEST(f);
     TEST(std::fputs("test\n", f) >= 0);
     std::fclose(f);

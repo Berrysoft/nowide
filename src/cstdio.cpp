@@ -21,13 +21,6 @@
 
 namespace boost {
 namespace nowide {
-    namespace detail {
-        FILE* wfopen(const wchar_t* filename, const wchar_t* mode)
-        {
-            return ::_wfopen(filename, mode);
-        }
-    } // namespace detail
-
     ///
     /// \brief Same as freopen but file_name and mode are UTF-8 strings
     ///

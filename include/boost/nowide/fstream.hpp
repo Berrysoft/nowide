@@ -15,7 +15,7 @@
 
 namespace boost {
 namespace nowide {
-#if !BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT
+#ifndef BOOST_WINDOWS
     using std::basic_ifstream;
     using std::basic_ofstream;
     using std::basic_fstream;
@@ -28,42 +28,42 @@ namespace nowide {
 #else
     /// \cond INTERNAL
     namespace detail {
-        // clang-format off
         struct StreamTypeIn
         {
-            static std::ios_base::openmode mode() { return std::ios_base::in; }
-            static std::ios_base::openmode mode_modifier() { return mode(); }
+            static constexpr std::ios_base::openmode mode = std::ios_base::in;
+            static constexpr std::ios_base::openmode mode_modifier = mode;
             template<typename CharType, typename Traits>
-            struct stream_base{
-                using type=std::basic_istream<CharType, Traits>;
+            struct stream_base
+            {
+                using type = std::basic_istream<CharType, Traits>;
             };
         };
         struct StreamTypeOut
         {
-            static std::ios_base::openmode mode() { return std::ios_base::out; }
-            static std::ios_base::openmode mode_modifier() { return mode(); }
+            static constexpr std::ios_base::openmode mode = std::ios_base::out;
+            static constexpr std::ios_base::openmode mode_modifier = mode;
             template<typename CharType, typename Traits>
-            struct stream_base{
-                using type=std::basic_ostream<CharType, Traits>;
+            struct stream_base
+            {
+                using type = std::basic_ostream<CharType, Traits>;
             };
         };
         struct StreamTypeInOut
         {
-            static std::ios_base::openmode mode() { return std::ios_base::in | std::ios_base::out; }
-            static std::ios_base::openmode mode_modifier() { return std::ios_base::openmode(); }
+            static constexpr std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out;
+            static constexpr std::ios_base::openmode mode_modifier = {};
             template<typename CharType, typename Traits>
-            struct stream_base{
-                using type=std::basic_iostream<CharType, Traits>;
+            struct stream_base
+            {
+                using type = std::basic_iostream<CharType, Traits>;
             };
         };
-        // clang-format on
 
         /// Base class for all basic_*fstream classes
         /// Contains basic_filebuf instance so its pointer can be used to construct basic_*stream
         /// Provides common functions to reduce boilerplate code including inheriting from
         /// the correct std::basic_[io]stream class and initializing it
         /// \tparam T_StreamType One of StreamType* above.
-        ///         Class used instead of value, because openmode::operator| may not be constexpr
         template<typename CharType, typename Traits, typename T_StreamType>
         class fstream_impl;
     } // namespace detail
@@ -85,18 +85,14 @@ namespace nowide {
         {
             open(file_name, mode);
         }
-#if BOOST_NOWIDE_USE_WCHAR_OVERLOADS
         explicit basic_ifstream(const wchar_t* file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
             open(file_name, mode);
         }
-#endif
-
         explicit basic_ifstream(const std::string& file_name, std::ios_base::openmode mode = std::ios_base::in)
         {
             open(file_name, mode);
         }
-
         explicit basic_ifstream(const std::filesystem::path& file_name,
                                 std::ios_base::openmode mode = std::ios_base::in)
         {
@@ -134,12 +130,10 @@ namespace nowide {
         {
             open(file_name, mode);
         }
-#if BOOST_NOWIDE_USE_WCHAR_OVERLOADS
         explicit basic_ofstream(const wchar_t* file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
             open(file_name, mode);
         }
-#endif
         explicit basic_ofstream(const std::string& file_name, std::ios_base::openmode mode = std::ios_base::out)
         {
             open(file_name, mode);
@@ -186,13 +180,11 @@ namespace nowide {
         {
             open(file_name, mode);
         }
-#if BOOST_NOWIDE_USE_WCHAR_OVERLOADS
         explicit basic_fstream(const wchar_t* file_name,
                                std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
             open(file_name, mode);
         }
-#endif
         explicit basic_fstream(const std::string& file_name,
                                std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         {
@@ -306,30 +298,28 @@ namespace nowide {
                 rdbuf()->swap(*other.rdbuf());
             }
 
-            void open(const std::string& file_name, std::ios_base::openmode mode = T_StreamType::mode())
+            void open(const std::string& file_name, std::ios_base::openmode mode = T_StreamType::mode)
             {
                 open(file_name.c_str(), mode);
             }
-            void open(const std::filesystem::path& file_name, std::ios_base::openmode mode = T_StreamType::mode())
+            void open(const std::filesystem::path& file_name, std::ios_base::openmode mode = T_StreamType::mode)
             {
                 open(file_name.c_str(), mode);
             }
-            void open(const char* file_name, std::ios_base::openmode mode = T_StreamType::mode())
+            void open(const char* file_name, std::ios_base::openmode mode = T_StreamType::mode)
             {
-                if(!rdbuf()->open(file_name, mode | T_StreamType::mode_modifier()))
+                if(!rdbuf()->open(file_name, mode | T_StreamType::mode_modifier))
                     setstate(std::ios_base::failbit);
                 else
                     clear();
             }
-#if BOOST_NOWIDE_USE_WCHAR_OVERLOADS
-            void open(const wchar_t* file_name, std::ios_base::openmode mode = T_StreamType::mode())
+            void open(const wchar_t* file_name, std::ios_base::openmode mode = T_StreamType::mode)
             {
-                if(!rdbuf()->open(file_name, mode | T_StreamType::mode_modifier()))
+                if(!rdbuf()->open(file_name, mode | T_StreamType::mode_modifier))
                     setstate(std::ios_base::failbit);
                 else
                     clear();
             }
-#endif
             bool is_open()
             {
                 return rdbuf()->is_open();

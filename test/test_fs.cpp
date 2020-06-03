@@ -6,7 +6,6 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/nowide/convert.hpp>
 #include <boost/nowide/cstdio.hpp>
 #include <boost/nowide/fstream.hpp>
 #include <filesystem>
@@ -25,25 +24,13 @@ void test_main(int, char**, char**)
         f << "Test" << std::endl;
     }
 
-#ifdef BOOST_WINDOWS
-    TEST(std::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
-#else
-    TEST(std::filesystem::is_regular_file(utf8_name));
-#endif // BOOST_WINDOWS
+    TEST(std::filesystem::is_regular_file(std::filesystem::u8path(utf8_name)));
 
     TEST(boost::nowide::remove(utf8_name.c_str()) == 0);
 
-#ifdef BOOST_WINDOWS
-    TEST(!std::filesystem::is_regular_file(boost::nowide::widen(utf8_name)));
-#else
-    TEST(!std::filesystem::is_regular_file(utf8_name));
-#endif // BOOST_WINDOWS
+    TEST(!std::filesystem::is_regular_file(std::filesystem::u8path(utf8_name)));
 
-#ifdef BOOST_WINDOWS
-    const std::filesystem::path path = boost::nowide::widen(utf8_name);
-#else
-    const std::filesystem::path path = utf8_name;
-#endif // BOOST_WINDOWS
+    const std::filesystem::path path = std::filesystem::u8path(utf8_name);
 
     {
         boost::nowide::ofstream f(path);

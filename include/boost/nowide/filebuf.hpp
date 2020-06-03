@@ -10,7 +10,7 @@
 #define BOOST_NOWIDE_FILEBUF_HPP_INCLUDED
 
 #include <boost/nowide/config.hpp>
-#if BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT
+#ifdef BOOST_WINDOWS
 #include <boost/nowide/cstdio.hpp>
 #include <boost/nowide/stackstring.hpp>
 #include <filesystem>
@@ -19,7 +19,7 @@
 
 namespace boost {
 namespace nowide {
-#if !BOOST_NOWIDE_USE_FILEBUF_REPLACEMENT
+#ifndef BOOST_WINDOWS
     using std::basic_filebuf;
     using std::filebuf;
     using std::wfilebuf;
@@ -42,12 +42,10 @@ namespace nowide {
             return std::basic_filebuf<CharType, Traits>::open(name.data(), mode);
         }
 
-#if BOOST_NOWIDE_USE_WCHAR_OVERLOADS
         std::basic_filebuf<CharType, Traits>* open(const wchar_t* s, std::ios_base::openmode mode)
         {
             return std::basic_filebuf<CharType, Traits>::open(s, mode);
         }
-#endif
 
         std::basic_filebuf<CharType, Traits>* open(const std::string& str, std::ios_base::openmode mode)
         {
