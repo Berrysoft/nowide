@@ -21,39 +21,41 @@
 
 namespace boost {
 namespace nowide {
-    ///
-    /// \brief Same as freopen but file_name and mode are UTF-8 strings
-    ///
     FILE* freopen(const char* file_name, const char* mode, FILE* stream)
     {
         const wstackstring wname(file_name);
         const wshort_stackstring wmode(mode);
         return _wfreopen(wname.data(), wmode.data(), stream);
     }
-    ///
-    /// \brief Same as fopen but file_name and mode are UTF-8 strings
-    ///
+
     FILE* fopen(const char* file_name, const char* mode)
     {
         const wstackstring wname(file_name);
         const wshort_stackstring wmode(mode);
         return _wfopen(wname.data(), wmode.data());
     }
-    ///
-    /// \brief Same as rename but old_name and new_name are UTF-8 strings
-    ///
+
     int rename(const char* old_name, const char* new_name)
     {
         const wstackstring wold(old_name), wnew(new_name);
         return _wrename(wold.data(), wnew.data());
     }
-    ///
-    /// \brief Same as rename but name is UTF-8 string
-    ///
+
     int remove(const char* name)
     {
         const wstackstring wname(name);
         return _wremove(wname.data());
+    }
+
+    static char tmpnam_buffer[L_tmpnam];
+    char* tmpnam(char* filename)
+    {
+        basic_stackstring<wchar_t, char, L_tmpnam> wfilename(filename);
+        if(_wtmpnam(wfilename.data()))
+        {
+            return narrow(filename ? filename : tmpnam_buffer, L_tmpnam, wfilename);
+        }
+        return nullptr;
     }
 } // namespace nowide
 } // namespace boost

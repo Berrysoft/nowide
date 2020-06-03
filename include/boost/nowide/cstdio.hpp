@@ -19,6 +19,7 @@ namespace nowide {
     using std::freopen;
     using std::remove;
     using std::rename;
+    using std::tmpnam;
 #else
 
     ///
@@ -37,6 +38,10 @@ namespace nowide {
     /// \brief Same as rename but name is UTF-8 string
     ///
     BOOST_NOWIDE_DECL int remove(const char* name);
+    ///
+    /// \brief Same as tmpnam but filename is UTF-8 string
+    ///
+    BOOST_NOWIDE_DECL char* tmpnam(char* filename);
 #endif
 } // namespace nowide
 } // namespace boost

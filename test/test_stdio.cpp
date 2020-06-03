@@ -127,4 +127,11 @@ void test_main(int, char** argv, char**)
         TEST(boost::nowide::remove(filename.c_str()) < 0);
         TEST(boost::nowide::remove(filename2.c_str()) == 0);
     }
+    std::cout << " -- tmpnam" << std::endl;
+    {
+        const char* tmpnam1 = boost::nowide::tmpnam(nullptr);
+        TEST(tmpnam1);
+        char tmpnam2[L_tmpnam];
+        TEST(boost::nowide::tmpnam(tmpnam2));
+    }
 }
