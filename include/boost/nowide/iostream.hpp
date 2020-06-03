@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2012 Artyom Beilis (Tonkikh)
 //  Copyright (c) 2020 Alexander Grund
+//  Copyright (c) 2020 Berrysoft
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE or copy at
@@ -14,15 +15,8 @@
 #include <istream>
 #include <memory>
 #include <ostream>
-
-#include <boost/config/abi_prefix.hpp> // must be the last #include
 #else
 #include <iostream>
-#endif
-
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4251)
 #endif
 
 namespace boost {
@@ -39,21 +33,21 @@ namespace nowide {
         class console_output_buffer;
         class console_input_buffer;
 
-        class BOOST_NOWIDE_DECL winconsole_ostream : public std::ostream
+        class winconsole_ostream : public std::ostream
         {
         public:
-            winconsole_ostream(int fd, winconsole_ostream* tieStream);
-            ~winconsole_ostream();
+            BOOST_NOWIDE_DECL winconsole_ostream(int fd, winconsole_ostream* tieStream);
+            BOOST_NOWIDE_DECL ~winconsole_ostream();
 
         private:
             std::unique_ptr<console_output_buffer> d;
         };
 
-        class BOOST_NOWIDE_DECL winconsole_istream : public std::istream
+        class winconsole_istream : public std::istream
         {
         public:
-            explicit winconsole_istream(winconsole_ostream* tieStream);
-            ~winconsole_istream();
+            BOOST_NOWIDE_DECL explicit winconsole_istream(winconsole_ostream* tieStream);
+            BOOST_NOWIDE_DECL ~winconsole_istream();
 
         private:
             std::unique_ptr<console_input_buffer> d;
@@ -91,13 +85,5 @@ namespace nowide {
 
 } // namespace nowide
 } // namespace boost
-
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
-
-#ifdef BOOST_WINDOWS
-#include <boost/config/abi_suffix.hpp> // pops abi_prefix.hpp pragmas
-#endif
 
 #endif

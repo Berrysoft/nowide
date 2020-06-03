@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2012 Artyom Beilis (Tonkikh)
 //  Copyright (c) 2019-2020 Alexander Grund
+//  Copyright (c) 2020 Berrysoft
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE or copy at
@@ -25,10 +26,7 @@ namespace nowide {
     using std::wfilebuf;
 #else // Windows
     ///
-    /// \brief This forward declaration defines the basic_filebuf type.
-    ///
-    /// it is implemented and specialized for CharType = char, it
-    /// implements std::filebuf over standard C I/O
+    /// \brief The basic_filebuf type.
     ///
     template<typename CharType, typename Traits = std::char_traits<CharType>>
     class basic_filebuf : public std::basic_filebuf<CharType, Traits>
@@ -62,7 +60,6 @@ namespace nowide {
     /// \brief Convenience typedef
     ///
     using filebuf = basic_filebuf<char>;
-
     using wfilebuf = basic_filebuf<wchar_t>;
 
 #endif // windows

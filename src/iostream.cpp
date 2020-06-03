@@ -1,5 +1,6 @@
 //
 //  Copyright (c) 2012 Artyom Beilis (Tonkikh)
+//  Copyright (c) 2020 Berrysoft
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE or copy at
@@ -24,7 +25,7 @@ namespace nowide {
     namespace detail {
 
         namespace {
-            bool is_atty_handle(HANDLE h)
+            static bool is_atty_handle(HANDLE h) noexcept
             {
                 if(h)
                 {
@@ -42,11 +43,11 @@ namespace nowide {
             {}
 
         protected:
-            int sync()
+            int sync() override
             {
                 return overflow(traits_type::eof());
             }
-            int overflow(int c)
+            int overflow(int c) override
             {
                 if(!handle_)
                     return -1;
@@ -108,7 +109,7 @@ namespace nowide {
             {}
 
         protected:
-            int sync()
+            int sync() override
             {
                 if(FlushConsoleInputBuffer(handle_) == 0)
                     return -1;
@@ -118,7 +119,7 @@ namespace nowide {
                 setg(0, 0, 0);
                 return 0;
             }
-            int pbackfail(int c)
+            int pbackfail(int c) override
             {
                 if(c == traits_type::eof())
                     return traits_type::eof();
@@ -151,7 +152,7 @@ namespace nowide {
                 return 0;
             }
 
-            int underflow()
+            int underflow() override
             {
                 if(!handle_)
                     return -1;
@@ -222,9 +223,9 @@ namespace nowide {
             bool was_newline_;
         };
 
-        winconsole_ostream::winconsole_ostream(int fd, winconsole_ostream* tieStream) : std::ostream(0)
+        winconsole_ostream::winconsole_ostream(int fd, winconsole_ostream* tieStream) : std::ostream(nullptr)
         {
-            HANDLE h = 0;
+            HANDLE h = nullptr;
             switch(fd)
             {
             case 1: h = GetStdHandle(STD_OUTPUT_HANDLE); break;
@@ -232,7 +233,7 @@ namespace nowide {
             }
             if(is_atty_handle(h))
             {
-                d.reset(new console_output_buffer(h));
+                d = std::make_unique<console_output_buffer>(h);
                 std::ostream::rdbuf(d.get());
             } else
             {
@@ -243,19 +244,15 @@ namespace nowide {
         }
         winconsole_ostream::~winconsole_ostream()
         {
-            try
-            {
-                flush();
-            } catch(...)
-            {}
+            flush();
         }
 
-        winconsole_istream::winconsole_istream(winconsole_ostream* tieStream) : std::istream(0)
+        winconsole_istream::winconsole_istream(winconsole_ostream* tieStream) : std::istream(nullptr)
         {
             HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
             if(is_atty_handle(h))
             {
-                d.reset(new console_input_buffer(h));
+                d = std::make_unique<console_input_buffer>(h);
                 std::istream::rdbuf(d.get());
             } else
             {
@@ -270,7 +267,7 @@ namespace nowide {
 
     } // namespace detail
 
-    detail::winconsole_ostream cout(1, NULL);
+    detail::winconsole_ostream cout(1, nullptr);
     detail::winconsole_istream cin(&cout);
     detail::winconsole_ostream cerr(2, &cout);
     detail::winconsole_ostream clog(2, &cout);
