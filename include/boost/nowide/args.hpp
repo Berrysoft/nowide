@@ -11,7 +11,6 @@
 #include <boost/config.hpp>
 #ifdef BOOST_WINDOWS
 #include <boost/nowide/stackstring.hpp>
-#include <boost/nowide/windows.hpp>
 #include <stdexcept>
 #include <vector>
 #endif
@@ -95,27 +94,21 @@ namespace nowide {
             int argc;
 
         public:
-            wargv_ptr()
-            {
-                p = CommandLineToArgvW(GetCommandLineW(), &argc);
-            }
-            ~wargv_ptr()
-            {
-                if(p)
-                    LocalFree(p);
-            }
+            BOOST_NOWIDE_DECL wargv_ptr() noexcept;
+            BOOST_NOWIDE_DECL ~wargv_ptr();
+
             wargv_ptr(const wargv_ptr&) = delete;
             wargv_ptr& operator=(const wargv_ptr&) = delete;
 
-            int size() const
+            constexpr int size() const noexcept
             {
                 return argc;
             }
-            operator bool() const
+            constexpr operator bool() const noexcept
             {
-                return p != NULL;
+                return p != nullptr;
             }
-            const wchar_t* operator[](size_t i) const
+            constexpr const wchar_t* operator[](size_t i) const noexcept
             {
                 return p[i];
             }
@@ -125,17 +118,13 @@ namespace nowide {
             wchar_t* p;
 
         public:
-            wenv_ptr() : p(GetEnvironmentStringsW())
-            {}
-            ~wenv_ptr()
-            {
-                if(p)
-                    FreeEnvironmentStringsW(p);
-            }
+            BOOST_NOWIDE_DECL wenv_ptr() noexcept;
+            BOOST_NOWIDE_DECL ~wenv_ptr();
+
             wenv_ptr(const wenv_ptr&) = delete;
             wenv_ptr& operator=(const wenv_ptr&) = delete;
 
-            operator const wchar_t*() const
+            constexpr operator const wchar_t*() const noexcept
             {
                 return p;
             }

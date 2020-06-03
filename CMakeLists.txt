@@ -42,7 +42,7 @@ endif()
 # Using glob here is ok as it is only for headers
 file(GLOB_RECURSE headers include/*.hpp)
 if(WIN32)
-  add_library(boost_nowide src/cstdio.cpp src/cstdlib.cpp src/iostream.cpp ${headers})
+  add_library(boost_nowide src/args.cpp src/cstdio.cpp src/cstdlib.cpp src/iostream.cpp ${headers})
   if(BUILD_SHARED_LIBS)
     target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_DYN_LINK)
   endif()
