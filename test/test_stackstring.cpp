@@ -97,18 +97,20 @@ void test_main(int, char**, char**)
         std::cout << "-- An empty string is accepted" << std::endl;
         const boost::nowide::short_stackstring s(wempty);
         TEST(s.data());
-        TEST(s.data() == std::string_view());
+        TEST(s == std::string_view());
         const boost::nowide::short_stackstring s2(wempty, wempty);
         TEST(s2.data());
-        TEST(s2.data() == std::string_view());
+        TEST(s2 == std::string_view());
     }
     {
         std::cout << "-- An empty string is accepted" << std::endl;
         boost::nowide::short_stackstring s, s2;
         TEST(s.convert(wempty));
-        TEST(s.data() == std::string_view());
+        TEST(s.empty());
+        TEST(s == std::string_view());
         TEST(s2.convert(wempty, wempty));
-        TEST(s2.data() == std::string_view());
+        TEST(s2.empty());
+        TEST(s2 == std::string_view());
     }
     {
         std::cout << "-- Will be put on heap" << std::endl;
@@ -162,71 +164,71 @@ void test_main(int, char**, char**)
         {
             stackstring sw2(heap), sw3, sEmpty;
             sw3 = heap;
-            TEST(sw2.data() == heapVal);
-            TEST(sw3.data() == heapVal);
+            TEST(sw2 == heapVal);
+            TEST(sw3 == heapVal);
             // Self assign avoiding clang self-assign-overloaded warning
             sw3 = static_cast<const stackstring&>(sw3); //-V570
-            TEST(sw3.data() == heapVal);
+            TEST(sw3 == heapVal);
             // Assign empty
             sw3 = sEmpty; //-V820
-            TEST(sw3.data() == nullptr);
+            TEST(sw3.empty());
         }
         {
             stackstring sw2(stack), sw3, sEmpty;
             sw3 = stack;
-            TEST(sw2.data() == stackVal);
-            TEST(sw3.data() == stackVal);
+            TEST(sw2 == stackVal);
+            TEST(sw3 == stackVal);
             // Self assign avoiding clang self-assign-overloaded warning
             sw3 = static_cast<const stackstring&>(sw3); //-V570
-            TEST(sw3.data() == stackVal);
+            TEST(sw3 == stackVal);
             // Assign empty
             sw3 = sEmpty; //-V820
-            TEST(sw3.data() == nullptr);
+            TEST(sw3.empty());
         }
         {
             stackstring sw2(stack);
             sw2 = heap;
-            TEST(sw2.data() == heapVal);
+            TEST(sw2 == heapVal);
         }
         {
             stackstring sw2(heap);
             sw2 = stack;
-            TEST(sw2.data() == stackVal);
+            TEST(sw2 == stackVal);
         }
         {
             stackstring sw2(heap), sw3(stack), sEmpty1, sEmpty2;
             swap(sw2, sw3);
-            TEST(sw2.data() == stackVal);
-            TEST(sw3.data() == heapVal);
+            TEST(sw2 == stackVal);
+            TEST(sw3 == heapVal);
             swap(sw2, sw3);
-            TEST(sw2.data() == heapVal);
-            TEST(sw3.data() == stackVal);
+            TEST(sw2 == heapVal);
+            TEST(sw3 == stackVal);
             swap(sw2, sEmpty1);
-            TEST(sEmpty1.data() == heapVal);
-            TEST(sw2.data() == nullptr);
+            TEST(sEmpty1 == heapVal);
+            TEST(sw2.empty());
             swap(sw3, sEmpty2);
-            TEST(sEmpty2.data() == stackVal);
-            TEST(sw3.data() == nullptr);
+            TEST(sEmpty2 == stackVal);
+            TEST(sw3.empty());
         }
         {
             stackstring sw2(heap), sw3(heap);
-            sw3.data()[0] = 'z';
+            sw3[0] = 'z';
             const std::wstring val2 = sw3.data();
             swap(sw2, sw3);
             TEST(sw2.data() == val2);
-            TEST(sw3.data() == heapVal);
+            TEST(sw3 == heapVal);
         }
         {
             stackstring sw2(stack), sw3(stack);
-            sw3.data()[0] = 'z';
+            sw3[0] = 'z';
             const std::wstring val2 = sw3.data();
             swap(sw2, sw3);
             TEST(sw2.data() == val2);
-            TEST(sw3.data() == stackVal);
+            TEST(sw3 == stackVal);
         }
         std::cout << "-- Sanity check" << std::endl;
-        TEST(stack.data() == stackVal);
-        TEST(heap.data() == heapVal);
+        TEST(stack == stackVal);
+        TEST(heap == heapVal);
     }
     {
         std::cout << "-- Test putting stackstrings into vector (done by args) class" << std::endl;

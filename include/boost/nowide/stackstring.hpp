@@ -200,19 +200,38 @@ namespace nowide {
                 return data_;
         }
 
-    protected:
-        /// True if the stack memory is used
-        constexpr bool uses_stack_memory() const noexcept
+        constexpr output_char& operator[](std::size_t index) noexcept
         {
-            return data_ == buffer_;
+            return data_[index];
         }
+        constexpr const output_char& operator[](std::size_t index) const noexcept
+        {
+            return data_[index];
+        }
+
         /// Return the current length of the string excluding the NULL terminator
         /// If NULL is stored returns NULL
         constexpr std::size_t length() const noexcept
         {
             if(!data_)
                 return 0;
-            return std::char_traits<output_char>::length(data_);
+            else
+                return std::char_traits<output_char>::length(data_);
+        }
+
+        constexpr bool empty() const noexcept
+        {
+            if(!data_)
+                return true;
+            else
+                return !data_[0];
+        }
+
+    protected:
+        /// True if the stack memory is used
+        constexpr bool uses_stack_memory() const noexcept
+        {
+            return data_ == buffer_;
         }
 
     private:
