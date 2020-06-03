@@ -9,6 +9,7 @@
 
 #include <boost/nowide/stackstring.hpp>
 #include <iostream>
+#include <string_view>
 #include <vector>
 
 #include "test.hpp"
@@ -28,7 +29,7 @@ public:
     using parent::uses_stack_memory;
     bool uses_heap_memory() const
     {
-        return !uses_stack_memory() && this->get();
+        return !uses_stack_memory() && this->data();
     }
 };
 
@@ -39,28 +40,28 @@ std::wstring stackstring_to_wide(const std::string& s)
 {
     const test_wstackstring ss(s.c_str());
     TEST(ss.uses_stack_memory());
-    return ss.get();
+    return ss.data();
 }
 
 std::string stackstring_to_narrow(const std::wstring& s)
 {
     const test_stackstring ss(s.c_str());
     TEST(ss.uses_stack_memory());
-    return ss.get();
+    return ss.data();
 }
 
 std::wstring heap_stackstring_to_wide(const std::string& s)
 {
     const test_basic_stackstring<wchar_t, char, 1> ss(s.c_str());
     TEST(ss.uses_heap_memory() || s.empty());
-    return ss.get();
+    return ss.data();
 }
 
 std::string heap_stackstring_to_narrow(const std::wstring& s)
 {
     const test_basic_stackstring<char, wchar_t, 1> ss(s.c_str());
     TEST(ss.uses_heap_memory() || s.empty());
-    return ss.get();
+    return ss.data();
 }
 
 void test_main(int, char**, char**)
@@ -70,89 +71,89 @@ void test_main(int, char**, char**)
     const wchar_t* wempty = L"";
 
     {
-        std::cout << "-- Default constructed string is NULL" << std::endl;
+        std::cout << "-- Default constructed string is nullptr" << std::endl;
         const boost::nowide::short_stackstring s;
-        TEST(s.get() == NULL);
+        TEST(s.data() == nullptr);
     }
     {
-        std::cout << "-- NULL ptr passed to ctor results in NULL" << std::endl;
-        const boost::nowide::short_stackstring s(NULL);
-        TEST(s.get() == NULL);
-        const boost::nowide::short_stackstring s2(NULL, NULL);
-        TEST(s2.get() == NULL);
+        std::cout << "-- nullptr passed to ctor results in nullptr" << std::endl;
+        const boost::nowide::short_stackstring s(nullptr);
+        TEST(s.data() == nullptr);
+        const boost::nowide::short_stackstring s2(nullptr, nullptr);
+        TEST(s2.data() == nullptr);
     }
     {
-        std::cout << "-- NULL ptr passed to convert results in NULL" << std::endl;
+        std::cout << "-- nullptr passed to convert results in nullptr" << std::endl;
         boost::nowide::short_stackstring s(L"foo");
-        TEST(s.get() == std::string("foo"));
-        s.convert(NULL);
-        TEST(s.get() == NULL);
+        TEST(s.data() == std::string_view("foo"));
+        s.convert(nullptr);
+        TEST(s.data() == nullptr);
         boost::nowide::short_stackstring s2(L"foo");
-        TEST(s2.get() == std::string("foo"));
-        s2.convert(NULL, NULL);
-        TEST(s2.get() == NULL);
+        TEST(s2.data() == std::string_view("foo"));
+        s2.convert(nullptr, nullptr);
+        TEST(s2.data() == nullptr);
     }
     {
         std::cout << "-- An empty string is accepted" << std::endl;
         const boost::nowide::short_stackstring s(wempty);
-        TEST(s.get());
-        TEST(s.get() == std::string());
+        TEST(s.data());
+        TEST(s.data() == std::string_view());
         const boost::nowide::short_stackstring s2(wempty, wempty);
-        TEST(s2.get());
-        TEST(s2.get() == std::string());
+        TEST(s2.data());
+        TEST(s2.data() == std::string_view());
     }
     {
         std::cout << "-- An empty string is accepted" << std::endl;
         boost::nowide::short_stackstring s, s2;
         TEST(s.convert(wempty));
-        TEST(s.get() == std::string());
+        TEST(s.data() == std::string_view());
         TEST(s2.convert(wempty, wempty));
-        TEST(s2.get() == std::string());
+        TEST(s2.data() == std::string_view());
     }
     {
         std::cout << "-- Will be put on heap" << std::endl;
         test_basic_stackstring<wchar_t, char, 3> sw;
         TEST(sw.convert(hello.c_str()));
         TEST(sw.uses_heap_memory());
-        TEST(sw.get() == whello);
+        TEST(sw.data() == whello);
         TEST(sw.convert(hello.c_str(), hello.c_str() + hello.size()));
         TEST(sw.uses_heap_memory());
-        TEST(sw.get() == whello);
+        TEST(sw.data() == whello);
     }
     {
         std::cout << "-- Will be put on stack" << std::endl;
         test_basic_stackstring<wchar_t, char, 40> sw;
         TEST(sw.convert(hello.c_str()));
         TEST(sw.uses_stack_memory());
-        TEST(sw.get() == whello);
+        TEST(sw.data() == whello);
         TEST(sw.convert(hello.c_str(), hello.c_str() + hello.size()));
         TEST(sw.uses_stack_memory());
-        TEST(sw.get() == whello);
+        TEST(sw.data() == whello);
     }
     {
         std::cout << "-- Will be put on heap" << std::endl;
         test_basic_stackstring<char, wchar_t, 3> sw;
         TEST(sw.convert(whello.c_str()));
         TEST(sw.uses_heap_memory());
-        TEST(sw.get() == hello);
+        TEST(sw.data() == hello);
         TEST(sw.convert(whello.c_str(), whello.c_str() + whello.size()));
         TEST(sw.uses_heap_memory());
-        TEST(sw.get() == hello);
+        TEST(sw.data() == hello);
     }
     {
         std::cout << "-- Will be put on stack" << std::endl;
         test_basic_stackstring<char, wchar_t, 40> sw;
         TEST(sw.convert(whello.c_str()));
         TEST(sw.uses_stack_memory());
-        TEST(sw.get() == hello);
+        TEST(sw.data() == hello);
         TEST(sw.convert(whello.c_str(), whello.c_str() + whello.size()));
         TEST(sw.uses_stack_memory());
-        TEST(sw.get() == hello);
+        TEST(sw.data() == hello);
     }
     {
         using stackstring = test_basic_stackstring<wchar_t, char, 6>;
-        const std::wstring heapVal = L"heapValue";
-        const std::wstring stackVal = L"stack";
+        const std::wstring_view heapVal = L"heapValue";
+        const std::wstring_view stackVal = L"stack";
         const stackstring heap(boost::nowide::narrow(heapVal).c_str());
         const stackstring stack(boost::nowide::narrow(stackVal).c_str());
         TEST(heap.uses_heap_memory());
@@ -161,71 +162,71 @@ void test_main(int, char**, char**)
         {
             stackstring sw2(heap), sw3, sEmpty;
             sw3 = heap;
-            TEST(sw2.get() == heapVal);
-            TEST(sw3.get() == heapVal);
+            TEST(sw2.data() == heapVal);
+            TEST(sw3.data() == heapVal);
             // Self assign avoiding clang self-assign-overloaded warning
             sw3 = static_cast<const stackstring&>(sw3); //-V570
-            TEST(sw3.get() == heapVal);
+            TEST(sw3.data() == heapVal);
             // Assign empty
             sw3 = sEmpty; //-V820
-            TEST(sw3.get() == NULL);
+            TEST(sw3.data() == nullptr);
         }
         {
             stackstring sw2(stack), sw3, sEmpty;
             sw3 = stack;
-            TEST(sw2.get() == stackVal);
-            TEST(sw3.get() == stackVal);
+            TEST(sw2.data() == stackVal);
+            TEST(sw3.data() == stackVal);
             // Self assign avoiding clang self-assign-overloaded warning
             sw3 = static_cast<const stackstring&>(sw3); //-V570
-            TEST(sw3.get() == stackVal);
+            TEST(sw3.data() == stackVal);
             // Assign empty
             sw3 = sEmpty; //-V820
-            TEST(sw3.get() == NULL);
+            TEST(sw3.data() == nullptr);
         }
         {
             stackstring sw2(stack);
             sw2 = heap;
-            TEST(sw2.get() == heapVal);
+            TEST(sw2.data() == heapVal);
         }
         {
             stackstring sw2(heap);
             sw2 = stack;
-            TEST(sw2.get() == stackVal);
+            TEST(sw2.data() == stackVal);
         }
         {
             stackstring sw2(heap), sw3(stack), sEmpty1, sEmpty2;
             swap(sw2, sw3);
-            TEST(sw2.get() == stackVal);
-            TEST(sw3.get() == heapVal);
+            TEST(sw2.data() == stackVal);
+            TEST(sw3.data() == heapVal);
             swap(sw2, sw3);
-            TEST(sw2.get() == heapVal);
-            TEST(sw3.get() == stackVal);
+            TEST(sw2.data() == heapVal);
+            TEST(sw3.data() == stackVal);
             swap(sw2, sEmpty1);
-            TEST(sEmpty1.get() == heapVal);
-            TEST(sw2.get() == NULL);
+            TEST(sEmpty1.data() == heapVal);
+            TEST(sw2.data() == nullptr);
             swap(sw3, sEmpty2);
-            TEST(sEmpty2.get() == stackVal);
-            TEST(sw3.get() == NULL);
+            TEST(sEmpty2.data() == stackVal);
+            TEST(sw3.data() == nullptr);
         }
         {
             stackstring sw2(heap), sw3(heap);
-            sw3.get()[0] = 'z';
-            const std::wstring val2 = sw3.get();
+            sw3.data()[0] = 'z';
+            const std::wstring val2 = sw3.data();
             swap(sw2, sw3);
-            TEST(sw2.get() == val2);
-            TEST(sw3.get() == heapVal);
+            TEST(sw2.data() == val2);
+            TEST(sw3.data() == heapVal);
         }
         {
             stackstring sw2(stack), sw3(stack);
-            sw3.get()[0] = 'z';
-            const std::wstring val2 = sw3.get();
+            sw3.data()[0] = 'z';
+            const std::wstring val2 = sw3.data();
             swap(sw2, sw3);
-            TEST(sw2.get() == val2);
-            TEST(sw3.get() == stackVal);
+            TEST(sw2.data() == val2);
+            TEST(sw3.data() == stackVal);
         }
         std::cout << "-- Sanity check" << std::endl;
-        TEST(stack.get() == stackVal);
-        TEST(heap.get() == heapVal);
+        TEST(stack.data() == stackVal);
+        TEST(heap.data() == heapVal);
     }
     {
         std::cout << "-- Test putting stackstrings into vector (done by args) class" << std::endl;
@@ -233,12 +234,12 @@ void test_main(int, char**, char**)
         using stackstring = boost::nowide::basic_stackstring<wchar_t, char, 5>;
         std::vector<stackstring> strings;
         strings.resize(2);
-        TEST(strings[0].convert("1234") == std::wstring(L"1234"));
-        TEST(strings[1].convert("Hello World") == std::wstring(L"Hello World"));
+        TEST(strings[0].convert("1234") == std::wstring_view(L"1234"));
+        TEST(strings[1].convert("Hello World") == std::wstring_view(L"Hello World"));
         strings.push_back(stackstring("FooBar"));
-        TEST(strings[0].get() == std::wstring(L"1234"));
-        TEST(strings[1].get() == std::wstring(L"Hello World"));
-        TEST(strings[2].get() == std::wstring(L"FooBar"));
+        TEST(strings[0] == std::wstring_view(L"1234"));
+        TEST(strings[1] == std::wstring_view(L"Hello World"));
+        TEST(strings[2] == std::wstring_view(L"FooBar"));
     }
     std::cout << "- Stackstring" << std::endl;
     run_all(stackstring_to_wide, stackstring_to_narrow);

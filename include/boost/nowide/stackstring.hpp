@@ -11,6 +11,7 @@
 #include <boost/nowide/convert.hpp>
 #include <cassert>
 #include <cstring>
+#include <string_view>
 
 namespace boost {
 namespace nowide {
@@ -27,38 +28,43 @@ namespace nowide {
     /// If a NULL pointer is passed to the constructor or convert method, NULL will be returned by c_str.
     /// Similarily a default constructed stackstring will return NULL on calling c_str.
     ///
-    template<typename CharOut = wchar_t, typename CharIn = char, size_t BufferSize = 256>
+    template<typename CharOut = wchar_t, typename CharIn = char, std::size_t BufferSize = 256>
     class basic_stackstring
     {
     public:
         /// Size of the stack buffer
-        static constexpr size_t buffer_size = BufferSize;
+        static constexpr std::size_t buffer_size = BufferSize;
         /// Type of the output character (converted to)
         using output_char = CharOut;
         /// Type of the input character (converted from)
         using input_char = CharIn;
 
         /// Creates a NULL stackstring
-        basic_stackstring() : data_(NULL)
+        constexpr basic_stackstring() noexcept
         {
             buffer_[0] = 0;
         }
         /// Convert the NULL terminated string input and store in internal buffer
         /// If input is NULL, nothing will be stored
-        explicit basic_stackstring(const input_char* input) : data_(NULL)
+        explicit basic_stackstring(const input_char* input)
         {
             convert(input);
         }
         /// Convert the sequence [begin, end) and store in internal buffer
         /// If begin is NULL, nothing will be stored
-        basic_stackstring(const input_char* begin, const input_char* end) : data_(NULL)
+        basic_stackstring(const input_char* begin, const input_char* end)
         {
             convert(begin, end);
         }
         /// Copy construct from other
-        basic_stackstring(const basic_stackstring& other) : data_(NULL)
+        basic_stackstring(const basic_stackstring& other)
         {
             *this = other;
+        }
+        /// Move construct from other
+        basic_stackstring(basic_stackstring&& other) noexcept
+        {
+            *this = std::move(other);
         }
         /// Copy assign from other
         basic_stackstring& operator=(const basic_stackstring& other)
@@ -66,17 +72,36 @@ namespace nowide {
             if(this != &other)
             {
                 clear();
-                const size_t len = other.length();
+                const std::size_t len = other.length();
                 if(other.uses_stack_memory())
                     data_ = buffer_;
                 else if(other.data_)
                     data_ = new output_char[len + 1];
                 else
                 {
-                    data_ = NULL;
+                    data_ = nullptr;
                     return *this;
                 }
                 std::memcpy(data_, other.data_, sizeof(output_char) * (len + 1));
+            }
+            return *this;
+        }
+        /// Move assign from other
+        basic_stackstring& operator=(basic_stackstring&& other) noexcept
+        {
+            if(this != &other)
+            {
+                clear();
+                if(other.uses_stack_memory())
+                {
+                    const std::size_t len = other.length();
+                    data_ = buffer_;
+                    std::memcpy(data_, other.data_, sizeof(output_char) * (len + 1));
+                } else
+                {
+                    data_ = other.data_;
+                    other.data_ = nullptr;
+                }
             }
             return *this;
         }
@@ -91,9 +116,9 @@ namespace nowide {
         output_char* convert(const input_char* input)
         {
             if(input)
-                return convert(input, input + detail::strlen(input));
+                return convert(input, input + std::char_traits<input_char>::length(input));
             clear();
-            return get();
+            return data();
         }
         /// Convert the sequence [begin, end) and store in internal buffer
         /// If begin is NULL, the current buffer will be reset to NULL
@@ -103,9 +128,9 @@ namespace nowide {
 
             if(begin)
             {
-                const size_t input_len = end - begin;
+                const std::size_t input_len = end - begin;
                 // Minimum size required: 1 output char per input char + trailing NULL
-                const size_t min_output_size = input_len + 1;
+                const std::size_t min_output_size = input_len + 1;
                 // If there is a chance the converted string fits on stack, try it
                 if(min_output_size <= buffer_size && detail::convert_buffer(buffer_, buffer_size, begin, end))
                     data_ = buffer_;
@@ -113,79 +138,86 @@ namespace nowide {
                 {
                     // Fallback: Allocate a buffer that is surely large enough on heap
                     // Max size: Every input char is transcoded to the output char with maximum with + trailing NULL
-                    const size_t max_output_size = input_len * detail::utf::utf_traits<output_char>::max_width + 1;
+                    const std::size_t max_output_size = input_len * detail::utf::utf_traits<output_char>::max_width + 1;
                     data_ = new output_char[max_output_size];
                     const bool success = detail::convert_buffer(data_, max_output_size, begin, end) == data_;
                     assert(success);
                     (void)success;
                 }
             }
-            return get();
+            return data();
         }
         /// Return the converted, NULL-terminated string or NULL if no string was converted
-        output_char* get()
+        constexpr output_char* data() noexcept
         {
             return data_;
         }
         /// Return the converted, NULL-terminated string or NULL if no string was converted
-        const output_char* get() const
+        constexpr const output_char* data() const noexcept
         {
             return data_;
+        }
+        /// Return the converted, NULL-terminated string or NULL if no string was converted
+        constexpr const output_char* c_str() const noexcept
+        {
+            return data();
         }
         /// Reset the internal buffer to NULL
-        void clear()
+        void clear() noexcept
         {
             if(!uses_stack_memory())
                 delete[] data_;
-            data_ = NULL;
+            data_ = nullptr;
         }
         /// Swap lhs with rhs
-        friend void swap(basic_stackstring& lhs, basic_stackstring& rhs)
+        friend void swap(basic_stackstring& lhs, basic_stackstring& rhs) noexcept
         {
             if(lhs.uses_stack_memory())
             {
                 if(rhs.uses_stack_memory())
                 {
-                    for(size_t i = 0; i < buffer_size; i++)
-                        std::swap(lhs.buffer_[i], rhs.buffer_[i]);
+                    std::swap(lhs.buffer_, rhs.buffer_);
                 } else
                 {
                     lhs.data_ = rhs.data_;
                     rhs.data_ = rhs.buffer_;
-                    for(size_t i = 0; i < buffer_size; i++)
-                        rhs.buffer_[i] = lhs.buffer_[i];
+                    std::swap(lhs.buffer_, rhs.buffer_);
                 }
             } else if(rhs.uses_stack_memory())
             {
                 rhs.data_ = lhs.data_;
                 lhs.data_ = lhs.buffer_;
-                for(size_t i = 0; i < buffer_size; i++)
-                    lhs.buffer_[i] = rhs.buffer_[i];
+                std::swap(lhs.buffer_, rhs.buffer_);
             } else
                 std::swap(lhs.data_, rhs.data_);
         }
 
+        constexpr operator std::basic_string_view<output_char>() const noexcept
+        {
+            if(!data_)
+                return {};
+            else
+                return data_;
+        }
+
     protected:
         /// True if the stack memory is used
-        bool uses_stack_memory() const
+        constexpr bool uses_stack_memory() const noexcept
         {
             return data_ == buffer_;
         }
         /// Return the current length of the string excluding the NULL terminator
         /// If NULL is stored returns NULL
-        size_t length() const
+        constexpr std::size_t length() const noexcept
         {
             if(!data_)
                 return 0;
-            size_t len = 0;
-            while(data_[len])
-                len++;
-            return len;
+            return std::char_traits<output_char>::length(data_);
         }
 
     private:
         output_char buffer_[buffer_size];
-        output_char* data_;
+        output_char* data_{nullptr};
     }; // basic_stackstring
 
     ///

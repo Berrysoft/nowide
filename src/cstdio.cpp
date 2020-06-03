@@ -35,7 +35,7 @@ namespace nowide {
     {
         const wstackstring wname(file_name);
         const wshort_stackstring wmode(mode);
-        return _wfreopen(wname.get(), wmode.get(), stream);
+        return _wfreopen(wname.data(), wmode.data(), stream);
     }
     ///
     /// \brief Same as fopen but file_name and mode are UTF-8 strings
@@ -44,7 +44,7 @@ namespace nowide {
     {
         const wstackstring wname(file_name);
         const wshort_stackstring wmode(mode);
-        return _wfopen(wname.get(), wmode.get());
+        return _wfopen(wname.data(), wmode.data());
     }
     ///
     /// \brief Same as rename but old_name and new_name are UTF-8 strings
@@ -52,7 +52,7 @@ namespace nowide {
     int rename(const char* old_name, const char* new_name)
     {
         const wstackstring wold(old_name), wnew(new_name);
-        return _wrename(wold.get(), wnew.get());
+        return _wrename(wold.data(), wnew.data());
     }
     ///
     /// \brief Same as rename but name is UTF-8 string
@@ -60,7 +60,7 @@ namespace nowide {
     int remove(const char* name)
     {
         const wstackstring wname(name);
-        return _wremove(wname.get());
+        return _wremove(wname.data());
     }
 } // namespace nowide
 } // namespace boost

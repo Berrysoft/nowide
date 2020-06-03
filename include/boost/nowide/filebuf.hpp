@@ -39,7 +39,7 @@ namespace nowide {
         std::basic_filebuf<CharType, Traits>* open(const char* s, std::ios_base::openmode mode)
         {
             const wstackstring name(s);
-            return std::basic_filebuf<CharType, Traits>::open(name.get(), mode);
+            return std::basic_filebuf<CharType, Traits>::open(name.data(), mode);
         }
 
 #if BOOST_NOWIDE_USE_WCHAR_OVERLOADS

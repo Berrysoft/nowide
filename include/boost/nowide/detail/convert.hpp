@@ -88,15 +88,6 @@ namespace nowide {
             return result;
         }
 
-        /// Return the length of the given string.
-        /// That is the number of characters until the first NULL character
-        /// Equivalent to `std::strlen(s)` but can handle wide-strings
-        template<typename Char>
-        constexpr size_t strlen(const Char* s)
-        {
-            return std::char_traits<Char>::length(s);
-        }
-
     } // namespace detail
       /// \endcond
 } // namespace nowide
