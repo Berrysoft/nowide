@@ -22,9 +22,9 @@ namespace nowide {
     class args
     {
     public:
-        args(int&, char**&)
+        BOOST_NOWIDE_NODISCARD args(int&, char**&)
         {}
-        args(int&, char**&, char**&)
+        BOOST_NOWIDE_NODISCARD args(int&, char**&, char**&)
         {}
     };
 
@@ -60,7 +60,7 @@ namespace nowide {
         ///
         /// Fix command line arguments
         ///
-        args(int& argc, char**& argv) :
+        BOOST_NOWIDE_NODISCARD args(int& argc, char**& argv) :
             old_argc_(argc), old_argv_(argv), old_env_(0), old_argc_ptr_(&argc), old_argv_ptr_(&argv), old_env_ptr_(0)
         {
             fix_args(argc, argv);
@@ -68,7 +68,7 @@ namespace nowide {
         ///
         /// Fix command line arguments and environment
         ///
-        args(int& argc, char**& argv, char**& env) :
+        BOOST_NOWIDE_NODISCARD args(int& argc, char**& argv, char**& env) :
             old_argc_(argc), old_argv_(argv), old_env_(env), old_argc_ptr_(&argc), old_argv_ptr_(&argv),
             old_env_ptr_(&env)
         {

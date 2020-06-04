@@ -50,6 +50,7 @@
 #endif // auto-linking disabled
 
 #define BOOST_NOWIDE_FALLTHROUGH [[fallthrough]]
+#define BOOST_NOWIDE_NODISCARD [[nodiscard]]
 
 //! @endcond
 
