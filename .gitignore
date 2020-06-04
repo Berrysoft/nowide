@@ -7,3 +7,4 @@
 !Jamfile.*
 CMakeSettings.json
 /out
+/TestResults

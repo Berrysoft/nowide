@@ -25,16 +25,8 @@
 
 #include "test.hpp"
 
-template<typename Key, typename Value, typename Key2>
-Value get(const std::map<Key, Value>& map, const Key2& key)
-{
-    typename std::map<Key, Value>::const_iterator it = map.find(key);
-    if(it == map.end())
-        throw std::runtime_error("Key not found");
-    return it->second;
-}
-
 namespace nw = boost::nowide;
+
 template<typename FStream>
 class io_fstream
 {
@@ -146,7 +138,7 @@ perf_data test_io(const char* file)
 {
     namespace chrono = std::chrono;
     using clock = chrono::high_resolution_clock;
-    using milliseconds = chrono::duration<double, std::milli>;
+    using chrono::milliseconds;
     perf_data results;
     // Use vector to force write to memory and avoid possible reordering
     std::vector<clock::time_point> start_and_end(2);
@@ -169,7 +161,7 @@ perf_data test_io(const char* file)
         if(block_size >= MIN_BLOCK_SIZE)
         {
             const milliseconds duration = chrono::duration_cast<milliseconds>(start_and_end[1] - start_and_end[0]);
-            const double speed = data_size / duration.count() / 1024; // MB/s
+            const double speed = (double)data_size / duration.count() / 1024; // MB/s
             results.write[block_size] = speed;
             std::cout << "  write block size " << std::setw(8) << block_size << " " << std::fixed
                       << std::setprecision(3) << speed << " MB/s" << std::endl;
@@ -189,7 +181,7 @@ perf_data test_io(const char* file)
         }
         start_and_end[1] = clock::now();
         const milliseconds duration = chrono::duration_cast<milliseconds>(start_and_end[1] - start_and_end[0]);
-        const double speed = data_size / duration.count() / 1024; // MB/s
+        const double speed = (double)data_size / duration.count() / 1024; // MB/s
         results.read[block_size] = speed;
         std::cout << "  read block size " << std::setw(8) << block_size << " " << std::fixed << std::setprecision(3)
                   << speed << " MB/s" << std::endl;
@@ -212,8 +204,8 @@ perf_data test_io_driver(const char* file, const char* type)
         double read_speed = 0, write_speed = 0;
         for(int i = 0; i < repeats; i++)
         {
-            read_speed += get(results[i].read, block_size);
-            write_speed += get(results[i].write, block_size);
+            read_speed += results[i].read.at(block_size);
+            write_speed += results[i].write.at(block_size);
         }
         results[0].read[block_size] = read_speed / repeats;
         results[0].write[block_size] = write_speed / repeats;
@@ -232,9 +224,9 @@ void print_perf_data(const std::map<size_t, double>& stdio_data,
     for(int block_size = MIN_BLOCK_SIZE; block_size <= MAX_BLOCK_SIZE; block_size *= 2)
     {
         std::cout << std::setw(8) << block_size << "  ";
-        std::cout << std::fixed << std::setprecision(3) << std::setw(8) << get(stdio_data, block_size) << " MB/s ";
-        std::cout << std::fixed << std::setprecision(3) << std::setw(8) << get(std_data, block_size) << " MB/s ";
-        std::cout << std::fixed << std::setprecision(3) << std::setw(8) << get(nowide_data, block_size) << " MB/s ";
+        std::cout << std::fixed << std::setprecision(3) << std::setw(8) << stdio_data.at(block_size) << " MB/s ";
+        std::cout << std::fixed << std::setprecision(3) << std::setw(8) << std_data.at(block_size) << " MB/s ";
+        std::cout << std::fixed << std::setprecision(3) << std::setw(8) << nowide_data.at(block_size) << " MB/s ";
         std::cout << std::endl;
     }
 }
@@ -264,7 +256,7 @@ int main(int argc, char** argv)
     try
     {
         test_perf(filename.c_str());
-    } catch(const std::runtime_error& err)
+    } catch(const std::exception& err)
     {
         std::cerr << "Benchmarking failed: " << err.what() << std::endl;
         return 1;
