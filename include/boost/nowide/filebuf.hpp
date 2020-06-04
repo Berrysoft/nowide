@@ -13,8 +13,8 @@
 #include <boost/nowide/config.hpp>
 #ifdef BOOST_WINDOWS
 #include <boost/nowide/cstdio.hpp>
+#include <boost/nowide/filesystem.hpp>
 #include <boost/nowide/stackstring.hpp>
-#include <filesystem>
 #endif
 #include <fstream>
 
@@ -50,7 +50,7 @@ namespace nowide {
             return this->open(str.c_str(), mode);
         }
 
-        std::basic_filebuf<CharType, Traits>* open(const std::filesystem::path& p, std::ios_base::openmode mode)
+        std::basic_filebuf<CharType, Traits>* open(const filesystem::path& p, std::ios_base::openmode mode)
         {
             return std::basic_filebuf<CharType, Traits>::open(p, mode);
         }

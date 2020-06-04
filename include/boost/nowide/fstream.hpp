@@ -196,7 +196,7 @@ namespace nowide {
             {
                 open(file_name, mode);
             }
-            explicit fstream_impl(const std::filesystem::path& file_name,
+            explicit fstream_impl(const filesystem::path& file_name,
                                   std::ios_base::openmode mode = T_StreamType::mode) :
                 fstream_impl()
             {
@@ -212,7 +212,7 @@ namespace nowide {
             {
                 open(file_name.c_str(), mode);
             }
-            void open(const std::filesystem::path& file_name, std::ios_base::openmode mode = T_StreamType::mode)
+            void open(const filesystem::path& file_name, std::ios_base::openmode mode = T_StreamType::mode)
             {
                 open(file_name.c_str(), mode);
             }

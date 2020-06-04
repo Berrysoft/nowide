@@ -19,18 +19,18 @@ void test_main(int, char**, char**)
       prefix + "\xf0\x9d\x92\x9e-\xD0\xBF\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82-\xE3\x82\x84\xE3\x81\x82.txt";
 
     {
-        boost::nowide::ofstream f(utf8_name.c_str());
+        boost::nowide::ofstream f(utf8_name);
         TEST(f);
         f << "Test" << std::endl;
     }
 
-    TEST(std::filesystem::is_regular_file(std::filesystem::u8path(utf8_name)));
+    const boost::nowide::filesystem::path path = utf8_name;
+
+    TEST(boost::nowide::filesystem::is_regular_file(path));
 
     TEST(boost::nowide::remove(utf8_name.c_str()) == 0);
 
-    TEST(!std::filesystem::is_regular_file(std::filesystem::u8path(utf8_name)));
-
-    const std::filesystem::path path = std::filesystem::u8path(utf8_name);
+    TEST(!boost::nowide::filesystem::is_regular_file(path));
 
     {
         boost::nowide::ofstream f(path);
