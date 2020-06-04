@@ -48,8 +48,17 @@ namespace nowide {
             {
                 return narrow(path_base::wstring());
             }
+            std::string generic_string() const
+            {
+                return narrow(path_base::generic_wstring());
+            }
 
-            path& operator=(path&& p) noexcept
+            path& operator=(const std::filesystem::path& p)
+            {
+                path_base::operator=(p);
+                return *this;
+            }
+            path& operator=(std::filesystem::path&& p)
             {
                 path_base::operator=(std::move(p));
                 return *this;
@@ -58,6 +67,11 @@ namespace nowide {
             path& operator=(const path& p)
             {
                 path_base::operator=(p);
+                return *this;
+            }
+            path& operator=(path&& p) noexcept
+            {
+                path_base::operator=(std::move(p));
                 return *this;
             }
         };
