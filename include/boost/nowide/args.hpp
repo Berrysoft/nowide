@@ -10,6 +10,7 @@
 #define BOOST_NOWIDE_ARGS_HPP_INCLUDED
 
 #include <boost/config.hpp>
+#include <boost/nowide/config.hpp>
 #ifdef BOOST_WINDOWS
 #include <boost/nowide/stackstring.hpp>
 #include <stdexcept>
