@@ -79,31 +79,8 @@ namespace nowide {
         using fstream_impl = detail::fstream_impl<CharType, Traits, detail::StreamTypeIn>;
 
     public:
-        basic_ifstream()
-        {}
+        using fstream_impl::fstream_impl;
 
-        explicit basic_ifstream(const char* file_name, std::ios_base::openmode mode = std::ios_base::in)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_ifstream(const wchar_t* file_name, std::ios_base::openmode mode = std::ios_base::in)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_ifstream(const std::string& file_name, std::ios_base::openmode mode = std::ios_base::in)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_ifstream(const std::filesystem::path& file_name,
-                                std::ios_base::openmode mode = std::ios_base::in)
-        {
-            open(file_name, mode);
-        }
-        using fstream_impl::open;
-        using fstream_impl::is_open;
-        using fstream_impl::close;
-        using fstream_impl::rdbuf;
-        using fstream_impl::swap;
         basic_ifstream(const basic_ifstream&) = delete;
         basic_ifstream& operator=(const basic_ifstream&) = delete;
         basic_ifstream(basic_ifstream&& other) noexcept : fstream_impl(std::move(other))
@@ -125,31 +102,8 @@ namespace nowide {
         using fstream_impl = detail::fstream_impl<CharType, Traits, detail::StreamTypeOut>;
 
     public:
-        basic_ofstream()
-        {}
-        explicit basic_ofstream(const char* file_name, std::ios_base::openmode mode = std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_ofstream(const wchar_t* file_name, std::ios_base::openmode mode = std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_ofstream(const std::string& file_name, std::ios_base::openmode mode = std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_ofstream(const std::filesystem::path& file_name,
-                                std::ios_base::openmode mode = std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
+        using fstream_impl::fstream_impl;
 
-        using fstream_impl::open;
-        using fstream_impl::is_open;
-        using fstream_impl::close;
-        using fstream_impl::rdbuf;
-        using fstream_impl::swap;
         basic_ofstream(const basic_ofstream&) = delete;
         basic_ofstream& operator=(const basic_ofstream&) = delete;
         basic_ofstream(basic_ofstream&& other) noexcept : fstream_impl(std::move(other))
@@ -161,10 +115,6 @@ namespace nowide {
         }
     };
 
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4250) // <class> : inherits <method> via dominance
-#endif
     ///
     /// \brief Same as std::basic_fstream<char> but accepts UTF-8 strings under Windows
     ///
@@ -174,34 +124,8 @@ namespace nowide {
         using fstream_impl = detail::fstream_impl<CharType, Traits, detail::StreamTypeInOut>;
 
     public:
-        basic_fstream()
-        {}
-        explicit basic_fstream(const char* file_name,
-                               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_fstream(const wchar_t* file_name,
-                               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_fstream(const std::string& file_name,
-                               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
-        explicit basic_fstream(const std::filesystem::path& file_name,
-                               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-        {
-            open(file_name, mode);
-        }
+        using fstream_impl::fstream_impl;
 
-        using fstream_impl::open;
-        using fstream_impl::is_open;
-        using fstream_impl::close;
-        using fstream_impl::rdbuf;
-        using fstream_impl::swap;
         basic_fstream(const basic_fstream&) = delete;
         basic_fstream& operator=(const basic_fstream&) = delete;
         basic_fstream(basic_fstream&& other) noexcept : fstream_impl(std::move(other))
@@ -212,26 +136,6 @@ namespace nowide {
             return *this;
         }
     };
-    template<typename CharType, typename Traits>
-    void swap(basic_filebuf<CharType, Traits>& lhs, basic_filebuf<CharType, Traits>& rhs)
-    {
-        lhs.swap(rhs);
-    }
-    template<typename CharType, typename Traits>
-    void swap(basic_ifstream<CharType, Traits>& lhs, basic_ifstream<CharType, Traits>& rhs)
-    {
-        lhs.swap(rhs);
-    }
-    template<typename CharType, typename Traits>
-    void swap(basic_ofstream<CharType, Traits>& lhs, basic_ofstream<CharType, Traits>& rhs)
-    {
-        lhs.swap(rhs);
-    }
-    template<typename CharType, typename Traits>
-    void swap(basic_fstream<CharType, Traits>& lhs, basic_fstream<CharType, Traits>& rhs)
-    {
-        lhs.swap(rhs);
-    }
 
     ///
     /// Same as std::ifstream but accepts UTF-8 strings under Windows
@@ -273,25 +177,30 @@ namespace nowide {
             using stream_base::setstate;
             using stream_base::clear;
 
-        protected:
             using base_buf_holder::buf_;
 
             fstream_impl() : stream_base(&buf_)
             {}
-            fstream_impl(const fstream_impl&) = delete;
-            fstream_impl& operator=(const fstream_impl&) = delete;
-
-            // coverity[exn_spec_violation]
-            fstream_impl(fstream_impl&& other) noexcept :
-                base_buf_holder(std::move(other)), stream_base(std::move(other))
+            explicit fstream_impl(const char* file_name, std::ios_base::openmode mode = T_StreamType::mode) :
+                fstream_impl()
             {
-                this->set_rdbuf(rdbuf());
+                open(file_name, mode);
             }
-            fstream_impl& operator=(fstream_impl&& rhs) noexcept
+            explicit fstream_impl(const wchar_t* file_name, std::ios_base::openmode mode = T_StreamType::mode) :
+                fstream_impl()
             {
-                base_buf_holder::operator=(std::move(rhs));
-                stream_base::operator=(std::move(rhs));
-                return *this;
+                open(file_name, mode);
+            }
+            explicit fstream_impl(const std::string& file_name, std::ios_base::openmode mode = T_StreamType::mode) :
+                fstream_impl()
+            {
+                open(file_name, mode);
+            }
+            explicit fstream_impl(const std::filesystem::path& file_name,
+                                  std::ios_base::openmode mode = T_StreamType::mode) :
+                fstream_impl()
+            {
+                open(file_name, mode);
             }
             void swap(fstream_impl& other)
             {
@@ -321,10 +230,6 @@ namespace nowide {
                 else
                     clear();
             }
-            bool is_open()
-            {
-                return rdbuf()->is_open();
-            }
             bool is_open() const
             {
                 return rdbuf()->is_open();
@@ -339,10 +244,24 @@ namespace nowide {
             {
                 return const_cast<internal_buffer_type*>(&buf_);
             }
+
+        protected:
+            fstream_impl(const fstream_impl&) = delete;
+            fstream_impl& operator=(const fstream_impl&) = delete;
+
+            // coverity[exn_spec_violation]
+            fstream_impl(fstream_impl&& other) noexcept :
+                base_buf_holder(std::move(other)), stream_base(std::move(other))
+            {
+                this->set_rdbuf(rdbuf());
+            }
+            fstream_impl& operator=(fstream_impl&& rhs) noexcept
+            {
+                base_buf_holder::operator=(std::move(rhs));
+                stream_base::operator=(std::move(rhs));
+                return *this;
+            }
         };
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
     } // namespace detail
 
 #endif // windows
