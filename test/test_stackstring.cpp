@@ -83,6 +83,14 @@ void test_main(int, char**, char**)
         TEST(s2.data() == nullptr);
     }
     {
+        std::cout << "-- empty string view to ctor results in nullptr" << std::endl;
+        const std::wstring_view whello_view = whello;
+        const boost::nowide::short_stackstring s(std::wstring_view{});
+        TEST(s.data() == nullptr);
+        const boost::nowide::short_stackstring s2(whello_view.substr(0, 0));
+        TEST(s.data() == nullptr);
+    }
+    {
         std::cout << "-- nullptr passed to convert results in nullptr" << std::endl;
         boost::nowide::short_stackstring s(L"foo");
         TEST(s.data() == std::string_view("foo"));

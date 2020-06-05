@@ -50,6 +50,11 @@ public:
     {
         convert(input);
     }
+    /// Convert the string input and store in internal buffer
+    explicit basic_stackstring(std::basic_string_view<input_char> input)
+    {
+        convert(input);
+    }
     /// Convert the sequence [begin, end) and store in internal buffer
     /// If begin is NULL, nothing will be stored
     basic_stackstring(const input_char* begin, const input_char* end)
@@ -115,10 +120,12 @@ public:
     /// If input is NULL, the current buffer will be reset to NULL
     output_char* convert(const input_char* input)
     {
-        if(input)
-            return convert(input, input + std::char_traits<input_char>::length(input));
-        clear();
-        return data();
+        return convert(input ? std::basic_string_view<input_char>(input) : std::basic_string_view<input_char>());
+    }
+    /// Convert the string input and store in internal buffer
+    output_char* convert(std::basic_string_view<input_char> input)
+    {
+        return convert(input.data(), input.data() + input.length());
     }
     /// Convert the sequence [begin, end) and store in internal buffer
     /// If begin is NULL, the current buffer will be reset to NULL
@@ -192,6 +199,7 @@ public:
             std::swap(lhs.data_, rhs.data_);
     }
 
+    /// Converts to std::basic_string_view
     constexpr operator std::basic_string_view<output_char>() const noexcept
     {
         if(!data_)
@@ -200,17 +208,19 @@ public:
             return data_;
     }
 
+    /// Return the reference of character of the specified index
     constexpr output_char& operator[](std::size_t index) noexcept
     {
         return data_[index];
     }
+    /// Return the reference of character of the specified index
     constexpr const output_char& operator[](std::size_t index) const noexcept
     {
         return data_[index];
     }
 
     /// Return the current length of the string excluding the NULL terminator
-    /// If NULL is stored returns NULL
+    /// If NULL is stored returns 0
     constexpr std::size_t length() const noexcept
     {
         if(!data_)
@@ -219,6 +229,13 @@ public:
             return std::char_traits<output_char>::length(data_);
     }
 
+    /// Same as length()
+    constexpr std::size_t size() const noexcept
+    {
+        return length();
+    }
+
+    /// Return whether the string is empty
     constexpr bool empty() const noexcept
     {
         if(!data_)
