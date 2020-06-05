@@ -31,13 +31,13 @@ namespace nowide {
             {}
             path(const std::string_view& string) : path_base(widen(string))
             {}
-            path(const std::filesystem::path& p) : path_base(p)
+            path(const path_base& p) : path_base(p)
             {}
-            path(std::filesystem::path&& p) : path_base(std::move(p))
+            path(path_base&& p) : path_base(std::move(p))
             {}
-            path(const path& p) : path_base(p)
+            path(const path& p) : path_base(static_cast<const path_base&>(p))
             {}
-            path(path&& p) noexcept : path_base(std::move(p))
+            path(path&& p) noexcept : path_base(static_cast<path_base&&>(std::move(p)))
             {}
 
             std::string string() const
@@ -65,12 +65,12 @@ namespace nowide {
                 return *this;
             }
 
-            path& operator=(const std::filesystem::path& p)
+            path& operator=(const path_base& p)
             {
                 path_base::operator=(p);
                 return *this;
             }
-            path& operator=(std::filesystem::path&& p)
+            path& operator=(path_base&& p)
             {
                 path_base::operator=(std::move(p));
                 return *this;
@@ -78,12 +78,12 @@ namespace nowide {
 
             path& operator=(const path& p)
             {
-                path_base::operator=(p);
+                path_base::operator=(static_cast<const path_base&>(p));
                 return *this;
             }
             path& operator=(path&& p) noexcept
             {
-                path_base::operator=(std::move(p));
+                path_base::operator=(static_cast<path_base&&>(std::move(p)));
                 return *this;
             }
         };
