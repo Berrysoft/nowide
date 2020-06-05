@@ -26,11 +26,11 @@ void test_main(int, char**, char**)
 
     const boost::nowide::filesystem::path path = utf8_name;
 
-    TEST(boost::nowide::filesystem::is_regular_file(path));
+    TEST(std::filesystem::is_regular_file(path));
 
     TEST(boost::nowide::remove(utf8_name.c_str()) == 0);
 
-    TEST(!boost::nowide::filesystem::is_regular_file(path));
+    TEST(!std::filesystem::is_regular_file(path));
 
     {
         boost::nowide::ofstream f(path);

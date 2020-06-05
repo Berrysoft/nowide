@@ -15,12 +15,8 @@ namespace boost {
 namespace nowide {
     namespace filesystem {
 #ifndef BOOST_WINDOWS
-        using namespace std::filesystem;
+        using std::filesystem::path;
 #else  // Windows
-        namespace {
-            using namespace std::filesystem;
-        }
-
         class path : public std::filesystem::path
         {
         private:
@@ -33,7 +29,7 @@ namespace nowide {
             {}
             path(const std::string& string) : path_base(widen(string))
             {}
-            path(std::string_view&& string) : path_base(widen(string))
+            path(const std::string_view& string) : path_base(widen(string))
             {}
             path(const std::filesystem::path& p) : path_base(p)
             {}
@@ -51,6 +47,22 @@ namespace nowide {
             std::string generic_string() const
             {
                 return narrow(path_base::generic_wstring());
+            }
+
+            path& operator=(const char* string)
+            {
+                path_base::operator=(widen(string));
+                return *this;
+            }
+            path& operator=(const std::string& string)
+            {
+                path_base::operator=(widen(string));
+                return *this;
+            }
+            path& operator=(const std::string_view& string)
+            {
+                path_base::operator=(widen(string));
+                return *this;
             }
 
             path& operator=(const std::filesystem::path& p)
