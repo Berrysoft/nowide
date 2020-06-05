@@ -14,83 +14,76 @@
 #include <iterator>
 #include <string>
 
-namespace boost {
-namespace nowide {
-    /// \cond INTERNAL
-    namespace detail {
-        ///
-        /// Convert a buffer of UTF sequences in the range [source_begin, source_end)
-        /// from \tparam CharIn to \tparam CharOut to the output \a buffer of size \a buffer_size.
-        ///
-        /// \return original buffer containing the NULL terminated string or NULL
-        ///
-        /// If there is not enough room in the buffer NULL is returned, and the content of the buffer is undefined.
-        /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
-        ///
-        template<typename CharOut, typename CharIn>
-        CharOut* convert_buffer(CharOut* buffer,
-                                size_t buffer_size,
-                                const CharIn* source_begin,
-                                const CharIn* source_end) noexcept
+/// \cond INTERNAL
+namespace boost::nowide::detail {
+///
+/// Convert a buffer of UTF sequences in the range [source_begin, source_end)
+/// from \tparam CharIn to \tparam CharOut to the output \a buffer of size \a buffer_size.
+///
+/// \return original buffer containing the NULL terminated string or NULL
+///
+/// If there is not enough room in the buffer NULL is returned, and the content of the buffer is undefined.
+/// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+///
+template<typename CharOut, typename CharIn>
+CharOut*
+convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, const CharIn* source_end) noexcept
+{
+    CharOut* rv = buffer;
+    if(buffer_size == 0)
+        return 0;
+    buffer_size--;
+    while(source_begin != source_end)
+    {
+        using namespace detail::utf;
+        code_point c = utf_traits<CharIn>::template decode(source_begin, source_end);
+        if(c == illegal || c == incomplete)
         {
-            CharOut* rv = buffer;
-            if(buffer_size == 0)
-                return 0;
-            buffer_size--;
-            while(source_begin != source_end)
-            {
-                using namespace detail::utf;
-                code_point c = utf_traits<CharIn>::template decode(source_begin, source_end);
-                if(c == illegal || c == incomplete)
-                {
-                    c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
-                }
-                size_t width = utf_traits<CharOut>::width(c);
-                if(buffer_size < width)
-                {
-                    rv = NULL;
-                    break;
-                }
-                buffer = utf_traits<CharOut>::template encode(c, buffer);
-                buffer_size -= width;
-            }
-            *buffer++ = 0;
-            return rv;
+            c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
         }
-
-        ///
-        /// Convert the UTF sequences in range [begin, end) from \tparam CharIn to \tparam CharOut
-        /// and return it as a string
-        ///
-        /// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
-        ///
-        template<typename CharOut,
-                 typename CharIn,
-                 typename TraitsOut = std::char_traits<CharOut>,
-                 typename AllocOut = std::allocator<CharOut>>
-        std::basic_string<CharOut, TraitsOut, AllocOut>
-        convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {})
+        size_t width = utf_traits<CharOut>::width(c);
+        if(buffer_size < width)
         {
-            std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
-            using inserter_type = std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>>;
-            inserter_type inserter(result);
-            using namespace detail::utf;
-            code_point c;
-            while(begin != end)
-            {
-                c = utf_traits<CharIn>::template decode(begin, end);
-                if(c == illegal || c == incomplete)
-                {
-                    c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
-                }
-                utf_traits<CharOut>::template encode(c, inserter);
-            }
-            return result;
+            rv = NULL;
+            break;
         }
+        buffer = utf_traits<CharOut>::template encode(c, buffer);
+        buffer_size -= width;
+    }
+    *buffer++ = 0;
+    return rv;
+}
 
-    } // namespace detail
-      /// \endcond
-} // namespace nowide
-} // namespace boost
+///
+/// Convert the UTF sequences in range [begin, end) from \tparam CharIn to \tparam CharOut
+/// and return it as a string
+///
+/// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+///
+template<typename CharOut,
+         typename CharIn,
+         typename TraitsOut = std::char_traits<CharOut>,
+         typename AllocOut = std::allocator<CharOut>>
+std::basic_string<CharOut, TraitsOut, AllocOut>
+convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {})
+{
+    std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
+    using inserter_type = std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>>;
+    inserter_type inserter(result);
+    using namespace detail::utf;
+    code_point c;
+    while(begin != end)
+    {
+        c = utf_traits<CharIn>::template decode(begin, end);
+        if(c == illegal || c == incomplete)
+        {
+            c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+        }
+        utf_traits<CharOut>::template encode(c, inserter);
+    }
+    return result;
+}
+} // namespace boost::nowide::detail
+/// \endcond
 
 #endif

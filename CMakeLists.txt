@@ -46,7 +46,6 @@ if(WIN32)
   if(BUILD_SHARED_LIBS)
     target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_DYN_LINK)
   endif()
-  target_compile_definitions(boost_nowide PUBLIC BOOST_NOWIDE_NO_LIB)
   target_include_directories(boost_nowide
       PUBLIC 
           $<INSTALL_INTERFACE:include>    
@@ -68,7 +67,6 @@ if(WIN32)
   )
 else()
   add_library(boost_nowide INTERFACE)
-  target_compile_definitions(boost_nowide INTERFACE BOOST_NOWIDE_NO_LIB)
   target_include_directories(boost_nowide
       INTERFACE 
           $<INSTALL_INTERFACE:include>    

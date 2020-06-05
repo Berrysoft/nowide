@@ -18,53 +18,51 @@
 #endif
 #include <fstream>
 
-namespace boost {
-namespace nowide {
+namespace boost::nowide {
 #ifndef BOOST_WINDOWS
-    using std::basic_filebuf;
-    using std::filebuf;
-    using std::wfilebuf;
+using std::basic_filebuf;
+using std::filebuf;
+using std::wfilebuf;
 #else // Windows
-    ///
-    /// \brief The basic_filebuf type.
-    ///
-    template<typename CharType, typename Traits = std::char_traits<CharType>>
-    class basic_filebuf : public std::basic_filebuf<CharType, Traits>
+///
+/// \brief The basic_filebuf type.
+///
+template<typename CharType, typename Traits = std::char_traits<CharType>>
+class basic_filebuf : public std::basic_filebuf<CharType, Traits>
+{
+public:
+    using std::basic_filebuf<CharType, Traits>::basic_filebuf;
+
+    std::basic_filebuf<CharType, Traits>* open(const char* s, std::ios_base::openmode mode)
     {
-    public:
-        using std::basic_filebuf<CharType, Traits>::basic_filebuf;
+        const wstackstring name(s);
+        return std::basic_filebuf<CharType, Traits>::open(name.data(), mode);
+    }
 
-        std::basic_filebuf<CharType, Traits>* open(const char* s, std::ios_base::openmode mode)
-        {
-            const wstackstring name(s);
-            return std::basic_filebuf<CharType, Traits>::open(name.data(), mode);
-        }
+    std::basic_filebuf<CharType, Traits>* open(const wchar_t* s, std::ios_base::openmode mode)
+    {
+        return std::basic_filebuf<CharType, Traits>::open(s, mode);
+    }
 
-        std::basic_filebuf<CharType, Traits>* open(const wchar_t* s, std::ios_base::openmode mode)
-        {
-            return std::basic_filebuf<CharType, Traits>::open(s, mode);
-        }
+    std::basic_filebuf<CharType, Traits>* open(const std::string& str, std::ios_base::openmode mode)
+    {
+        return this->open(str.c_str(), mode);
+    }
 
-        std::basic_filebuf<CharType, Traits>* open(const std::string& str, std::ios_base::openmode mode)
-        {
-            return this->open(str.c_str(), mode);
-        }
+    std::basic_filebuf<CharType, Traits>* open(const filesystem::path& p, std::ios_base::openmode mode)
+    {
+        return std::basic_filebuf<CharType, Traits>::open(p, mode);
+    }
+};
 
-        std::basic_filebuf<CharType, Traits>* open(const filesystem::path& p, std::ios_base::openmode mode)
-        {
-            return std::basic_filebuf<CharType, Traits>::open(p, mode);
-        }
-    };
-
-    ///
-    /// \brief Convenience typedef
-    ///
-    using filebuf = basic_filebuf<char>;
-    using wfilebuf = basic_filebuf<wchar_t>;
+///
+/// \brief Convenience typedef
+///
+using filebuf = basic_filebuf<char>;
+using wfilebuf = basic_filebuf<wchar_t>;
 
 #endif // windows
 
-} // namespace nowide
-} // namespace boost
+} // namespace boost::nowide
 
 #endif

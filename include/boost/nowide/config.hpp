@@ -28,40 +28,14 @@
 #define BOOST_NOWIDE_DECL
 #endif // BOOST_NOWIDE_DYN_LINK
 
-//
-// Automatically link to the correct build variant where possible.
-//
-#if !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_NOWIDE_NO_LIB) && !defined(BOOST_NOWIDE_SOURCE)
-//
-// Set the name of our library, this will get undef'ed by auto_link.hpp
-// once it's done with it:
-//
-#define BOOST_LIB_NAME boost_nowide
-//
-// If we're importing code from a dll, then tell auto_link.hpp about it:
-//
-#if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_NOWIDE_DYN_LINK)
-#define BOOST_DYN_LINK
-#endif
-//
-// And include the header that does the work:
-//
-#include <boost/config/auto_link.hpp>
-#endif // auto-linking disabled
-
-#define BOOST_NOWIDE_FALLTHROUGH [[fallthrough]]
-#define BOOST_NOWIDE_NODISCARD [[nodiscard]]
-
 //! @endcond
 
-namespace boost {
 ///
 /// \brief This namespace includes implementations of the standard library functions and
 /// classes such that they accept UTF-8 strings on Windows.
 /// On other platforms (i.e. not on Windows) those functions and classes are just aliases
 /// of the corresponding ones from the std namespace or behave like them.
 ///
-namespace nowide {}
-} // namespace boost
+namespace boost::nowide {}
 
 #endif // boost/nowide/config.hpp

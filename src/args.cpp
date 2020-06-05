@@ -12,28 +12,26 @@
 
 #include <windows.h>
 
-namespace boost {
-namespace nowide {
-    args::wargv_ptr::wargv_ptr() noexcept
-    {
-        p = CommandLineToArgvW(GetCommandLineW(), &argc);
-    }
+namespace boost::nowide {
+args::wargv_ptr::wargv_ptr() noexcept
+{
+    p = CommandLineToArgvW(GetCommandLineW(), &argc);
+}
 
-    args::wargv_ptr::~wargv_ptr()
-    {
-        if(p)
-            LocalFree(p);
-    }
+args::wargv_ptr::~wargv_ptr()
+{
+    if(p)
+        LocalFree(p);
+}
 
-    args::wenv_ptr::wenv_ptr() noexcept
-    {
-        p = GetEnvironmentStringsW();
-    }
+args::wenv_ptr::wenv_ptr() noexcept
+{
+    p = GetEnvironmentStringsW();
+}
 
-    args::wenv_ptr::~wenv_ptr()
-    {
-        if(p)
-            FreeEnvironmentStringsW(p);
-    }
-} // namespace nowide
-} // namespace boost
+args::wenv_ptr::~wenv_ptr()
+{
+    if(p)
+        FreeEnvironmentStringsW(p);
+}
+} // namespace boost::nowide

@@ -19,71 +19,69 @@
 #include <iostream>
 #endif
 
-namespace boost {
-namespace nowide {
+namespace boost::nowide {
 #ifndef BOOST_WINDOWS
-    using std::cout;
-    using std::cerr;
-    using std::cin;
-    using std::clog;
+using std::cout;
+using std::cerr;
+using std::cin;
+using std::clog;
 #else
 
-    /// \cond INTERNAL
-    namespace detail {
-        class console_output_buffer;
-        class console_input_buffer;
+/// \cond INTERNAL
+namespace detail {
+    class console_output_buffer;
+    class console_input_buffer;
 
-        class winconsole_ostream : public std::ostream
-        {
-        public:
-            BOOST_NOWIDE_DECL winconsole_ostream(int fd, winconsole_ostream* tieStream);
-            BOOST_NOWIDE_DECL ~winconsole_ostream();
+    class winconsole_ostream : public std::ostream
+    {
+    public:
+        BOOST_NOWIDE_DECL winconsole_ostream(int fd, winconsole_ostream* tieStream);
+        BOOST_NOWIDE_DECL ~winconsole_ostream();
 
-        private:
-            std::unique_ptr<console_output_buffer> d;
-        };
+    private:
+        std::unique_ptr<console_output_buffer> d;
+    };
 
-        class winconsole_istream : public std::istream
-        {
-        public:
-            BOOST_NOWIDE_DECL explicit winconsole_istream(winconsole_ostream* tieStream);
-            BOOST_NOWIDE_DECL ~winconsole_istream();
+    class winconsole_istream : public std::istream
+    {
+    public:
+        BOOST_NOWIDE_DECL explicit winconsole_istream(winconsole_ostream* tieStream);
+        BOOST_NOWIDE_DECL ~winconsole_istream();
 
-        private:
-            std::unique_ptr<console_input_buffer> d;
-        };
-    } // namespace detail
+    private:
+        std::unique_ptr<console_input_buffer> d;
+    };
+} // namespace detail
 
-    /// \endcond
+/// \endcond
 
-    ///
-    /// \brief Same as std::cin, but uses UTF-8
-    ///
-    /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
-    ///
-    extern BOOST_NOWIDE_DECL detail::winconsole_istream cin;
-    ///
-    /// \brief Same as std::cout, but uses UTF-8
-    ///
-    /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
-    ///
-    extern BOOST_NOWIDE_DECL detail::winconsole_ostream cout;
-    ///
-    /// \brief Same as std::cerr, but uses UTF-8
-    ///
-    /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
-    ///
-    extern BOOST_NOWIDE_DECL detail::winconsole_ostream cerr;
-    ///
-    /// \brief Same as std::clog, but uses UTF-8
-    ///
-    /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
-    ///
-    extern BOOST_NOWIDE_DECL detail::winconsole_ostream clog;
+///
+/// \brief Same as std::cin, but uses UTF-8
+///
+/// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
+///
+extern BOOST_NOWIDE_DECL detail::winconsole_istream cin;
+///
+/// \brief Same as std::cout, but uses UTF-8
+///
+/// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
+///
+extern BOOST_NOWIDE_DECL detail::winconsole_ostream cout;
+///
+/// \brief Same as std::cerr, but uses UTF-8
+///
+/// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
+///
+extern BOOST_NOWIDE_DECL detail::winconsole_ostream cerr;
+///
+/// \brief Same as std::clog, but uses UTF-8
+///
+/// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
+///
+extern BOOST_NOWIDE_DECL detail::winconsole_ostream clog;
 
 #endif
 
-} // namespace nowide
-} // namespace boost
+} // namespace boost::nowide
 
 #endif

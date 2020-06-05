@@ -21,79 +21,77 @@
 #include <vector>
 #include <windows.h>
 
-namespace boost {
-namespace nowide {
-    char* getenv(const char* key)
+namespace boost::nowide {
+char* getenv(const char* key)
+{
+    static stackstring value;
+
+    const wshort_stackstring name(key);
+
+    static constexpr size_t buf_size = 64;
+    wchar_t buf[buf_size];
+    std::vector<wchar_t> tmp;
+    wchar_t* ptr = buf;
+    size_t n = GetEnvironmentVariableW(name.data(), buf, buf_size);
+    if(n == 0 && GetLastError() == 203) // ERROR_ENVVAR_NOT_FOUND
+        return 0;
+    if(n >= buf_size)
     {
-        static stackstring value;
-
-        const wshort_stackstring name(key);
-
-        static constexpr size_t buf_size = 64;
-        wchar_t buf[buf_size];
-        std::vector<wchar_t> tmp;
-        wchar_t* ptr = buf;
-        size_t n = GetEnvironmentVariableW(name.data(), buf, buf_size);
-        if(n == 0 && GetLastError() == 203) // ERROR_ENVVAR_NOT_FOUND
+        tmp.resize(n + 1, L'\0');
+        n = GetEnvironmentVariableW(name.data(), &tmp[0], static_cast<unsigned>(tmp.size() - 1));
+        // The size may have changed
+        if(n >= tmp.size() - 1)
             return 0;
-        if(n >= buf_size)
-        {
-            tmp.resize(n + 1, L'\0');
-            n = GetEnvironmentVariableW(name.data(), &tmp[0], static_cast<unsigned>(tmp.size() - 1));
-            // The size may have changed
-            if(n >= tmp.size() - 1)
-                return 0;
-            ptr = &tmp[0];
-        }
-        value.convert(ptr);
-        return value.data();
+        ptr = &tmp[0];
     }
+    value.convert(ptr);
+    return value.data();
+}
 
-    int setenv(const char* key, const char* value, int overwrite)
+int setenv(const char* key, const char* value, int overwrite)
+{
+    const wshort_stackstring name(key);
+    if(!overwrite)
     {
-        const wshort_stackstring name(key);
-        if(!overwrite)
-        {
-            wchar_t unused[2];
-            if(GetEnvironmentVariableW(name.data(), unused, 2) != 0 || GetLastError() != 203) // ERROR_ENVVAR_NOT_FOUND
-                return 0;
-        }
-        const wstackstring wval(value);
-        if(SetEnvironmentVariableW(name.data(), wval.data()))
+        wchar_t unused[2];
+        if(GetEnvironmentVariableW(name.data(), unused, 2) != 0 || GetLastError() != 203) // ERROR_ENVVAR_NOT_FOUND
             return 0;
+    }
+    const wstackstring wval(value);
+    if(SetEnvironmentVariableW(name.data(), wval.data()))
+        return 0;
+    return -1;
+}
+
+int unsetenv(const char* key)
+{
+    const wshort_stackstring name(key);
+    if(SetEnvironmentVariableW(name.data(), 0))
+        return 0;
+    return -1;
+}
+
+int putenv(char* string)
+{
+    const char* key = string;
+    const char* key_end = string;
+    while(*key_end != '=' && *key_end != '\0')
+        key_end++;
+    if(*key_end == '\0')
         return -1;
-    }
+    const wshort_stackstring wkey(key, key_end);
+    const wstackstring wvalue(key_end + 1);
 
-    int unsetenv(const char* key)
-    {
-        const wshort_stackstring name(key);
-        if(SetEnvironmentVariableW(name.data(), 0))
-            return 0;
-        return -1;
-    }
+    if(SetEnvironmentVariableW(wkey.data(), wvalue.data()))
+        return 0;
+    return -1;
+}
 
-    int putenv(char* string)
-    {
-        const char* key = string;
-        const char* key_end = string;
-        while(*key_end != '=' && *key_end != '\0')
-            key_end++;
-        if(*key_end == '\0')
-            return -1;
-        const wshort_stackstring wkey(key, key_end);
-        const wstackstring wvalue(key_end + 1);
-
-        if(SetEnvironmentVariableW(wkey.data(), wvalue.data()))
-            return 0;
-        return -1;
-    }
-
-    int system(const char* cmd)
-    {
-        if(!cmd)
-            return _wsystem(0);
-        const wstackstring wcmd(cmd);
-        return _wsystem(wcmd.data());
-    }
-} // namespace nowide
-} // namespace boost
+int system(const char* cmd)
+{
+    if(!cmd)
+        return _wsystem(0);
+    const wstackstring wcmd(cmd);
+    return _wsystem(wcmd.data());
+}
+} // namespace boost::nowide
