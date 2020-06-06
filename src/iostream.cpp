@@ -9,6 +9,7 @@
 #define BOOST_NOWIDE_SOURCE
 #include <boost/nowide/convert.hpp>
 #include <boost/nowide/iostream.hpp>
+#include <atomic>
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -20,26 +21,34 @@
 
 #include <windows.h>
 
+#ifdef _MSC_VER
+#define BOOST_NOWIDE_IOSTREAM_DECL
+#else
+#define BOOST_NOWIDE_IOSTREAM_DECL BOOST_NOWIDE_DECL
+#endif // _MSC_VER
+
 namespace boost::nowide {
 namespace detail {
-
-    namespace {
-        static bool is_atty_handle(HANDLE h) noexcept
+    static bool is_atty_handle(HANDLE h) noexcept
+    {
+        if(h)
         {
-            if(h)
-            {
-                DWORD dummy;
-                return GetConsoleMode(h, &dummy) != FALSE;
-            }
-            return false;
+            DWORD dummy;
+            return GetConsoleMode(h, &dummy) != FALSE;
         }
-    } // namespace
+        return false;
+    }
 
     class console_output_buffer : public std::streambuf
     {
     public:
         console_output_buffer(HANDLE h) : handle_(h)
         {}
+
+        bool is_atty() noexcept
+        {
+            return is_atty_handle(handle_);
+        }
 
     protected:
         int sync() override
@@ -106,6 +115,11 @@ namespace detail {
     public:
         console_input_buffer(HANDLE h) : handle_(h), wsize_(0), was_newline_(true)
         {}
+
+        bool is_atty() noexcept
+        {
+            return is_atty_handle(handle_);
+        }
 
     protected:
         int sync() override
@@ -221,53 +235,111 @@ namespace detail {
         std::vector<char> pback_buffer_;
         bool was_newline_;
     };
-
-    winconsole_ostream::winconsole_ostream(int fd, winconsole_ostream* tieStream) : std::ostream(nullptr)
-    {
-        HANDLE h = nullptr;
-        switch(fd)
-        {
-        case 1: h = GetStdHandle(STD_OUTPUT_HANDLE); break;
-        case 2: h = GetStdHandle(STD_ERROR_HANDLE); break;
-        }
-        if(is_atty_handle(h))
-        {
-            d = std::make_unique<console_output_buffer>(h);
-            std::ostream::rdbuf(d.get());
-        } else
-        {
-            std::ostream::rdbuf(fd == 1 ? std::cout.rdbuf() : std::cerr.rdbuf());
-        }
-        if(tieStream)
-            tie(tieStream);
-    }
-    winconsole_ostream::~winconsole_ostream()
-    {
-        flush();
-    }
-
-    winconsole_istream::winconsole_istream(winconsole_ostream* tieStream) : std::istream(nullptr)
-    {
-        HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
-        if(is_atty_handle(h))
-        {
-            d = std::make_unique<console_input_buffer>(h);
-            std::istream::rdbuf(d.get());
-        } else
-        {
-            std::istream::rdbuf(std::cin.rdbuf());
-        }
-        if(tieStream)
-            tie(tieStream);
-    }
-
-    winconsole_istream::~winconsole_istream()
-    {}
-
 } // namespace detail
 
-detail::winconsole_ostream cout(1, nullptr);
-detail::winconsole_istream cin(&cout);
-detail::winconsole_ostream cerr(2, &cout);
-detail::winconsole_ostream clog(2, &cout);
+alignas(detail::console_input_buffer) static char cin_buf[sizeof(detail::console_input_buffer)];
+alignas(detail::console_output_buffer) static char cout_buf[sizeof(detail::console_output_buffer)];
+alignas(detail::console_output_buffer) static char cerr_buf[sizeof(detail::console_output_buffer)];
+
+BOOST_NOWIDE_IOSTREAM_DECL alignas(std::istream) char cin[sizeof(std::istream)];
+BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cout[sizeof(std::ostream)];
+BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cerr[sizeof(std::ostream)];
+BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char clog[sizeof(std::ostream)];
+
+#ifdef _MSC_VER
+#pragma comment( \
+  linker,        \
+  "/EXPORT:?cin@nowide@boost@@3V?$basic_istream@DU?$char_traits@D@std@@@std@@A=?cin@nowide@boost@@3PADA")
+
+#pragma comment( \
+  linker,        \
+  "/EXPORT:?cout@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A=?cout@nowide@boost@@3PADA")
+
+#pragma comment( \
+  linker,        \
+  "/EXPORT:?cerr@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A=?cerr@nowide@boost@@3PADA")
+
+#pragma comment( \
+  linker,        \
+  "/EXPORT:?clog@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A=?clog@nowide@boost@@3PADA")
+#endif // _MSC_VER
+
+namespace detail {
+    struct DoInit
+    {
+        DoInit();
+        ~DoInit();
+    };
+
+    DoInit::DoInit()
+    {
+        detail::console_input_buffer* pcin_buf =
+          new(cin_buf) detail::console_input_buffer(GetStdHandle(STD_INPUT_HANDLE));
+        detail::console_output_buffer* pcout_buf =
+          new(cout_buf) detail::console_output_buffer(GetStdHandle(STD_OUTPUT_HANDLE));
+        detail::console_output_buffer* pcerr_buf =
+          new(cerr_buf) detail::console_output_buffer(GetStdHandle(STD_ERROR_HANDLE));
+
+        std::istream* pcin;
+        if(pcin_buf->is_atty())
+        {
+            pcin = new(cin) std::istream(pcin_buf);
+        } else
+        {
+            pcin = new(cin) std::istream(std::cin.rdbuf());
+        }
+        std::ostream* pcout;
+        if(pcout_buf->is_atty())
+        {
+            pcout = new(cout) std::ostream(pcout_buf);
+        } else
+        {
+            pcout = new(cout) std::ostream(std::cout.rdbuf());
+        }
+        std::ostream* pcerr;
+        if(pcerr_buf->is_atty())
+        {
+            pcerr = new(cerr) std::ostream(pcerr_buf);
+            new(clog) std::ostream(pcerr_buf);
+        } else
+        {
+            pcerr = new(cerr) std::ostream(std::cerr.rdbuf());
+            new(clog) std::ostream(std::clog.rdbuf());
+        }
+
+        pcin->tie(pcout);
+        pcerr->tie(pcout);
+    }
+
+    DoInit::~DoInit()
+    {
+        try
+        {
+            std::istream* pcin = reinterpret_cast<std::istream*>(cin);
+            std::ostream* pcout = reinterpret_cast<std::ostream*>(cout);
+            std::ostream* pcerr = reinterpret_cast<std::ostream*>(cerr);
+            std::ostream* pclog = reinterpret_cast<std::ostream*>(clog);
+
+            pcout->flush();
+            pcerr->flush();
+            pclog->flush();
+
+            pcin->~basic_istream();
+            pcout->~basic_ostream();
+            pcerr->~basic_ostream();
+            pclog->~basic_ostream();
+        } catch(...)
+        {}
+    }
+} // namespace detail
+
+namespace ios {
+    Init::Init()
+    {
+        static boost::nowide::detail::DoInit __do_init{};
+    }
+
+    Init::~Init()
+    {}
+} // namespace ios
 } // namespace boost::nowide

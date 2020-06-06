@@ -13,7 +13,6 @@
 #include <boost/nowide/config.hpp>
 #ifdef BOOST_WINDOWS
 #include <istream>
-#include <memory>
 #include <ostream>
 #else
 #include <iostream>
@@ -28,58 +27,47 @@ using std::clog;
 #else
 
 /// \cond INTERNAL
-namespace detail {
-    class console_output_buffer;
-    class console_input_buffer;
-
-    class winconsole_ostream : public std::ostream
+namespace ios {
+    /// \brief Class to initialize UTF-8 iostreams
+    struct Init
     {
-    public:
-        BOOST_NOWIDE_DECL winconsole_ostream(int fd, winconsole_ostream* tieStream);
-        BOOST_NOWIDE_DECL ~winconsole_ostream();
-
-    private:
-        std::unique_ptr<console_output_buffer> d;
+        BOOST_NOWIDE_DECL Init();
+        BOOST_NOWIDE_DECL ~Init();
     };
 
-    class winconsole_istream : public std::istream
-    {
-    public:
-        BOOST_NOWIDE_DECL explicit winconsole_istream(winconsole_ostream* tieStream);
-        BOOST_NOWIDE_DECL ~winconsole_istream();
-
-    private:
-        std::unique_ptr<console_input_buffer> d;
-    };
-} // namespace detail
+#ifndef BOOST_NOWIDE_SOURCE
+    static const Init __init{};
+#endif // !BOOST_NOWIDE_SOURCE
+} // namespace ios
 
 /// \endcond
 
+#ifndef BOOST_NOWIDE_SOURCE
 ///
 /// \brief Same as std::cin, but uses UTF-8
 ///
 /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
 ///
-extern BOOST_NOWIDE_DECL detail::winconsole_istream cin;
+extern BOOST_NOWIDE_DECL std::istream cin;
 ///
 /// \brief Same as std::cout, but uses UTF-8
 ///
 /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
 ///
-extern BOOST_NOWIDE_DECL detail::winconsole_ostream cout;
+extern BOOST_NOWIDE_DECL std::ostream cout;
 ///
 /// \brief Same as std::cerr, but uses UTF-8
 ///
 /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
 ///
-extern BOOST_NOWIDE_DECL detail::winconsole_ostream cerr;
+extern BOOST_NOWIDE_DECL std::ostream cerr;
 ///
 /// \brief Same as std::clog, but uses UTF-8
 ///
 /// Note, the stream is not synchronized with stdio and not affected by std::ios::sync_with_stdio
 ///
-extern BOOST_NOWIDE_DECL detail::winconsole_ostream clog;
-
+extern BOOST_NOWIDE_DECL std::ostream clog;
+#endif // !BOOST_NOWIDE_SOURCE
 #endif
 
 } // namespace boost::nowide
