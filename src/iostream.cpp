@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
+#include <new>
 #include <vector>
 
 #ifndef NOMINMAX
@@ -315,10 +316,10 @@ namespace detail {
     {
         try
         {
-            std::istream* pcin = reinterpret_cast<std::istream*>(cin);
-            std::ostream* pcout = reinterpret_cast<std::ostream*>(cout);
-            std::ostream* pcerr = reinterpret_cast<std::ostream*>(cerr);
-            std::ostream* pclog = reinterpret_cast<std::ostream*>(clog);
+            std::istream* pcin = std::launder(reinterpret_cast<std::istream*>(cin));
+            std::ostream* pcout = std::launder(reinterpret_cast<std::ostream*>(cout));
+            std::ostream* pcerr = std::launder(reinterpret_cast<std::ostream*>(cerr));
+            std::ostream* pclog = std::launder(reinterpret_cast<std::ostream*>(clog));
 
             pcout->flush();
             pcerr->flush();
