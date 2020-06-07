@@ -6,16 +6,16 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_DETAIL_CONVERT_HPP_INCLUDED
-#define BOOST_NOWIDE_DETAIL_CONVERT_HPP_INCLUDED
+#ifndef NOWIDE_DETAIL_CONVERT_HPP_INCLUDED
+#define NOWIDE_DETAIL_CONVERT_HPP_INCLUDED
 
-#include <boost/nowide/detail/utf.hpp>
-#include <boost/nowide/replacement.hpp>
 #include <iterator>
+#include <nowide/detail/utf.hpp>
+#include <nowide/replacement.hpp>
 #include <string>
 
 /// \cond INTERNAL
-namespace boost::nowide::detail {
+namespace nowide::detail {
 ///
 /// Convert a buffer of UTF sequences in the range [source_begin, source_end)
 /// from \tparam CharIn to \tparam CharOut to the output \a buffer of size \a buffer_size.
@@ -23,7 +23,7 @@ namespace boost::nowide::detail {
 /// \return original buffer containing the NULL terminated string or NULL
 ///
 /// If there is not enough room in the buffer NULL is returned, and the content of the buffer is undefined.
-/// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+/// Any illegal sequences are replaced with the replacement character, see #NOWIDE_REPLACEMENT_CHARACTER
 ///
 template<typename CharOut, typename CharIn>
 CharOut*
@@ -39,7 +39,7 @@ convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, 
         code_point c = utf_traits<CharIn>::template decode(source_begin, source_end);
         if(c == illegal || c == incomplete)
         {
-            c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+            c = NOWIDE_REPLACEMENT_CHARACTER;
         }
         size_t width = utf_traits<CharOut>::width(c);
         if(buffer_size < width)
@@ -58,7 +58,7 @@ convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, 
 /// Convert the UTF sequences in range [begin, end) from \tparam CharIn to \tparam CharOut
 /// and return it as a string
 ///
-/// Any illegal sequences are replaced with the replacement character, see #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+/// Any illegal sequences are replaced with the replacement character, see #NOWIDE_REPLACEMENT_CHARACTER
 ///
 template<typename CharOut,
          typename CharIn,
@@ -77,13 +77,13 @@ convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {
         c = utf_traits<CharIn>::template decode(begin, end);
         if(c == illegal || c == incomplete)
         {
-            c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+            c = NOWIDE_REPLACEMENT_CHARACTER;
         }
         utf_traits<CharOut>::template encode(c, inserter);
     }
     return result;
 }
-} // namespace boost::nowide::detail
+} // namespace nowide::detail
 /// \endcond
 
 #endif

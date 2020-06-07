@@ -6,8 +6,8 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_LIB_TEST_H_INCLUDED
-#define BOOST_NOWIDE_LIB_TEST_H_INCLUDED
+#ifndef NOWIDE_LIB_TEST_H_INCLUDED
+#define NOWIDE_LIB_TEST_H_INCLUDED
 
 #include <cstdlib>
 #include <iostream>
@@ -18,29 +18,27 @@
 #include <crtdbg.h>
 #endif
 
-namespace boost {
 namespace nowide {
-    struct test_monitor
+struct test_monitor
+{
+    test_monitor()
     {
-        test_monitor()
-        {
 #if defined(_MSC_VER) && (_MSC_VER > 1310)
-            // disable message boxes on assert(), abort()
-            ::_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+        // disable message boxes on assert(), abort()
+        ::_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 #endif
 #if defined(_MSC_VER) && defined(_CPPLIB_VER) && defined(_DEBUG)
-            // disable message boxes on iterator debugging violations
-            _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
-            _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+        // disable message boxes on iterator debugging violations
+        _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+        _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
-        }
-    };
+    }
+};
 } // namespace nowide
-} // namespace boost
 
-inline boost::nowide::test_monitor& test_mon()
+inline nowide::test_monitor& test_mon()
 {
-    static boost::nowide::test_monitor instance;
+    static nowide::test_monitor instance;
     return instance;
 }
 
@@ -88,7 +86,7 @@ inline void test_equal_impl(const T& lhs, const U& rhs, const char* file, const 
         DISABLE_CONST_EXPR_DETECTED                                      \
     } while(0) DISABLE_CONST_EXPR_DETECTED_POP
 
-#ifndef BOOST_NOWIDE_TEST_NO_MAIN
+#ifndef NOWIDE_TEST_NO_MAIN
 // Tests should implement this
 void test_main(int argc, char** argv, char** env);
 
@@ -106,4 +104,4 @@ int main(int argc, char** argv, char** env)
 }
 #endif
 
-#endif // #ifndef BOOST_NOWIDE_LIB_TEST_H_INCLUDED
+#endif // #ifndef NOWIDE_LIB_TEST_H_INCLUDED

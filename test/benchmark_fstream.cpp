@@ -8,11 +8,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#define BOOST_NOWIDE_TEST_NO_MAIN
+#define NOWIDE_TEST_NO_MAIN
 
-#include <boost/nowide/convert.hpp>
-#include <boost/nowide/cstdio.hpp>
-#include <boost/nowide/fstream.hpp>
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
@@ -20,12 +17,15 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <nowide/convert.hpp>
+#include <nowide/cstdio.hpp>
+#include <nowide/fstream.hpp>
 #include <stdexcept>
 #include <vector>
 
 #include "test.hpp"
 
-namespace nw = boost::nowide;
+namespace nw = nowide;
 
 template<typename FStream>
 class io_fstream
@@ -100,15 +100,15 @@ private:
 #if defined(_MSC_VER)
 extern "C" void _ReadWriteBarrier(void);
 #pragma intrinsic(_ReadWriteBarrier)
-#define BOOST_NOWIDE_READ_WRITE_BARRIER() _ReadWriteBarrier()
+#define NOWIDE_READ_WRITE_BARRIER() _ReadWriteBarrier()
 #elif defined(__GNUC__)
 #if(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) > 40100
-#define BOOST_NOWIDE_READ_WRITE_BARRIER() __sync_synchronize()
+#define NOWIDE_READ_WRITE_BARRIER() __sync_synchronize()
 #else
-#define BOOST_NOWIDE_READ_WRITE_BARRIER() __asm__ __volatile__("" : : : "memory")
+#define NOWIDE_READ_WRITE_BARRIER() __asm__ __volatile__("" : : : "memory")
 #endif
 #else
-#define BOOST_NOWIDE_READ_WRITE_BARRIER() (void)
+#define NOWIDE_READ_WRITE_BARRIER() (void)
 #endif
 
 struct perf_data
@@ -149,11 +149,11 @@ perf_data test_io(const char* file)
         FStream tmp(file, false);
         tmp.rewind();
         start_and_end[0] = clock::now();
-        BOOST_NOWIDE_READ_WRITE_BARRIER();
+        NOWIDE_READ_WRITE_BARRIER();
         for(int size = 0; size < data_size; size += block_size)
         {
             tmp.write(&buf[0], block_size);
-            BOOST_NOWIDE_READ_WRITE_BARRIER();
+            NOWIDE_READ_WRITE_BARRIER();
         }
         tmp.flush();
         start_and_end[1] = clock::now();
@@ -173,11 +173,11 @@ perf_data test_io(const char* file)
         FStream tmp(file, true);
         tmp.rewind();
         start_and_end[0] = clock::now();
-        BOOST_NOWIDE_READ_WRITE_BARRIER();
+        NOWIDE_READ_WRITE_BARRIER();
         for(int size = 0; size < data_size; size += block_size)
         {
             tmp.read(&buf[0], block_size);
-            BOOST_NOWIDE_READ_WRITE_BARRIER();
+            NOWIDE_READ_WRITE_BARRIER();
         }
         start_and_end[1] = clock::now();
         const milliseconds duration = chrono::duration_cast<milliseconds>(start_and_end[1] - start_and_end[0]);

@@ -7,23 +7,23 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/nowide/stackstring.hpp>
 #include <iostream>
+#include <nowide/stackstring.hpp>
 #include <string_view>
 #include <vector>
 
 #include "test.hpp"
 #include "test_sets.hpp"
 
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1700
+#if defined(NOWIDE_MSVC) && NOWIDE_MSVC < 1700
 #pragma warning(disable : 4428) // universal-character-name encountered in source
 #endif
 
 template<typename CharOut, typename CharIn, size_t BufferSize>
-class test_basic_stackstring : public boost::nowide::basic_stackstring<CharOut, CharIn, BufferSize>
+class test_basic_stackstring : public nowide::basic_stackstring<CharOut, CharIn, BufferSize>
 {
 public:
-    using parent = boost::nowide::basic_stackstring<CharOut, CharIn, BufferSize>;
+    using parent = nowide::basic_stackstring<CharOut, CharIn, BufferSize>;
 
     using parent::parent;
     using parent::uses_stack_memory;
@@ -67,52 +67,52 @@ std::string heap_stackstring_to_narrow(const std::wstring& s)
 void test_main(int, char**, char**)
 {
     std::string hello = "\xd7\xa9\xd7\x9c\xd7\x95\xd7\x9d";
-    std::wstring whello = boost::nowide::widen(hello);
+    std::wstring whello = nowide::widen(hello);
     const wchar_t* wempty = L"";
 
     {
         std::cout << "-- Default constructed string is nullptr" << std::endl;
-        const boost::nowide::short_stackstring s;
+        const nowide::short_stackstring s;
         TEST(s.data() == nullptr);
     }
     {
         std::cout << "-- nullptr passed to ctor results in nullptr" << std::endl;
-        const boost::nowide::short_stackstring s(nullptr);
+        const nowide::short_stackstring s(nullptr);
         TEST(s.data() == nullptr);
-        const boost::nowide::short_stackstring s2(nullptr, nullptr);
+        const nowide::short_stackstring s2(nullptr, nullptr);
         TEST(s2.data() == nullptr);
     }
     {
         std::cout << "-- empty string view to ctor results in nullptr" << std::endl;
         const std::wstring_view whello_view = whello;
-        const boost::nowide::short_stackstring s(std::wstring_view{});
+        const nowide::short_stackstring s(std::wstring_view{});
         TEST(s.data() == nullptr);
-        const boost::nowide::short_stackstring s2(whello_view.substr(0, 0));
+        const nowide::short_stackstring s2(whello_view.substr(0, 0));
         TEST(s.data() == nullptr);
     }
     {
         std::cout << "-- nullptr passed to convert results in nullptr" << std::endl;
-        boost::nowide::short_stackstring s(L"foo");
+        nowide::short_stackstring s(L"foo");
         TEST(s.data() == std::string_view("foo"));
         s.convert(nullptr);
         TEST(s.data() == nullptr);
-        boost::nowide::short_stackstring s2(L"foo");
+        nowide::short_stackstring s2(L"foo");
         TEST(s2.data() == std::string_view("foo"));
         s2.convert(nullptr, nullptr);
         TEST(s2.data() == nullptr);
     }
     {
         std::cout << "-- An empty string is accepted" << std::endl;
-        const boost::nowide::short_stackstring s(wempty);
+        const nowide::short_stackstring s(wempty);
         TEST(s.data());
         TEST(s == std::string_view());
-        const boost::nowide::short_stackstring s2(wempty, wempty);
+        const nowide::short_stackstring s2(wempty, wempty);
         TEST(s2.data());
         TEST(s2 == std::string_view());
     }
     {
         std::cout << "-- An empty string is accepted" << std::endl;
-        boost::nowide::short_stackstring s, s2;
+        nowide::short_stackstring s, s2;
         TEST(s.convert(wempty));
         TEST(s.empty());
         TEST(s == std::string_view());
@@ -164,8 +164,8 @@ void test_main(int, char**, char**)
         using stackstring = test_basic_stackstring<wchar_t, char, 6>;
         const std::wstring_view heapVal = L"heapValue";
         const std::wstring_view stackVal = L"stack";
-        const stackstring heap(boost::nowide::narrow(heapVal).c_str());
-        const stackstring stack(boost::nowide::narrow(stackVal).c_str());
+        const stackstring heap(nowide::narrow(heapVal).c_str());
+        const stackstring stack(nowide::narrow(stackVal).c_str());
         TEST(heap.uses_heap_memory());
         TEST(stack.uses_stack_memory());
 
@@ -241,7 +241,7 @@ void test_main(int, char**, char**)
     {
         std::cout << "-- Test putting stackstrings into vector (done by args) class" << std::endl;
         // Use a smallish buffer, to have stack and heap values
-        using stackstring = boost::nowide::basic_stackstring<wchar_t, char, 5>;
+        using stackstring = nowide::basic_stackstring<wchar_t, char, 5>;
         std::vector<stackstring> strings;
         strings.resize(2);
         TEST(strings[0].convert("1234") == std::wstring_view(L"1234"));

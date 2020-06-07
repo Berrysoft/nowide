@@ -7,16 +7,16 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_UTF8_CODECVT_HPP_INCLUDED
-#define BOOST_NOWIDE_UTF8_CODECVT_HPP_INCLUDED
+#ifndef NOWIDE_UTF8_CODECVT_HPP_INCLUDED
+#define NOWIDE_UTF8_CODECVT_HPP_INCLUDED
 
-#include <boost/nowide/detail/utf.hpp>
-#include <boost/nowide/replacement.hpp>
 #include <cstdint>
 #include <cstring>
 #include <locale>
+#include <nowide/detail/utf.hpp>
+#include <nowide/replacement.hpp>
 
-namespace boost::nowide {
+namespace nowide {
 
 static_assert(sizeof(std::mbstate_t) >= 2, "mbstate_t is to small to store an UTF-16 codepoint");
 namespace detail {
@@ -36,14 +36,14 @@ namespace detail {
 ///
 /// @tparam CharSize Determines the encoding: 2 for UTF-16, 4 for UTF-32
 ///
-/// Invalid sequences are replaced by #BOOST_NOWIDE_REPLACEMENT_CHARACTER
+/// Invalid sequences are replaced by #NOWIDE_REPLACEMENT_CHARACTER
 /// A trailing incomplete sequence will result in a return value of std::codecvt::partial
 template<typename CharType, int CharSize = sizeof(CharType)>
 class utf8_codecvt;
 
 /// Specialization for the UTF-8 <-> UTF-16 variant of the std::codecvt implementation
 template<typename CharType>
-class BOOST_SYMBOL_VISIBLE utf8_codecvt<CharType, 2> : public std::codecvt<CharType, char, std::mbstate_t>
+class NOWIDE_SYMBOL_VISIBLE utf8_codecvt<CharType, 2> : public std::codecvt<CharType, char, std::mbstate_t>
 {
 public:
     static_assert(sizeof(CharType) >= 2, "CharType must be able to store UTF16 code point");
@@ -84,7 +84,7 @@ protected:
             char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
             if(ch == detail::utf::illegal)
             {
-                ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                ch = NOWIDE_REPLACEMENT_CHARACTER;
             } else if(ch == detail::utf::incomplete)
             {
                 from = prev_from;
@@ -131,7 +131,7 @@ protected:
 
             if(ch == detail::utf::illegal)
             {
-                ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                ch = NOWIDE_REPLACEMENT_CHARACTER;
             } else if(ch == detail::utf::incomplete)
             {
                 from = from_saved;
@@ -214,7 +214,7 @@ protected:
                     ch = ((char32_t(vh) << 10) | vl) + 0x10000;
                 } else
                 {
-                    ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                    ch = NOWIDE_REPLACEMENT_CHARACTER;
                 }
             } else
             {
@@ -233,7 +233,7 @@ protected:
                     // if we observe second surrogate pair and
                     // first only may be expected we should break from the loop with error
                     // as it is illegal input
-                    ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                    ch = NOWIDE_REPLACEMENT_CHARACTER;
                 }
             }
             if(!detail::utf::is_valid_codepoint(ch))
@@ -262,7 +262,7 @@ protected:
 
 /// Specialization for the UTF-8 <-> UTF-32 variant of the std::codecvt implementation
 template<typename CharType>
-class BOOST_SYMBOL_VISIBLE utf8_codecvt<CharType, 4> : public std::codecvt<CharType, char, std::mbstate_t>
+class NOWIDE_SYMBOL_VISIBLE utf8_codecvt<CharType, 4> : public std::codecvt<CharType, char, std::mbstate_t>
 {
 public:
     utf8_codecvt(size_t refs = 0) : std::codecvt<CharType, char, std::mbstate_t>(refs)
@@ -302,7 +302,7 @@ protected:
                 break;
             } else if(ch == detail::utf::illegal)
             {
-                ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                ch = NOWIDE_REPLACEMENT_CHARACTER;
             }
             max--;
         }
@@ -327,7 +327,7 @@ protected:
 
             if(ch == detail::utf::illegal)
             {
-                ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                ch = NOWIDE_REPLACEMENT_CHARACTER;
             } else if(ch == detail::utf::incomplete)
             {
                 r = std::codecvt_base::partial;
@@ -358,7 +358,7 @@ protected:
             ch = *from;
             if(!detail::utf::is_valid_codepoint(ch))
             {
-                ch = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                ch = NOWIDE_REPLACEMENT_CHARACTER;
             }
             int len = detail::utf::utf_traits<char>::width(ch);
             if(to_end - to < len)
@@ -377,6 +377,6 @@ protected:
     }
 };
 
-} // namespace boost::nowide
+} // namespace nowide
 
 #endif

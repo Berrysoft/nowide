@@ -6,13 +6,13 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#define BOOST_NOWIDE_SOURCE
+#define NOWIDE_SOURCE
 
-#include <boost/nowide/args.hpp>
+#include <nowide/args.hpp>
 
 #include <windows.h>
 
-namespace boost::nowide {
+namespace nowide {
 args::wargv_ptr::wargv_ptr() noexcept
 {
     p = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -34,4 +34,4 @@ args::wenv_ptr::~wenv_ptr()
     if(p)
         FreeEnvironmentStringsW(p);
 }
-} // namespace boost::nowide
+} // namespace nowide

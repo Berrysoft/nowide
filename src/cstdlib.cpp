@@ -7,7 +7,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#define BOOST_NOWIDE_SOURCE
+#define NOWIDE_SOURCE
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
@@ -16,12 +16,12 @@
 #undef __STRICT_ANSI__
 #endif
 
-#include <boost/nowide/cstdlib.hpp>
-#include <boost/nowide/stackstring.hpp>
+#include <nowide/cstdlib.hpp>
+#include <nowide/stackstring.hpp>
 #include <vector>
 #include <windows.h>
 
-namespace boost::nowide {
+namespace nowide {
 char* getenv(const char* key)
 {
     static stackstring value;
@@ -94,4 +94,4 @@ int system(const char* cmd)
     const wstackstring wcmd(cmd);
     return _wsystem(wcmd.data());
 }
-} // namespace boost::nowide
+} // namespace nowide

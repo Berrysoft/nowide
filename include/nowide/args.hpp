@@ -6,19 +6,18 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_ARGS_HPP_INCLUDED
-#define BOOST_NOWIDE_ARGS_HPP_INCLUDED
+#ifndef NOWIDE_ARGS_HPP_INCLUDED
+#define NOWIDE_ARGS_HPP_INCLUDED
 
-#include <boost/config.hpp>
-#include <boost/nowide/config.hpp>
-#ifdef BOOST_WINDOWS
-#include <boost/nowide/stackstring.hpp>
+#include <nowide/config.hpp>
+#ifdef NOWIDE_WINDOWS
+#include <nowide/stackstring.hpp>
 #include <stdexcept>
 #include <vector>
 #endif
 
-namespace boost::nowide {
-#ifndef BOOST_WINDOWS
+namespace nowide {
+#ifndef NOWIDE_WINDOWS
 class args
 {
 public:
@@ -49,7 +48,7 @@ public:
 /// Usage:
 /// \code
 /// int main(int argc, char** argv, char** env) {
-///   boost::nowide::args _(argc, argv, env); // Note the _ as a "don't care" name for the instance
+///   nowide::args _(argc, argv, env); // Note the _ as a "don't care" name for the instance
 ///   // Use argv and env as usual, they are now UTF-8 encoded on Windows
 ///   return 0; // Memory held by args is released
 /// }
@@ -94,8 +93,8 @@ private:
         int argc;
 
     public:
-        BOOST_NOWIDE_DECL wargv_ptr() noexcept;
-        BOOST_NOWIDE_DECL ~wargv_ptr();
+        NOWIDE_DECL wargv_ptr() noexcept;
+        NOWIDE_DECL ~wargv_ptr();
 
         wargv_ptr(const wargv_ptr&) = delete;
         wargv_ptr& operator=(const wargv_ptr&) = delete;
@@ -118,8 +117,8 @@ private:
         wchar_t* p;
 
     public:
-        BOOST_NOWIDE_DECL wenv_ptr() noexcept;
-        BOOST_NOWIDE_DECL ~wenv_ptr();
+        NOWIDE_DECL wenv_ptr() noexcept;
+        NOWIDE_DECL ~wenv_ptr();
 
         wenv_ptr(const wenv_ptr&) = delete;
         wenv_ptr& operator=(const wenv_ptr&) = delete;
@@ -180,5 +179,5 @@ private:
 
 #endif
 
-} // namespace boost::nowide
+} // namespace nowide
 #endif

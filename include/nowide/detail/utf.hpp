@@ -7,11 +7,11 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_UTF_HPP_INCLUDED
-#define BOOST_NOWIDE_UTF_HPP_INCLUDED
+#ifndef NOWIDE_UTF_HPP_INCLUDED
+#define NOWIDE_UTF_HPP_INCLUDED
 
-#include <boost/nowide/config.hpp>
 #include <cstddef>
+#include <nowide/config.hpp>
 
 ///
 /// \brief Namespace that holds basic operations on UTF encoded sequences
@@ -19,7 +19,7 @@
 /// All functions defined in this namespace do not require linking with Boost.Nowide library
 /// Extracted from Boost.Locale
 ///
-namespace boost::nowide::detail::utf {
+namespace nowide::detail::utf {
 
 ///
 /// \brief The integral type that can hold a Unicode code point
@@ -61,13 +61,13 @@ struct utf_traits<CharType, 1>
         unsigned char c = ci;
         if(c < 128)
             return 0;
-        if(BOOST_UNLIKELY(c < 194))
+        if(NOWIDE_UNLIKELY(c < 194))
             return -1;
         if(c < 224)
             return 1;
         if(c < 240)
             return 2;
-        if(BOOST_LIKELY(c <= 244))
+        if(NOWIDE_LIKELY(c <= 244))
             return 3;
         return -1;
     }
@@ -82,7 +82,7 @@ struct utf_traits<CharType, 1>
         } else if(value <= 0x7FF)
         {
             return 2;
-        } else if(BOOST_LIKELY(value <= 0xFFFF))
+        } else if(NOWIDE_LIKELY(value <= 0xFFFF))
         {
             return 3;
         } else
@@ -105,7 +105,7 @@ struct utf_traits<CharType, 1>
     template<typename Iterator>
     static constexpr code_point decode(Iterator& p, Iterator e) noexcept(noexcept(*p++))
     {
-        if(BOOST_UNLIKELY(p == e))
+        if(NOWIDE_UNLIKELY(p == e))
             return incomplete;
 
         unsigned char lead = *p++;
@@ -113,7 +113,7 @@ struct utf_traits<CharType, 1>
         // First byte is fully validated here
         int trail_size = trail_length(lead);
 
-        if(BOOST_UNLIKELY(trail_size < 0))
+        if(NOWIDE_UNLIKELY(trail_size < 0))
             return illegal;
 
         //
@@ -130,7 +130,7 @@ struct utf_traits<CharType, 1>
         switch(trail_size)
         {
         case 3:
-            if(BOOST_UNLIKELY(p == e))
+            if(NOWIDE_UNLIKELY(p == e))
                 return incomplete;
             tmp = *p++;
             if(!is_trail(tmp))
@@ -138,7 +138,7 @@ struct utf_traits<CharType, 1>
             c = (c << 6) | (tmp & 0x3F);
             [[fallthrough]];
         case 2:
-            if(BOOST_UNLIKELY(p == e))
+            if(NOWIDE_UNLIKELY(p == e))
                 return incomplete;
             tmp = *p++;
             if(!is_trail(tmp))
@@ -146,7 +146,7 @@ struct utf_traits<CharType, 1>
             c = (c << 6) | (tmp & 0x3F);
             [[fallthrough]];
         case 1:
-            if(BOOST_UNLIKELY(p == e))
+            if(NOWIDE_UNLIKELY(p == e))
                 return incomplete;
             tmp = *p++;
             if(!is_trail(tmp))
@@ -156,11 +156,11 @@ struct utf_traits<CharType, 1>
 
         // Check code point validity: no surrogates and
         // valid range
-        if(BOOST_UNLIKELY(!is_valid_codepoint(c)))
+        if(NOWIDE_UNLIKELY(!is_valid_codepoint(c)))
             return illegal;
 
         // make sure it is the most compact representation
-        if(BOOST_UNLIKELY(width(c) != trail_size + 1))
+        if(NOWIDE_UNLIKELY(width(c) != trail_size + 1))
             return illegal;
 
         return c;
@@ -177,7 +177,7 @@ struct utf_traits<CharType, 1>
 
         if(lead < 224)
             trail_size = 1;
-        else if(BOOST_LIKELY(lead < 240)) // non-BMP rare
+        else if(NOWIDE_LIKELY(lead < 240)) // non-BMP rare
             trail_size = 2;
         else
             trail_size = 3;
@@ -204,7 +204,7 @@ struct utf_traits<CharType, 1>
         {
             *out++ = static_cast<char_type>((value >> 6) | 0xC0);
             *out++ = static_cast<char_type>((value & 0x3F) | 0x80);
-        } else if(BOOST_LIKELY(value <= 0xFFFF))
+        } else if(NOWIDE_LIKELY(value <= 0xFFFF))
         {
             *out++ = static_cast<char_type>((value >> 12) | 0xE0);
             *out++ = static_cast<char_type>(((value >> 6) & 0x3F) | 0x80);
@@ -264,10 +264,10 @@ struct utf_traits<CharType, 2>
     template<typename It>
     static constexpr code_point decode(It& current, It last) noexcept(noexcept(*current++))
     {
-        if(BOOST_UNLIKELY(current == last))
+        if(NOWIDE_UNLIKELY(current == last))
             return incomplete;
         char16_t w1 = *current++;
-        if(BOOST_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
+        if(NOWIDE_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
         {
             return w1;
         }
@@ -284,7 +284,7 @@ struct utf_traits<CharType, 2>
     static constexpr code_point decode_valid(It& current) noexcept(noexcept(*current++))
     {
         char16_t w1 = *current++;
-        if(BOOST_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
+        if(NOWIDE_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
         {
             return w1;
         }
@@ -300,7 +300,7 @@ struct utf_traits<CharType, 2>
     template<typename It>
     static It encode(code_point u, It out) noexcept(noexcept(*out++))
     {
-        if(BOOST_LIKELY(u <= 0xFFFF))
+        if(NOWIDE_LIKELY(u <= 0xFFFF))
         {
             *out++ = static_cast<char_type>(u);
         } else
@@ -341,10 +341,10 @@ struct utf_traits<CharType, 4>
     template<typename It>
     static constexpr code_point decode(It& current, It last) noexcept(noexcept(*current++))
     {
-        if(BOOST_UNLIKELY(current == last))
+        if(NOWIDE_UNLIKELY(current == last))
             return incomplete;
         code_point c = *current++;
-        if(BOOST_UNLIKELY(!is_valid_codepoint(c)))
+        if(NOWIDE_UNLIKELY(!is_valid_codepoint(c)))
             return illegal;
         return c;
     }
@@ -362,6 +362,6 @@ struct utf_traits<CharType, 4>
 
 }; // utf32
 
-} // namespace boost::nowide::detail::utf
+} // namespace nowide::detail::utf
 
 #endif

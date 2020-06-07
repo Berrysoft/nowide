@@ -6,14 +6,14 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#define BOOST_NOWIDE_SOURCE
-#include <boost/nowide/convert.hpp>
-#include <boost/nowide/iostream.hpp>
+#define NOWIDE_SOURCE
 #include <atomic>
 #include <cassert>
 #include <cstring>
 #include <iostream>
 #include <new>
+#include <nowide/convert.hpp>
+#include <nowide/iostream.hpp>
 #include <vector>
 
 #ifndef NOMINMAX
@@ -22,13 +22,13 @@
 
 #include <windows.h>
 
-#ifdef _MSC_VER
-#define BOOST_NOWIDE_IOSTREAM_DECL
+#ifdef NOWIDE_MSVC
+#define NOWIDE_IOSTREAM_DECL
 #else
-#define BOOST_NOWIDE_IOSTREAM_DECL BOOST_NOWIDE_DECL
-#endif // _MSC_VER
+#define NOWIDE_IOSTREAM_DECL NOWIDE_DECL
+#endif // NOWIDE_MSVC
 
-namespace boost::nowide {
+namespace nowide {
 namespace detail {
     static bool is_atty_handle(HANDLE h) noexcept
     {
@@ -94,7 +94,7 @@ namespace detail {
             while((c = decoder::decode(p, e)) != uf::incomplete)
             {
                 if(c == uf::illegal)
-                    c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                    c = NOWIDE_REPLACEMENT_CHARACTER;
                 assert(out - wbuffer_ + encoder::width(c) <= static_cast<int>(wbuffer_size));
                 out = encoder::encode(c, out);
                 decoded = p - b;
@@ -205,7 +205,7 @@ namespace detail {
                     break;
                 }
                 if(c == detail::utf::illegal)
-                    c = BOOST_NOWIDE_REPLACEMENT_CHARACTER;
+                    c = NOWIDE_REPLACEMENT_CHARACTER;
                 assert(out - buffer_ + encoder::width(c) <= static_cast<int>(buffer_size));
                 // Skip \r chars as std::cin does
                 if(c != '\r')
@@ -242,26 +242,26 @@ alignas(detail::console_input_buffer) static char cin_buf[sizeof(detail::console
 alignas(detail::console_output_buffer) static char cout_buf[sizeof(detail::console_output_buffer)];
 alignas(detail::console_output_buffer) static char cerr_buf[sizeof(detail::console_output_buffer)];
 
-BOOST_NOWIDE_IOSTREAM_DECL alignas(std::istream) char cin[sizeof(std::istream)];
-BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cout[sizeof(std::ostream)];
-BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cerr[sizeof(std::ostream)];
-BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char clog[sizeof(std::ostream)];
+NOWIDE_IOSTREAM_DECL alignas(std::istream) char cin[sizeof(std::istream)];
+NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cout[sizeof(std::ostream)];
+NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cerr[sizeof(std::ostream)];
+NOWIDE_IOSTREAM_DECL alignas(std::ostream) char clog[sizeof(std::ostream)];
 
-#ifdef _MSC_VER
-#define BOOST_NOWIDE_ISTREAM(name) "?" #name "@nowide@boost@@3V?$basic_istream@DU?$char_traits@D@std@@@std@@A"
-#define BOOST_NOWIDE_OSTREAM(name) "?" #name "@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A"
-#define BOOST_NOWIDE_PCHAR(name) "?" #name "@nowide@boost@@3PADA"
+#ifdef NOWIDE_MSVC
+#define NOWIDE_ISTREAM(name) "?" #name "@nowide@@3V?$basic_istream@DU?$char_traits@D@std@@@std@@A"
+#define NOWIDE_OSTREAM(name) "?" #name "@nowide@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A"
+#define NOWIDE_PCHAR(name) "?" #name "@nowide@@3PADA"
 
-#define BOOST_MSVC_EXPORT(exp, ori) "/EXPORT:" exp "=" ori
+#define NOWIDE_MSVC_EXPORT(exp, ori) "/EXPORT:" exp "=" ori
 
-#define BOOST_NOWIDE_EXPORT_ISTREAM(name) BOOST_MSVC_EXPORT(BOOST_NOWIDE_ISTREAM(name), BOOST_NOWIDE_PCHAR(name))
-#define BOOST_NOWIDE_EXPORT_OSTREAM(name) BOOST_MSVC_EXPORT(BOOST_NOWIDE_OSTREAM(name), BOOST_NOWIDE_PCHAR(name))
+#define NOWIDE_EXPORT_ISTREAM(name) NOWIDE_MSVC_EXPORT(NOWIDE_ISTREAM(name), NOWIDE_PCHAR(name))
+#define NOWIDE_EXPORT_OSTREAM(name) NOWIDE_MSVC_EXPORT(NOWIDE_OSTREAM(name), NOWIDE_PCHAR(name))
 
-#pragma comment(linker, BOOST_NOWIDE_EXPORT_ISTREAM(cin))
-#pragma comment(linker, BOOST_NOWIDE_EXPORT_OSTREAM(cout))
-#pragma comment(linker, BOOST_NOWIDE_EXPORT_OSTREAM(cerr))
-#pragma comment(linker, BOOST_NOWIDE_EXPORT_OSTREAM(clog))
-#endif // _MSC_VER
+#pragma comment(linker, NOWIDE_EXPORT_ISTREAM(cin))
+#pragma comment(linker, NOWIDE_EXPORT_OSTREAM(cout))
+#pragma comment(linker, NOWIDE_EXPORT_OSTREAM(cerr))
+#pragma comment(linker, NOWIDE_EXPORT_OSTREAM(clog))
+#endif // NOWIDE_MSVC
 
 namespace detail {
     struct DoInit
@@ -346,10 +346,10 @@ namespace detail {
 namespace ios {
     Init::Init()
     {
-        static boost::nowide::detail::DoInit __do_init{};
+        static nowide::detail::DoInit __do_init{};
     }
 
     Init::~Init()
     {}
 } // namespace ios
-} // namespace boost::nowide
+} // namespace nowide

@@ -8,7 +8,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#define BOOST_NOWIDE_SOURCE
+#define NOWIDE_SOURCE
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
@@ -17,10 +17,10 @@
 #undef __STRICT_ANSI__
 #endif
 
-#include <boost/nowide/cstdio.hpp>
-#include <boost/nowide/stackstring.hpp>
+#include <nowide/cstdio.hpp>
+#include <nowide/stackstring.hpp>
 
-namespace boost::nowide {
+namespace nowide {
 FILE* freopen(const char* file_name, const char* mode, FILE* stream)
 {
     const wstackstring wname(file_name);
@@ -57,4 +57,4 @@ char* tmpnam(char* filename)
     }
     return nullptr;
 }
-} // namespace boost::nowide
+} // namespace nowide

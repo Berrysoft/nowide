@@ -5,17 +5,17 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_INTEGRATION_FILESYSTEM_HPP_INCLUDED
-#define BOOST_NOWIDE_INTEGRATION_FILESYSTEM_HPP_INCLUDED
+#ifndef NOWIDE_INTEGRATION_FILESYSTEM_HPP_INCLUDED
+#define NOWIDE_INTEGRATION_FILESYSTEM_HPP_INCLUDED
 
-#include <boost/nowide/convert.hpp>
 #include <filesystem>
+#include <nowide/convert.hpp>
 
 ///
 /// \brief This namespace includes partial implementation of <filesystem> with UTF-8 awareness
 ///
-namespace boost::nowide::filesystem {
-#ifndef BOOST_WINDOWS
+namespace nowide::filesystem {
+#ifndef NOWIDE_WINDOWS
 using std::filesystem::path;
 #else  // Windows
 class path : public std::filesystem::path
@@ -89,6 +89,6 @@ public:
     }
 };
 #endif // Windows
-} // namespace boost::nowide::filesystem
+} // namespace nowide::filesystem
 
 #endif

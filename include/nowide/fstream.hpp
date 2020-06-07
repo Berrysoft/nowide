@@ -6,16 +6,16 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_NOWIDE_FSTREAM_HPP_INCLUDED
-#define BOOST_NOWIDE_FSTREAM_HPP_INCLUDED
+#ifndef NOWIDE_FSTREAM_HPP_INCLUDED
+#define NOWIDE_FSTREAM_HPP_INCLUDED
 
-#include <boost/nowide/config.hpp>
-#include <boost/nowide/filebuf.hpp>
 #include <istream>
+#include <nowide/config.hpp>
+#include <nowide/filebuf.hpp>
 #include <ostream>
 
-namespace boost::nowide {
-#ifndef BOOST_WINDOWS
+namespace nowide {
+#ifndef NOWIDE_WINDOWS
 using std::basic_ifstream;
 using std::basic_ofstream;
 using std::basic_fstream;
@@ -262,6 +262,6 @@ namespace detail {
 
 #endif // windows
 
-} // namespace boost::nowide
+} // namespace nowide
 
 #endif
