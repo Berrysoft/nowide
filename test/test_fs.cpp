@@ -7,8 +7,8 @@
 //
 
 #include <boost/nowide/cstdio.hpp>
+#include <boost/nowide/filesystem.hpp>
 #include <boost/nowide/fstream.hpp>
-#include <filesystem>
 
 #include "test.hpp"
 
