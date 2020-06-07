@@ -13,7 +13,7 @@
 
 #include "test.hpp"
 
-void test_main(int argc, char** argv, char** env)
+void test_main(int, char**, char**)
 {
     const std::string prefix = "nowide-";
     const std::string utf8_name =
