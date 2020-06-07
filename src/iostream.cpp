@@ -248,21 +248,19 @@ BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cerr[sizeof(std::ostream)]
 BOOST_NOWIDE_IOSTREAM_DECL alignas(std::ostream) char clog[sizeof(std::ostream)];
 
 #ifdef _MSC_VER
-#pragma comment( \
-  linker,        \
-  "/EXPORT:?cin@nowide@boost@@3V?$basic_istream@DU?$char_traits@D@std@@@std@@A=?cin@nowide@boost@@3PADA")
+#define BOOST_NOWIDE_ISTREAM(name) "?" #name "@nowide@boost@@3V?$basic_istream@DU?$char_traits@D@std@@@std@@A"
+#define BOOST_NOWIDE_OSTREAM(name) "?" #name "@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A"
+#define BOOST_NOWIDE_PCHAR(name) "?" #name "@nowide@boost@@3PADA"
 
-#pragma comment( \
-  linker,        \
-  "/EXPORT:?cout@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A=?cout@nowide@boost@@3PADA")
+#define BOOST_MSVC_EXPORT(exp, ori) "/EXPORT:" exp "=" ori
 
-#pragma comment( \
-  linker,        \
-  "/EXPORT:?cerr@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A=?cerr@nowide@boost@@3PADA")
+#define BOOST_NOWIDE_EXPORT_ISTREAM(name) BOOST_MSVC_EXPORT(BOOST_NOWIDE_ISTREAM(name), BOOST_NOWIDE_PCHAR(name))
+#define BOOST_NOWIDE_EXPORT_OSTREAM(name) BOOST_MSVC_EXPORT(BOOST_NOWIDE_OSTREAM(name), BOOST_NOWIDE_PCHAR(name))
 
-#pragma comment( \
-  linker,        \
-  "/EXPORT:?clog@nowide@boost@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A=?clog@nowide@boost@@3PADA")
+#pragma comment(linker, BOOST_NOWIDE_EXPORT_ISTREAM(cin))
+#pragma comment(linker, BOOST_NOWIDE_EXPORT_OSTREAM(cout))
+#pragma comment(linker, BOOST_NOWIDE_EXPORT_OSTREAM(cerr))
+#pragma comment(linker, BOOST_NOWIDE_EXPORT_OSTREAM(clog))
 #endif // _MSC_VER
 
 namespace detail {
@@ -274,12 +272,9 @@ namespace detail {
 
     DoInit::DoInit()
     {
-        detail::console_input_buffer* pcin_buf =
-          new(cin_buf) detail::console_input_buffer(GetStdHandle(STD_INPUT_HANDLE));
-        detail::console_output_buffer* pcout_buf =
-          new(cout_buf) detail::console_output_buffer(GetStdHandle(STD_OUTPUT_HANDLE));
-        detail::console_output_buffer* pcerr_buf =
-          new(cerr_buf) detail::console_output_buffer(GetStdHandle(STD_ERROR_HANDLE));
+        auto pcin_buf = new(cin_buf) detail::console_input_buffer(GetStdHandle(STD_INPUT_HANDLE));
+        auto pcout_buf = new(cout_buf) detail::console_output_buffer(GetStdHandle(STD_OUTPUT_HANDLE));
+        auto pcerr_buf = new(cerr_buf) detail::console_output_buffer(GetStdHandle(STD_ERROR_HANDLE));
 
         std::istream* pcin;
         if(pcin_buf->is_atty())
@@ -314,23 +309,37 @@ namespace detail {
 
     DoInit::~DoInit()
     {
+        auto pcin = std::launder(reinterpret_cast<std::istream*>(cin));
+        auto pcout = std::launder(reinterpret_cast<std::ostream*>(cout));
+        auto pcerr = std::launder(reinterpret_cast<std::ostream*>(cerr));
+        auto pclog = std::launder(reinterpret_cast<std::ostream*>(clog));
         try
         {
-            std::istream* pcin = std::launder(reinterpret_cast<std::istream*>(cin));
-            std::ostream* pcout = std::launder(reinterpret_cast<std::ostream*>(cout));
-            std::ostream* pcerr = std::launder(reinterpret_cast<std::ostream*>(cerr));
-            std::ostream* pclog = std::launder(reinterpret_cast<std::ostream*>(clog));
-
-            pcout->flush();
-            pcerr->flush();
             pclog->flush();
-
-            pcin->~basic_istream();
-            pcout->~basic_ostream();
-            pcerr->~basic_ostream();
-            pclog->~basic_ostream();
         } catch(...)
         {}
+        pclog->~basic_ostream();
+        try
+        {
+            pcerr->flush();
+        } catch(...)
+        {}
+        pcerr->~basic_ostream();
+        try
+        {
+            pcout->flush();
+        } catch(...)
+        {}
+        pcout->~basic_ostream();
+        pcin->~basic_istream();
+
+        auto pcin_buf = std::launder(reinterpret_cast<detail::console_input_buffer*>(cin_buf));
+        auto pcout_buf = std::launder(reinterpret_cast<detail::console_output_buffer*>(cout_buf));
+        auto pcerr_buf = std::launder(reinterpret_cast<detail::console_output_buffer*>(cerr_buf));
+
+        pcerr_buf->~console_output_buffer();
+        pcout_buf->~console_output_buffer();
+        pcin_buf->~console_input_buffer();
     }
 } // namespace detail
 
