@@ -50,11 +50,19 @@
 #define NOWIDE_DECL
 #endif // NOWIDE_DYN_LINK
 
-#if !defined(NOWIDE_LIKELY)
-#define NOWIDE_LIKELY(x) x
+#ifndef NOWIDE_LIKELY
+#ifdef __GNUC__
+#define NOWIDE_LIKELY(x) (__builtin_expect(!!(x), 1))
+#else
+#define NOWIDE_LIKELY(x) (x)
+#endif // __GNUC__
 #endif
-#if !defined(NOWIDE_UNLIKELY)
-#define NOWIDE_UNLIKELY(x) x
+#ifndef NOWIDE_UNLIKELY
+#ifdef __GNUC__
+#define NOWIDE_UNLIKELY(x) (__builtin_expect(!!(x), 0))
+#else
+#define NOWIDE_UNLIKELY(x) (x)
+#endif // __GNUC__
 #endif
 
 //! @endcond

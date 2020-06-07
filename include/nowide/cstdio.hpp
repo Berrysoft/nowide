@@ -38,10 +38,6 @@ NOWIDE_DECL int rename(const char* old_name, const char* new_name);
 /// \brief Same as rename but name is UTF-8 string
 ///
 NOWIDE_DECL int remove(const char* name);
-///
-/// \brief Same as tmpnam but filename is UTF-8 string
-///
-NOWIDE_DECL char* tmpnam(char* filename);
 #endif
 } // namespace nowide
 

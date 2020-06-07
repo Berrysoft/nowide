@@ -46,15 +46,4 @@ int remove(const char* name)
     const wstackstring wname(name);
     return _wremove(wname.data());
 }
-
-static char tmpnam_buffer[L_tmpnam];
-char* tmpnam(char* filename)
-{
-    basic_stackstring<wchar_t, char, L_tmpnam> wfilename(filename);
-    if(_wtmpnam(wfilename.data()))
-    {
-        return narrow(filename ? filename : tmpnam_buffer, L_tmpnam, wfilename);
-    }
-    return nullptr;
-}
 } // namespace nowide

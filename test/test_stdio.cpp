@@ -9,11 +9,11 @@
 
 #include <nowide/cstdio.hpp>
 
-#include <nowide/convert.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <iostream>
+#include <nowide/convert.hpp>
 
 #include "test.hpp"
 
@@ -126,12 +126,5 @@ void test_main(int, char** argv, char**)
         TEST(file_exists(filename2));
         TEST(nowide::remove(filename.c_str()) < 0);
         TEST(nowide::remove(filename2.c_str()) == 0);
-    }
-    std::cout << " -- tmpnam" << std::endl;
-    {
-        const char* tmpnam1 = nowide::tmpnam(nullptr);
-        TEST(tmpnam1);
-        char tmpnam2[L_tmpnam];
-        TEST(nowide::tmpnam(tmpnam2));
     }
 }

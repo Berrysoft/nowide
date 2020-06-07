@@ -14,14 +14,11 @@ Distributed under the [Boost Software License, Version 1.0](http://www.boost.org
 * Usable via CMake
 * Compiled library only on Windows
 
-### Requirements (All versions)
+### Requirements
 
 * C++17 (or higher) compatible compiler
     * MSVC 2019 and up work
     * libstdc++ < 9 is unsupported as it is silently lacking C++17 features
-
-### Requirements (Boost version)
-
 * CMake
 
 # Quickstart
@@ -54,7 +51,7 @@ See the [Documentation](https://www.boost.org/doc/libs/master/libs/nowide/index.
 ## With CMake
 
 Nowide fully supports CMake.
-So you can use `add_subdirectory("path-to-boost-nowide-repo")` and link your project against the target `Boost::nowide`.
+So you can use `add_subdirectory("path-to-boost-nowide-repo")` and link your project against the target `nowide::nowide`.
 
 You can also pre-compile and install Nowide via the usual workflow:
 ```
