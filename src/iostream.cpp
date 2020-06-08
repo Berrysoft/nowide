@@ -272,9 +272,9 @@ namespace detail {
 
     DoInit::DoInit()
     {
-        auto pcin_buf = new(cin_buf) detail::console_input_buffer(GetStdHandle(STD_INPUT_HANDLE));
-        auto pcout_buf = new(cout_buf) detail::console_output_buffer(GetStdHandle(STD_OUTPUT_HANDLE));
-        auto pcerr_buf = new(cerr_buf) detail::console_output_buffer(GetStdHandle(STD_ERROR_HANDLE));
+        auto pcin_buf = new(cin_buf) console_input_buffer(GetStdHandle(STD_INPUT_HANDLE));
+        auto pcout_buf = new(cout_buf) console_output_buffer(GetStdHandle(STD_OUTPUT_HANDLE));
+        auto pcerr_buf = new(cerr_buf) console_output_buffer(GetStdHandle(STD_ERROR_HANDLE));
 
         std::istream* pcin;
         if(pcin_buf->is_atty())
@@ -333,9 +333,9 @@ namespace detail {
         pcout->~basic_ostream();
         pcin->~basic_istream();
 
-        auto pcin_buf = std::launder(reinterpret_cast<detail::console_input_buffer*>(cin_buf));
-        auto pcout_buf = std::launder(reinterpret_cast<detail::console_output_buffer*>(cout_buf));
-        auto pcerr_buf = std::launder(reinterpret_cast<detail::console_output_buffer*>(cerr_buf));
+        auto pcin_buf = std::launder(reinterpret_cast<console_input_buffer*>(cin_buf));
+        auto pcout_buf = std::launder(reinterpret_cast<console_output_buffer*>(cout_buf));
+        auto pcerr_buf = std::launder(reinterpret_cast<console_output_buffer*>(cerr_buf));
 
         pcerr_buf->~console_output_buffer();
         pcout_buf->~console_output_buffer();
@@ -343,7 +343,7 @@ namespace detail {
     }
 } // namespace detail
 
-namespace ios {
+namespace ios_base {
     Init::Init()
     {
         static nowide::detail::DoInit __do_init{};
@@ -351,5 +351,5 @@ namespace ios {
 
     Init::~Init()
     {}
-} // namespace ios
+} // namespace ios_base
 } // namespace nowide

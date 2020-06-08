@@ -13,6 +13,7 @@
 #include <nowide/config.hpp>
 #ifdef NOWIDE_WINDOWS
 #include <istream>
+#include <nowide/ios.hpp>
 #include <ostream>
 #else
 #include <iostream>
@@ -27,18 +28,11 @@ using std::clog;
 #else
 
 /// \cond INTERNAL
-namespace ios {
-    /// \brief Class to initialize UTF-8 iostreams
-    struct Init
-    {
-        NOWIDE_DECL Init();
-        NOWIDE_DECL ~Init();
-    };
-
+namespace ios_base {
 #ifndef NOWIDE_SOURCE
     static const Init __init{};
 #endif // !NOWIDE_SOURCE
-} // namespace ios
+} // namespace ios_base
 
 /// \endcond
 
@@ -69,7 +63,6 @@ extern NOWIDE_DECL std::ostream cerr;
 extern NOWIDE_DECL std::ostream clog;
 #endif // !NOWIDE_SOURCE
 #endif
-
 } // namespace nowide
 
 #endif
