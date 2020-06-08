@@ -40,16 +40,11 @@ namespace detail {
         return false;
     }
 
-    class console_output_buffer : public std::streambuf
+    class oconbuf : public std::streambuf
     {
     public:
-        console_output_buffer(HANDLE h) : handle_(h)
+        oconbuf(HANDLE h) : handle_(h)
         {}
-
-        bool is_atty() noexcept
-        {
-            return is_atty_handle(handle_);
-        }
 
     protected:
         int sync() override
@@ -111,16 +106,11 @@ namespace detail {
         HANDLE handle_;
     };
 
-    class console_input_buffer : public std::streambuf
+    class iconbuf : public std::streambuf
     {
     public:
-        console_input_buffer(HANDLE h) : handle_(h), wsize_(0), was_newline_(true)
+        iconbuf(HANDLE h) : handle_(h), wsize_(0), was_newline_(true)
         {}
-
-        bool is_atty() noexcept
-        {
-            return is_atty_handle(handle_);
-        }
 
     protected:
         int sync() override
@@ -129,7 +119,7 @@ namespace detail {
                 return -1;
             wsize_ = 0;
             was_newline_ = true;
-            pback_buffer_.clear();
+            pback_char_ = traits_type::eof();
             setg(0, 0, 0);
             return 0;
         }
@@ -145,22 +135,7 @@ namespace detail {
                 return 0;
             }
 
-            char* pnext;
-            if(pback_buffer_.empty())
-            {
-                pback_buffer_.resize(4);
-                pnext = &pback_buffer_[0] + pback_buffer_.size() - 1u;
-            } else
-            {
-                size_t n = pback_buffer_.size();
-                pback_buffer_.resize(n * 2);
-                std::memcpy(&pback_buffer_[n], &pback_buffer_[0], n);
-                pnext = &pback_buffer_[0] + n - 1;
-            }
-
-            char* pFirst = &pback_buffer_[0];
-            char* pLast = pFirst + pback_buffer_.size();
-            setg(pFirst, pnext, pLast);
+            setg(&pback_char_, &pback_char_, &pback_char_ + 1);
             *gptr() = traits_type::to_char_type(c);
 
             return 0;
@@ -170,14 +145,13 @@ namespace detail {
         {
             if(!handle_)
                 return -1;
-            if(!pback_buffer_.empty())
-                pback_buffer_.clear();
+            pback_char_ = traits_type::eof();
 
             size_t n = read();
             setg(buffer_, buffer_, buffer_ + n);
             if(n == 0)
                 return traits_type::eof();
-            return std::char_traits<char>::to_int_type(*gptr());
+            return traits_type::to_int_type(*gptr());
         }
 
     private:
@@ -233,14 +207,15 @@ namespace detail {
         wchar_t wbuffer_[wbuffer_size];
         HANDLE handle_;
         size_t wsize_;
-        std::vector<char> pback_buffer_;
+        char pback_char_;
         bool was_newline_;
     };
+
 } // namespace detail
 
-alignas(detail::console_input_buffer) static char cin_buf[sizeof(detail::console_input_buffer)];
-alignas(detail::console_output_buffer) static char cout_buf[sizeof(detail::console_output_buffer)];
-alignas(detail::console_output_buffer) static char cerr_buf[sizeof(detail::console_output_buffer)];
+alignas(detail::iconbuf) static char cin_buf[sizeof(detail::iconbuf)];
+alignas(detail::oconbuf) static char cout_buf[sizeof(detail::oconbuf)];
+alignas(detail::oconbuf) static char cerr_buf[sizeof(detail::oconbuf)];
 
 NOWIDE_IOSTREAM_DECL alignas(std::istream) char cin[sizeof(std::istream)];
 NOWIDE_IOSTREAM_DECL alignas(std::ostream) char cout[sizeof(std::ostream)];
@@ -272,74 +247,46 @@ namespace detail {
 
     DoInit::DoInit()
     {
-        auto pcin_buf = new(cin_buf) console_input_buffer(GetStdHandle(STD_INPUT_HANDLE));
-        auto pcout_buf = new(cout_buf) console_output_buffer(GetStdHandle(STD_OUTPUT_HANDLE));
-        auto pcerr_buf = new(cerr_buf) console_output_buffer(GetStdHandle(STD_ERROR_HANDLE));
+        HANDLE input_handle = GetStdHandle(STD_INPUT_HANDLE);
+        HANDLE output_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE error_handle = GetStdHandle(STD_ERROR_HANDLE);
 
         std::istream* pcin;
-        if(pcin_buf->is_atty())
+        if(is_atty_handle(input_handle))
         {
-            pcin = new(cin) std::istream(pcin_buf);
+            pcin = new(cin) std::istream(new(cin_buf) iconbuf(input_handle));
         } else
         {
             pcin = new(cin) std::istream(std::cin.rdbuf());
         }
         std::ostream* pcout;
-        if(pcout_buf->is_atty())
+        if(is_atty_handle(output_handle))
         {
-            pcout = new(cout) std::ostream(pcout_buf);
+            pcout = new(cout) std::ostream(new(cout_buf) oconbuf(output_handle));
         } else
         {
             pcout = new(cout) std::ostream(std::cout.rdbuf());
         }
         std::ostream* pcerr;
-        if(pcerr_buf->is_atty())
+        if(is_atty_handle(error_handle))
         {
-            pcerr = new(cerr) std::ostream(pcerr_buf);
-            new(clog) std::ostream(pcerr_buf);
+            pcerr = new(cerr) std::ostream(new(cerr_buf) oconbuf(error_handle));
         } else
         {
             pcerr = new(cerr) std::ostream(std::cerr.rdbuf());
-            new(clog) std::ostream(std::clog.rdbuf());
         }
-
+        new(clog) std::ostream(pcerr->rdbuf());
         pcin->tie(pcout);
         pcerr->tie(pcout);
     }
 
     DoInit::~DoInit()
     {
-        auto pcin = std::launder(reinterpret_cast<std::istream*>(cin));
         auto pcout = std::launder(reinterpret_cast<std::ostream*>(cout));
-        auto pcerr = std::launder(reinterpret_cast<std::ostream*>(cerr));
         auto pclog = std::launder(reinterpret_cast<std::ostream*>(clog));
-        try
-        {
-            pclog->flush();
-        } catch(...)
-        {}
-        pclog->~basic_ostream();
-        try
-        {
-            pcerr->flush();
-        } catch(...)
-        {}
-        pcerr->~basic_ostream();
-        try
-        {
-            pcout->flush();
-        } catch(...)
-        {}
-        pcout->~basic_ostream();
-        pcin->~basic_istream();
 
-        auto pcin_buf = std::launder(reinterpret_cast<console_input_buffer*>(cin_buf));
-        auto pcout_buf = std::launder(reinterpret_cast<console_output_buffer*>(cout_buf));
-        auto pcerr_buf = std::launder(reinterpret_cast<console_output_buffer*>(cerr_buf));
-
-        pcerr_buf->~console_output_buffer();
-        pcout_buf->~console_output_buffer();
-        pcin_buf->~console_input_buffer();
+        pclog->flush();
+        pcout->flush();
     }
 } // namespace detail
 

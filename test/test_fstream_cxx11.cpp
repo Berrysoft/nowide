@@ -6,12 +6,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <nowide/config.hpp>
-
-#include <nowide/fstream.hpp>
-
-#include <nowide/cstdio.hpp>
 #include <iterator>
+#include <nowide/cstdio.hpp>
+#include <nowide/fstream.hpp>
 #include <utility>
 
 #include "test.hpp"

@@ -21,9 +21,9 @@
 
 namespace nowide {
 #ifndef NOWIDE_WINDOWS
+using std::cin;
 using std::cout;
 using std::cerr;
-using std::cin;
 using std::clog;
 #else
 

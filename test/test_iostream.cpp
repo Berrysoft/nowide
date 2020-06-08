@@ -6,10 +6,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <nowide/iostream.hpp>
-
-#include <nowide/detail/utf.hpp>
 #include <limits>
+#include <nowide/detail/utf.hpp>
+#include <nowide/iostream.hpp>
 #include <string>
 
 #include "test.hpp"
@@ -34,32 +33,15 @@ void test_main(int argc, char** argv, char**)
                           "Invalid UTF-8: `\xFF' `\xd7\xFF' `\xe5\xFF\x8c' `\xf0\x9d\x84\xFF' \n"
                           "\n";
 
-    // If we are using the standard rdbuf we can only put back 1 char
-    if(nowide::cin.rdbuf() == std::cin.rdbuf())
+    int maxval = 15000;
+    for(int i = 0; i < maxval; i++)
     {
-        std::cout << "Using std::cin" << std::endl;
-        int maxval = 15000;
-        for(int i = 0; i < maxval; i++)
-        {
-            char c = i % 96 + ' ';
-            TEST(nowide::cin.putback(c));
-            int ci = i % 96 + ' ';
-            TEST(nowide::cin.get() == ci);
-        }
-    } else
-    {
-        int maxval = 15000;
-        for(int i = 0; i < maxval; i++)
-        {
-            char c = i % 96 + ' ';
-            TEST(nowide::cin.putback(c));
-        }
-        for(int i = maxval - 1; i >= 0; i--)
-        {
-            int c = i % 96 + ' ';
-            TEST(nowide::cin.get() == c);
-        }
+        char c = i % 96 + ' ';
+        TEST(nowide::cin.putback(c));
+        int ci = i % 96 + ' ';
+        TEST(nowide::cin.get() == ci);
     }
+
     nowide::cout << "Normal I/O:" << std::endl;
     nowide::cout << example << std::endl;
     nowide::cerr << example << std::endl;
@@ -74,7 +56,8 @@ void test_main(int argc, char** argv, char**)
 
     TEST(nowide::cout);
     TEST(nowide::cerr);
-    if(argc == 2 && argv[1] == std::string("-i"))
+
+    if(argc == 2 && argv[1] == std::string_view("-i"))
     {
         nowide::cout << "Input 2 strings" << std::endl;
         std::string v1, v2;
