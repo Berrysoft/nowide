@@ -94,7 +94,6 @@ public:
 ///
 /// \brief Same as std::basic_ofstream<char> but accepts UTF-8 strings under Windows
 ///
-
 template<typename CharType, typename Traits = std::char_traits<CharType>>
 class basic_ofstream : public detail::fstream_impl<CharType, Traits, detail::StreamTypeOut>
 {
@@ -138,19 +137,16 @@ public:
 
 ///
 /// Same as std::ifstream but accepts UTF-8 strings under Windows
-/// and *\::filesystem::path on all systems
 ///
 using ifstream = basic_ifstream<char>;
 using wifstream = basic_ifstream<wchar_t>;
 ///
 /// Same as std::ofstream but accepts UTF-8 strings under Windows
-/// and *\::filesystem::path on all systems
 ///
 using ofstream = basic_ofstream<char>;
 using wofstream = basic_ofstream<wchar_t>;
 ///
 /// Same as std::fstream but accepts UTF-8 strings under Windows
-/// and *\::filesystem::path on all systems
 ///
 using fstream = basic_fstream<char>;
 using wfstream = basic_fstream<wchar_t>;

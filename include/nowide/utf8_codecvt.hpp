@@ -41,9 +41,18 @@ namespace detail {
 template<typename CharType, int CharSize = sizeof(CharType)>
 class utf8_codecvt;
 
+template<typename CharType>
+class utf8_codecvt<CharType, 1> : public std::codecvt<CharType, char, std::mbstate_t>
+{
+    bool do_always_noconv() const noexcept override
+    {
+        return true;
+    }
+};
+
 /// Specialization for the UTF-8 <-> UTF-16 variant of the std::codecvt implementation
 template<typename CharType>
-class NOWIDE_SYMBOL_VISIBLE utf8_codecvt<CharType, 2> : public std::codecvt<CharType, char, std::mbstate_t>
+class utf8_codecvt<CharType, 2> : public std::codecvt<CharType, char, std::mbstate_t>
 {
 public:
     static_assert(sizeof(CharType) >= 2, "CharType must be able to store UTF16 code point");
@@ -262,7 +271,7 @@ protected:
 
 /// Specialization for the UTF-8 <-> UTF-32 variant of the std::codecvt implementation
 template<typename CharType>
-class NOWIDE_SYMBOL_VISIBLE utf8_codecvt<CharType, 4> : public std::codecvt<CharType, char, std::mbstate_t>
+class utf8_codecvt<CharType, 4> : public std::codecvt<CharType, char, std::mbstate_t>
 {
 public:
     utf8_codecvt(size_t refs = 0) : std::codecvt<CharType, char, std::mbstate_t>(refs)

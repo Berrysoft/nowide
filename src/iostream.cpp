@@ -7,14 +7,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 #define NOWIDE_SOURCE
-#include <atomic>
 #include <cassert>
 #include <cstring>
 #include <iostream>
 #include <new>
 #include <nowide/convert.hpp>
 #include <nowide/iostream.hpp>
-#include <vector>
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -40,177 +38,170 @@ namespace detail {
         return false;
     }
 
-    class oconbuf : public std::streambuf
+    template<typename T, std::size_t N>
+    constexpr std::size_t bufsize(T (&buffer)[N]) noexcept
+    {
+        for(std::size_t i = 0; i < N; i++)
+        {
+            if(!buffer[i])
+                return i;
+        }
+        return N;
+    }
+
+    template<typename CharType, typename TraitsType = std::char_traits<CharType>>
+    class basic_oconbuf : public std::basic_streambuf<CharType, TraitsType>
     {
     public:
-        oconbuf(HANDLE h) : handle_(h)
+        basic_oconbuf(HANDLE h) : handle_(h)
         {}
 
     protected:
-        int sync() override
-        {
-            return overflow(traits_type::eof());
-        }
-        int overflow(int c) override
-        {
-            if(!handle_)
-                return -1;
-            int n = static_cast<int>(pptr() - pbase());
-            int r = 0;
+        using typename std::basic_streambuf<CharType, TraitsType>::traits_type;
+        using typename std::basic_streambuf<CharType, TraitsType>::int_type;
 
-            if(n > 0 && (r = write(pbase(), n)) < 0)
-                return -1;
-            if(r < n)
+        int_type overflow(int_type c) override
+        {
+            namespace uf = detail::utf;
+            if(!handle_)
+                return traits_type::eof();
+            if(traits_type::eq_int_type(c, traits_type::eof()))
+                return 0;
+            std::size_t bsize = bufsize(buffer_);
+            CharType inc = traits_type::to_char_type(c);
+            wchar_t outc[encoder::max_width];
+            std::size_t osize = 0;
+            uf::code_point code;
+            CharType* pbuf = buffer_;
+            if(bsize >= decoder::max_width)
             {
-                std::memmove(pbase(), pbase() + r, n - r);
+                code = decoder::decode(pbuf, pbuf + decoder::max_width);
+            } else
+            {
+                buffer_[bsize] = inc;
+                code = decoder::decode(pbuf, pbuf + bsize + 1);
             }
-            setp(buffer_, buffer_ + buffer_size);
-            pbump(n - r);
-            if(c != traits_type::eof())
-                sputc(traits_type::to_char_type(c));
-            return 0;
+            if(code == uf::incomplete)
+            {
+                return 0;
+            } else if(code == uf::illegal)
+            {
+                outc[0] = NOWIDE_REPLACEMENT_CHARACTER;
+                osize = 1;
+            } else
+            {
+                wchar_t* p = encoder::encode(code, outc);
+                osize = p - outc;
+            }
+            std::memset(buffer_, 0, sizeof(buffer_));
+            if(!WriteConsoleW(handle_, outc, static_cast<DWORD>(osize), 0, 0))
+                return -1;
+            return static_cast<int_type>(osize);
         }
 
     private:
-        using decoder = detail::utf::utf_traits<char>;
+        using decoder = detail::utf::utf_traits<CharType>;
         using encoder = detail::utf::utf_traits<wchar_t>;
 
-        int write(const char* p, int n)
-        {
-            namespace uf = detail::utf;
-            const char* b = p;
-            const char* e = p + n;
-            DWORD size = 0;
-            if(n > buffer_size)
-                return -1;
-            wchar_t* out = wbuffer_;
-            uf::code_point c;
-            size_t decoded = 0;
-            while((c = decoder::decode(p, e)) != uf::incomplete)
-            {
-                if(c == uf::illegal)
-                    c = NOWIDE_REPLACEMENT_CHARACTER;
-                assert(out - wbuffer_ + encoder::width(c) <= static_cast<int>(wbuffer_size));
-                out = encoder::encode(c, out);
-                decoded = p - b;
-            }
-            if(!WriteConsoleW(handle_, wbuffer_, static_cast<DWORD>(out - wbuffer_), &size, 0))
-                return -1;
-            return static_cast<int>(decoded);
-        }
-
-        static constexpr int buffer_size = 1024;
-        static constexpr int wbuffer_size = buffer_size * encoder::max_width;
-        char buffer_[buffer_size];
-        wchar_t wbuffer_[wbuffer_size];
+        CharType buffer_[decoder::max_width];
         HANDLE handle_;
     };
 
-    class iconbuf : public std::streambuf
+    using oconbuf = basic_oconbuf<char>;
+
+    template<typename CharType, typename TraitsType = std::char_traits<CharType>>
+    class basic_iconbuf : public std::basic_streambuf<CharType, TraitsType>
     {
     public:
-        iconbuf(HANDLE h) : handle_(h), wsize_(0), was_newline_(true)
+        basic_iconbuf(HANDLE h) : handle_(h), was_newline_(true)
         {}
 
     protected:
+        using typename std::basic_streambuf<CharType, TraitsType>::traits_type;
+        using typename std::basic_streambuf<CharType, TraitsType>::int_type;
+
         int sync() override
         {
-            if(FlushConsoleInputBuffer(handle_) == 0)
+            if(!FlushConsoleInputBuffer(handle_))
                 return -1;
-            wsize_ = 0;
-            was_newline_ = true;
-            pback_char_ = traits_type::eof();
-            setg(0, 0, 0);
+            this->setg(nullptr, nullptr, nullptr);
             return 0;
         }
-        int pbackfail(int c) override
+
+        int_type pbackfail(int_type c) override
         {
-            if(c == traits_type::eof())
+            if(traits_type::eq_int_type(c, traits_type::eof()))
                 return traits_type::eof();
 
-            if(gptr() != eback())
-            {
-                gbump(-1);
-                *gptr() = traits_type::to_char_type(c);
-                return 0;
-            }
-
-            setg(&pback_char_, &pback_char_, &pback_char_ + 1);
-            *gptr() = traits_type::to_char_type(c);
+            buffer_[0] = traits_type::to_char_type(c);
+            this->setg(buffer_, buffer_, buffer_ + bufsize(buffer_));
 
             return 0;
         }
 
-        int underflow() override
+        int_type underflow() override
         {
+            namespace uf = detail::utf;
+
             if(!handle_)
-                return -1;
-            pback_char_ = traits_type::eof();
-
-            size_t n = read();
-            setg(buffer_, buffer_, buffer_ + n);
-            if(n == 0)
                 return traits_type::eof();
-            return traits_type::to_int_type(*gptr());
+
+            std::memset(buffer_, 0, sizeof(buffer_));
+
+            wchar_t inc;
+            std::size_t bsize = bufsize(wbuffer_);
+            DWORD read_chars;
+            if(!ReadConsoleW(handle_, &inc, 1, &read_chars, 0))
+                return traits_type::eof();
+            wbuffer_[bsize] = inc;
+            wchar_t* pbuf = wbuffer_;
+            uf::code_point code = decoder::decode(pbuf, pbuf + bsize + 1);
+            std::size_t out_size;
+            if(code == uf::incomplete)
+                return underflow();
+            else if(code == uf::illegal)
+            {
+                buffer_[1] = traits_type::to_char_type(NOWIDE_REPLACEMENT_CHARACTER);
+                out_size = 1;
+            } else
+            {
+                CharType* p = encoder::encode(code, buffer_ + 1);
+                for(CharType* pcur = buffer_ + 1; pcur < p;)
+                {
+                    if(*pcur == CharType{'\r'})
+                    {
+                        std::memmove(pcur, pcur + 1, (p - pcur - 1) * sizeof(CharType));
+                        p--;
+                    } else
+                        pcur++;
+                }
+                out_size = p - buffer_ - 1;
+            }
+            std::memset(wbuffer_, 0, sizeof(wbuffer_));
+            if(out_size == 0)
+                return underflow();
+            this->setg(buffer_ + 1, buffer_ + 1, buffer_ + 1 + out_size);
+            // A CTRL+Z at the start of the line should be treated as EOF
+            if(was_newline_ && out_size && buffer_[1] == '\x1a')
+            {
+                sync();
+                return traits_type::eof();
+            }
+            was_newline_ = out_size == 0 || buffer_[1] == '\n';
+            return traits_type::to_int_type(*this->gptr());
         }
 
     private:
         using decoder = detail::utf::utf_traits<wchar_t>;
-        using encoder = detail::utf::utf_traits<char>;
+        using encoder = detail::utf::utf_traits<CharType>;
 
-        size_t read()
-        {
-            DWORD read_wchars = 0;
-            const size_t n = wbuffer_size - wsize_;
-            if(!ReadConsoleW(handle_, wbuffer_ + wsize_, static_cast<DWORD>(n), &read_wchars, 0))
-                return 0;
-            wsize_ += read_wchars;
-            char* out = buffer_;
-            const wchar_t* cur_input_ptr = wbuffer_;
-            const wchar_t* const end_input_ptr = wbuffer_ + wsize_;
-            while(cur_input_ptr != end_input_ptr)
-            {
-                const wchar_t* const prev_input_ptr = cur_input_ptr;
-                detail::utf::code_point c = decoder::decode(cur_input_ptr, end_input_ptr);
-                // If incomplete restore to beginning of incomplete char to use on next buffer
-                if(c == detail::utf::incomplete)
-                {
-                    cur_input_ptr = prev_input_ptr;
-                    break;
-                }
-                if(c == detail::utf::illegal)
-                    c = NOWIDE_REPLACEMENT_CHARACTER;
-                assert(out - buffer_ + encoder::width(c) <= static_cast<int>(buffer_size));
-                // Skip \r chars as std::cin does
-                if(c != '\r')
-                    out = encoder::encode(c, out);
-            }
-
-            wsize_ = end_input_ptr - cur_input_ptr;
-            if(wsize_ > 0)
-                std::memmove(wbuffer_, end_input_ptr - wsize_, sizeof(wchar_t) * wsize_);
-
-            // A CTRL+Z at the start of the line should be treated as EOF
-            if(was_newline_ && out > buffer_ && buffer_[0] == '\x1a')
-            {
-                sync();
-                return 0;
-            }
-            was_newline_ = out == buffer_ || out[-1] == '\n';
-
-            return out - buffer_;
-        }
-
-        static constexpr size_t wbuffer_size = 1024;
-        static constexpr size_t buffer_size = wbuffer_size * encoder::max_width;
-        char buffer_[buffer_size];
-        wchar_t wbuffer_[wbuffer_size];
+        wchar_t wbuffer_[decoder::max_width];
+        CharType buffer_[encoder::max_width + 1];
         HANDLE handle_;
-        size_t wsize_;
-        char pback_char_;
         bool was_newline_;
     };
 
+    using iconbuf = basic_iconbuf<char>;
 } // namespace detail
 
 alignas(detail::iconbuf) static char cin_buf[sizeof(detail::iconbuf)];
@@ -282,11 +273,39 @@ namespace detail {
 
     DoInit::~DoInit()
     {
+        auto pcin = std::launder(reinterpret_cast<std::istream*>(cin));
         auto pcout = std::launder(reinterpret_cast<std::ostream*>(cout));
+        auto pcerr = std::launder(reinterpret_cast<std::ostream*>(cerr));
         auto pclog = std::launder(reinterpret_cast<std::ostream*>(clog));
 
-        pclog->flush();
         pcout->flush();
+        pclog->flush();
+
+        pclog->~basic_ostream();
+        pcerr->~basic_ostream();
+        pcout->~basic_ostream();
+        pcin->~basic_istream();
+
+        HANDLE input_handle = GetStdHandle(STD_INPUT_HANDLE);
+        HANDLE output_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE error_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+        auto pcin_buf = std::launder(reinterpret_cast<iconbuf*>(cin_buf));
+        auto pcout_buf = std::launder(reinterpret_cast<oconbuf*>(cout_buf));
+        auto pcerr_buf = std::launder(reinterpret_cast<oconbuf*>(cerr_buf));
+
+        if(is_atty_handle(error_handle))
+        {
+            pcerr_buf->~oconbuf();
+        }
+        if(is_atty_handle(output_handle))
+        {
+            pcout_buf->~oconbuf();
+        }
+        if(is_atty_handle(input_handle))
+        {
+            pcin_buf->~iconbuf();
+        }
     }
 } // namespace detail
 
