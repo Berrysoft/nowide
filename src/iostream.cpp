@@ -146,48 +146,51 @@ namespace detail {
             if(!handle_)
                 return traits_type::eof();
 
-            std::memset(buffer_, 0, sizeof(buffer_));
-
-            wchar_t inc;
-            std::size_t bsize = bufsize(wbuffer_);
-            DWORD read_chars;
-            if(!ReadConsoleW(handle_, &inc, 1, &read_chars, 0))
-                return traits_type::eof();
-            wbuffer_[bsize] = inc;
-            wchar_t* pbuf = wbuffer_;
-            uf::code_point code = decoder::decode(pbuf, pbuf + bsize + 1);
-            std::size_t out_size;
-            if(code == uf::incomplete)
-                return underflow();
-            else if(code == uf::illegal)
+            while(true)
             {
-                buffer_[1] = traits_type::to_char_type(NOWIDE_REPLACEMENT_CHARACTER);
-                out_size = 1;
-            } else
-            {
-                CharType* p = encoder::encode(code, buffer_ + 1);
-                for(CharType* pcur = buffer_ + 1; pcur < p;)
+                std::memset(buffer_, 0, sizeof(buffer_));
+                wchar_t inc;
+                std::size_t bsize = bufsize(wbuffer_);
+                DWORD read_chars;
+                if(!ReadConsoleW(handle_, &inc, 1, &read_chars, 0))
+                    return traits_type::eof();
+                wbuffer_[bsize] = inc;
+                wchar_t* pbuf = wbuffer_;
+                uf::code_point code = decoder::decode(pbuf, pbuf + bsize + 1);
+                std::size_t out_size;
+                if(code == uf::incomplete)
+                    continue;
+                else if(code == uf::illegal)
                 {
-                    if(*pcur == CharType{'\r'})
+                    buffer_[1] = traits_type::to_char_type(NOWIDE_REPLACEMENT_CHARACTER);
+                    out_size = 1;
+                } else
+                {
+                    CharType* p = encoder::encode(code, buffer_ + 1);
+                    for(CharType* pcur = buffer_ + 1; pcur < p;)
                     {
-                        std::memmove(pcur, pcur + 1, (p - pcur - 1) * sizeof(CharType));
-                        p--;
-                    } else
-                        pcur++;
+                        if(*pcur == CharType{'\r'})
+                        {
+                            std::memmove(pcur, pcur + 1, (p - pcur - 1) * sizeof(CharType));
+                            p--;
+                        } else
+                            pcur++;
+                    }
+                    out_size = p - buffer_ - 1;
                 }
-                out_size = p - buffer_ - 1;
+                std::memset(wbuffer_, 0, sizeof(wbuffer_));
+                if(out_size == 0)
+                    continue;
+                this->setg(buffer_ + 1, buffer_ + 1, buffer_ + 1 + out_size);
+                // A CTRL+Z at the start of the line should be treated as EOF
+                if(was_newline_ && out_size && buffer_[1] == '\x1a')
+                {
+                    sync();
+                    return traits_type::eof();
+                }
+                was_newline_ = out_size == 0 || buffer_[1] == '\n';
+                break;
             }
-            std::memset(wbuffer_, 0, sizeof(wbuffer_));
-            if(out_size == 0)
-                return underflow();
-            this->setg(buffer_ + 1, buffer_ + 1, buffer_ + 1 + out_size);
-            // A CTRL+Z at the start of the line should be treated as EOF
-            if(was_newline_ && out_size && buffer_[1] == '\x1a')
-            {
-                sync();
-                return traits_type::eof();
-            }
-            was_newline_ = out_size == 0 || buffer_[1] == '\n';
             return traits_type::to_int_type(*this->gptr());
         }
 
