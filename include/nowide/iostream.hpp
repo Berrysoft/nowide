@@ -11,9 +11,9 @@
 #define NOWIDE_IOSTREAM_HPP_INCLUDED
 
 #include <nowide/config.hpp>
+#include <nowide/ios.hpp>
 #ifdef NOWIDE_WINDOWS
 #include <istream>
-#include <nowide/ios.hpp>
 #include <ostream>
 #else
 #include <iostream>

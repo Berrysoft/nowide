@@ -22,9 +22,6 @@ using std::basic_fstream;
 using std::ifstream;
 using std::ofstream;
 using std::fstream;
-using std::wifstream;
-using std::wofstream;
-using std::wfstream;
 #else
 /// \cond INTERNAL
 namespace detail {
@@ -139,17 +136,14 @@ public:
 /// Same as std::ifstream but accepts UTF-8 strings under Windows
 ///
 using ifstream = basic_ifstream<char>;
-using wifstream = basic_ifstream<wchar_t>;
 ///
 /// Same as std::ofstream but accepts UTF-8 strings under Windows
 ///
 using ofstream = basic_ofstream<char>;
-using wofstream = basic_ofstream<wchar_t>;
 ///
 /// Same as std::fstream but accepts UTF-8 strings under Windows
 ///
 using fstream = basic_fstream<char>;
-using wfstream = basic_fstream<wchar_t>;
 
 // Implementation
 namespace detail {

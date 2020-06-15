@@ -33,7 +33,7 @@ namespace detail {
         if(h)
         {
             DWORD dummy;
-            return GetConsoleMode(h, &dummy) != FALSE;
+            return GetConsoleMode(h, &dummy);
         }
         return false;
     }
@@ -133,6 +133,8 @@ namespace detail {
             if(traits_type::eq_int_type(c, traits_type::eof()))
                 return traits_type::eof();
 
+            if(this->gptr() == buffer_)
+                return traits_type::eof();
             buffer_[0] = traits_type::to_char_type(c);
             this->setg(buffer_, buffer_, buffer_ + bufsize(buffer_));
 

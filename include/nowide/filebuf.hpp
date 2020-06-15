@@ -22,7 +22,6 @@ namespace nowide {
 #ifndef NOWIDE_WINDOWS
 using std::basic_filebuf;
 using std::filebuf;
-using std::wfilebuf;
 #else // Windows
 ///
 /// \brief The basic_filebuf type.
@@ -59,7 +58,6 @@ public:
 /// \brief Convenience typedef
 ///
 using filebuf = basic_filebuf<char>;
-using wfilebuf = basic_filebuf<wchar_t>;
 
 #endif // windows
 
