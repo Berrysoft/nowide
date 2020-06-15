@@ -15,7 +15,7 @@
 
 namespace nowide::ios_base {
 #ifndef NOWIDE_WINDOWS
-using std::ios_base::Init;
+using Init = typename std::ios_base::Init;
 #else
 /// \brief Class to initialize UTF-8 iostreams
 struct Init
