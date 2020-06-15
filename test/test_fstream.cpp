@@ -112,15 +112,6 @@ void test_with_different_buffer_sizes(const char* filepath)
         TEST(f.get() == 'd');
         TEST(f.get() == 'e');
 
-        // Putback after flush is implementation defined
-        // Boost.Nowide: Works
-#if NOWIDE_USE_FILEBUF_REPLACEMENT
-        TEST(f << std::flush);
-        TEST(f.putback('e'));
-        TEST(f.putback('d'));
-        TEST(f.get() == 'd');
-        TEST(f.get() == 'e');
-#endif
         // Rest of sequence
         TEST(f.get() == 'f');
         TEST(f.get() == 'g');
@@ -131,14 +122,6 @@ void test_with_different_buffer_sizes(const char* filepath)
         TEST(f.seekg(1));
         TEST(f.get() == 'B');
         TEST(f.putback('B'));
-        // Putting back multiple chars is not possible on all implementations after a seek/flush
-#if NOWIDE_USE_FILEBUF_REPLACEMENT
-        TEST(f.putback('a'));
-        TEST(!f.putback('x')); // At beginning of file -> No putback possible
-        // Get characters that were putback to avoid MSVC bug https://github.com/microsoft/STL/issues/342
-        f.clear();
-        TEST(f.get() == 'a');
-#endif
         TEST(f.get() == 'B');
         f.close();
         TEST(nw::remove(filepath) == 0);
