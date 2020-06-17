@@ -10,12 +10,11 @@
 #define NOWIDE_DETAIL_CONVERT_HPP_INCLUDED
 
 #include <iterator>
-#include <nowide/detail/utf.hpp>
 #include <nowide/replacement.hpp>
+#include <nowide/utf/utf.hpp>
 #include <string>
 
-/// \cond INTERNAL
-namespace nowide::detail {
+namespace nowide::utf {
 ///
 /// Convert a buffer of UTF sequences in the range [source_begin, source_end)
 /// from \tparam CharIn to \tparam CharOut to the output \a buffer of size \a buffer_size.
@@ -35,7 +34,7 @@ convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, 
     buffer_size--;
     while(source_begin != source_end)
     {
-        using namespace detail::utf;
+        using namespace utf;
         code_point c = utf_traits<CharIn>::template decode(source_begin, source_end);
         if(c == illegal || c == incomplete)
         {
@@ -70,7 +69,7 @@ convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {
     std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
     using inserter_type = std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>>;
     inserter_type inserter(result);
-    using namespace detail::utf;
+    using namespace utf;
     code_point c;
     while(begin != end)
     {
@@ -83,7 +82,6 @@ convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {
     }
     return result;
 }
-} // namespace nowide::detail
-/// \endcond
+} // namespace nowide::utf
 
 #endif

@@ -9,7 +9,7 @@
 #ifndef NOWIDE_CONVERT_HPP_INCLUDED
 #define NOWIDE_CONVERT_HPP_INCLUDED
 
-#include <nowide/detail/convert.hpp>
+#include <nowide/utf/convert.hpp>
 #include <string>
 #include <string_view>
 
@@ -25,7 +25,7 @@ template<typename CharOut, typename CharIn, typename TraitsIn = std::char_traits
 inline CharOut*
 convert(CharOut* output, std::size_t output_size, std::basic_string_view<CharIn, TraitsIn> source) noexcept
 {
-    return detail::convert_buffer(output, output_size, source.data(), source.data() + source.length());
+    return utf::convert_buffer(output, output_size, source.data(), source.data() + source.length());
 }
 
 ///
@@ -37,7 +37,7 @@ convert(CharOut* output, std::size_t output_size, std::basic_string_view<CharIn,
 ///
 inline char* narrow(char* output, size_t output_size, const wchar_t* begin, const wchar_t* end) noexcept
 {
-    return detail::convert_buffer(output, output_size, begin, end);
+    return utf::convert_buffer(output, output_size, begin, end);
 }
 ///
 /// Convert NULL terminated wide string (UTF-16/32) to NULL terminated narrow string (UTF-8)
@@ -60,7 +60,7 @@ inline char* narrow(char* output, size_t output_size, std::wstring_view source) 
 ///
 inline wchar_t* widen(wchar_t* output, size_t output_size, const char* begin, const char* end) noexcept
 {
-    return detail::convert_buffer(output, output_size, begin, end);
+    return utf::convert_buffer(output, output_size, begin, end);
 }
 ///
 /// Convert NULL terminated narrow string (UTF-8) to NULL terminated wide string (UTF-16/32)
@@ -89,7 +89,7 @@ template<typename CharOut,
 inline std::basic_string<CharOut, TraitsOut, AllocOut> convert(std::basic_string_view<CharIn, TraitsIn> s,
                                                                const AllocOut& alloc = {})
 {
-    return detail::convert_string<CharOut, CharIn, TraitsOut, AllocOut>(s.data(), s.data() + s.length(), alloc);
+    return utf::convert_string<CharOut, CharIn, TraitsOut, AllocOut>(s.data(), s.data() + s.length(), alloc);
 }
 
 ///
@@ -101,7 +101,7 @@ inline std::basic_string<CharOut, TraitsOut, AllocOut> convert(std::basic_string
 ///
 inline std::string narrow(const wchar_t* s, size_t count)
 {
-    return detail::convert_string<char>(s, s + count);
+    return utf::convert_string<char>(s, s + count);
 }
 ///
 /// Convert wide string (UTF-16/32) to narrow string (UTF-8).
@@ -123,7 +123,7 @@ inline std::string narrow(std::wstring_view s)
 ///
 inline std::wstring widen(const char* s, size_t count)
 {
-    return detail::convert_string<wchar_t>(s, s + count);
+    return utf::convert_string<wchar_t>(s, s + count);
 }
 ///
 /// Convert narrow string (UTF-8) to wide string (UTF-16/32).

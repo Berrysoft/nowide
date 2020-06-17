@@ -139,15 +139,15 @@ public:
             // Minimum size required: 1 output char per input char + trailing NULL
             const std::size_t min_output_size = input_len + 1;
             // If there is a chance the converted string fits on stack, try it
-            if(min_output_size <= buffer_size && detail::convert_buffer(buffer_, buffer_size, begin, end))
+            if(min_output_size <= buffer_size && utf::convert_buffer(buffer_, buffer_size, begin, end))
                 data_ = buffer_;
             else
             {
                 // Fallback: Allocate a buffer that is surely large enough on heap
                 // Max size: Every input char is transcoded to the output char with maximum with + trailing NULL
-                const std::size_t max_output_size = input_len * detail::utf::utf_traits<output_char>::max_width + 1;
+                const std::size_t max_output_size = input_len * utf::utf_traits<output_char>::max_width + 1;
                 data_ = new output_char[max_output_size];
-                const bool success = detail::convert_buffer(data_, max_output_size, begin, end) == data_;
+                const bool success = utf::convert_buffer(data_, max_output_size, begin, end) == data_;
                 assert(success);
                 (void)success;
             }

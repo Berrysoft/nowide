@@ -62,7 +62,7 @@ namespace detail {
 
         int_type overflow(int_type c) override
         {
-            namespace uf = detail::utf;
+            namespace uf = utf;
             if(!handle_)
                 return traits_type::eof();
             if(traits_type::eq_int_type(c, traits_type::eof()))
@@ -100,8 +100,8 @@ namespace detail {
         }
 
     private:
-        using decoder = detail::utf::utf_traits<CharType>;
-        using encoder = detail::utf::utf_traits<wchar_t>;
+        using decoder = utf::utf_traits<CharType>;
+        using encoder = utf::utf_traits<wchar_t>;
 
         CharType buffer_[decoder::max_width];
         HANDLE handle_;
@@ -143,7 +143,7 @@ namespace detail {
 
         int_type underflow() override
         {
-            namespace uf = detail::utf;
+            namespace uf = utf;
 
             if(!handle_)
                 return traits_type::eof();
@@ -197,8 +197,8 @@ namespace detail {
         }
 
     private:
-        using decoder = detail::utf::utf_traits<wchar_t>;
-        using encoder = detail::utf::utf_traits<CharType>;
+        using decoder = utf::utf_traits<wchar_t>;
+        using encoder = utf::utf_traits<CharType>;
 
         wchar_t wbuffer_[decoder::max_width];
         CharType buffer_[encoder::max_width + 1];

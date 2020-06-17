@@ -7,15 +7,15 @@
 //
 
 #include <limits>
-#include <nowide/detail/utf.hpp>
 #include <nowide/iostream.hpp>
+#include <nowide/utf/utf.hpp>
 #include <string>
 
 #include "test.hpp"
 
 bool isValidUTF8(const std::string& s)
 {
-    using namespace nowide::detail::utf;
+    using namespace nowide::utf;
     for(std::string::const_iterator it = s.begin(); it != s.end();)
     {
         code_point c = utf_traits<char>::decode(it, s.end());

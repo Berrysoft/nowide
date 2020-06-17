@@ -16,7 +16,7 @@
 #include <cstring>
 #include <iostream>
 #include <nowide/args.hpp>
-#include <nowide/detail/convert.hpp>
+#include <nowide/utf/convert.hpp>
 #include <string>
 #include <vector>
 
@@ -35,7 +35,7 @@ bool is_ascii(const std::string& s)
 std::string replace_non_ascii(const std::string& s)
 {
     std::string::const_iterator it = s.begin();
-    namespace utf = nowide::detail::utf;
+    namespace utf = nowide::utf;
     using utf8 = utf::utf_traits<char>;
     std::string result;
     result.reserve(s.size());

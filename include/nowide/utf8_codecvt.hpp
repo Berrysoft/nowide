@@ -13,12 +13,12 @@
 #include <cstdint>
 #include <cstring>
 #include <locale>
-#include <nowide/detail/utf.hpp>
 #include <nowide/replacement.hpp>
+#include <nowide/utf/utf.hpp>
 
 namespace nowide {
 
-static_assert(sizeof(std::mbstate_t) >= 2, "mbstate_t is to small to store an UTF-16 codepoint");
+static_assert(sizeof(std::mbstate_t) >= 2, "mbstate_t is too small to store an UTF-16 codepoint");
 namespace detail {
     inline char16_t read_state(const std::mbstate_t& src)
     {
@@ -90,11 +90,11 @@ protected:
         while(max > 0 && from < from_end)
         {
             const char* prev_from = from;
-            char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
-            if(ch == detail::utf::illegal)
+            char32_t ch = utf::utf_traits<char>::decode(from, from_end);
+            if(ch == utf::illegal)
             {
                 ch = NOWIDE_REPLACEMENT_CHARACTER;
-            } else if(ch == detail::utf::incomplete)
+            } else if(ch == utf::incomplete)
             {
                 from = prev_from;
                 break;
@@ -136,12 +136,12 @@ protected:
         {
             const char* from_saved = from;
 
-            char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
+            char32_t ch = utf::utf_traits<char>::decode(from, from_end);
 
-            if(ch == detail::utf::illegal)
+            if(ch == utf::illegal)
             {
                 ch = NOWIDE_REPLACEMENT_CHARACTER;
-            } else if(ch == detail::utf::incomplete)
+            } else if(ch == utf::incomplete)
             {
                 from = from_saved;
                 r = std::codecvt_base::partial;
@@ -245,18 +245,18 @@ protected:
                     ch = NOWIDE_REPLACEMENT_CHARACTER;
                 }
             }
-            if(!detail::utf::is_valid_codepoint(ch))
+            if(!utf::is_valid_codepoint(ch))
             {
                 r = std::codecvt_base::error;
                 break;
             }
-            int len = detail::utf::utf_traits<char>::width(ch);
+            int len = utf::utf_traits<char>::width(ch);
             if(to_end - to < len)
             {
                 r = std::codecvt_base::partial;
                 break;
             }
-            to = detail::utf::utf_traits<char>::encode(ch, to);
+            to = utf::utf_traits<char>::encode(ch, to);
             state = 0;
             from++;
         }
@@ -304,12 +304,12 @@ protected:
         while(max > 0 && from < from_end)
         {
             const char* save_from = from;
-            char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
-            if(ch == detail::utf::incomplete)
+            char32_t ch = utf::utf_traits<char>::decode(from, from_end);
+            if(ch == utf::incomplete)
             {
                 from = save_from;
                 break;
-            } else if(ch == detail::utf::illegal)
+            } else if(ch == utf::illegal)
             {
                 ch = NOWIDE_REPLACEMENT_CHARACTER;
             }
@@ -332,12 +332,12 @@ protected:
         {
             const char* from_saved = from;
 
-            char32_t ch = detail::utf::utf_traits<char>::decode(from, from_end);
+            char32_t ch = utf::utf_traits<char>::decode(from, from_end);
 
-            if(ch == detail::utf::illegal)
+            if(ch == utf::illegal)
             {
                 ch = NOWIDE_REPLACEMENT_CHARACTER;
-            } else if(ch == detail::utf::incomplete)
+            } else if(ch == utf::incomplete)
             {
                 r = std::codecvt_base::partial;
                 from = from_saved;
@@ -365,17 +365,17 @@ protected:
         {
             char32_t ch = 0;
             ch = *from;
-            if(!detail::utf::is_valid_codepoint(ch))
+            if(!utf::is_valid_codepoint(ch))
             {
                 ch = NOWIDE_REPLACEMENT_CHARACTER;
             }
-            int len = detail::utf::utf_traits<char>::width(ch);
+            int len = utf::utf_traits<char>::width(ch);
             if(to_end - to < len)
             {
                 r = std::codecvt_base::partial;
                 break;
             }
-            to = detail::utf::utf_traits<char>::encode(ch, to);
+            to = utf::utf_traits<char>::encode(ch, to);
             from++;
         }
         from_next = from;

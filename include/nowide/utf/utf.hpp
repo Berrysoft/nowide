@@ -19,7 +19,7 @@
 /// All functions defined in this namespace do not require linking with Boost.Nowide library
 /// Extracted from Boost.Locale
 ///
-namespace nowide::detail::utf {
+namespace nowide::utf {
 
 ///
 /// \brief The integral type that can hold a Unicode code point
@@ -362,6 +362,6 @@ struct utf_traits<CharType, 4>
 
 }; // utf32
 
-} // namespace nowide::detail::utf
+} // namespace nowide::utf
 
 #endif
