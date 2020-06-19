@@ -65,11 +65,13 @@ void test_main(int, char** argv, char**)
     }
     std::cout << " -- stat - different time_t size" << std::endl;
     {
+#ifndef _WIN64
         struct _stat32 stdStat32;
         TEST(
           nowide::detail::stat(filename.c_str(), reinterpret_cast<nowide::posix_stat_t*>(&stdStat32), sizeof(stdStat32))
           == 0);
         TEST(stdStat32.st_size == testDataSize);
+#endif // !_WIN64
         struct _stat64i32 stdStat64i32;
         TEST(nowide::detail::stat(filename.c_str(),
                                   reinterpret_cast<nowide::posix_stat_t*>(&stdStat64i32),
@@ -77,11 +79,13 @@ void test_main(int, char** argv, char**)
              == 0);
         TEST(stdStat64i32.st_size == testDataSize);
 
+#ifndef _WIN64
         struct _stat32i64 stdStat32i64;
         TEST(
           nowide::detail::stat(filename.c_str(), reinterpret_cast<nowide::stat_t*>(&stdStat32i64), sizeof(stdStat32i64))
           == 0);
         TEST(stdStat32i64.st_size == testDataSize);
+#endif // !_WIN64
         struct _stat64 stdStat64;
         TEST(nowide::detail::stat(filename.c_str(), reinterpret_cast<nowide::stat_t*>(&stdStat64), sizeof(stdStat64))
              == 0);

@@ -1,5 +1,6 @@
 //
 //  Copyright (c) 2020 Alexander Grund
+//  Copyright (c) 2020 Berrysoft
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,11 +13,6 @@
 #include <sys/types.h>
 // Include after sys/types.h
 #include <sys/stat.h>
-
-#if defined(__MINGW32__) && defined(__MSVCRT_VERSION__) && __MSVCRT_VERSION__ < 0x0601
-/// Forward declaration in case MinGW32 is used and __MSVCRT_VERSION__ is defined lower than 6.1
-struct __stat64;
-#endif
 
 namespace nowide {
 #ifndef NOWIDE_WINDOWS
