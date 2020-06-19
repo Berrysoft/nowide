@@ -26,6 +26,7 @@ endfunction()
 
 nowide_add_test(test_codecvt)
 nowide_add_test(test_convert)
+nowide_add_test(test_stat)
 nowide_add_test(test_env)
 nowide_add_test(test_env_win SRC test_env.cpp DEFINITIONS NOWIDE_TEST_INCLUDE_WINDOWS)
 nowide_add_test(test_fstream)
