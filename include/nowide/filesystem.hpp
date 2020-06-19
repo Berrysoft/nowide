@@ -18,6 +18,9 @@ namespace nowide::filesystem {
 #ifndef NOWIDE_WINDOWS
 using std::filesystem::path;
 #else  // Windows
+///
+/// \brief Same as std::filesystem::path but accepts UTF-8 strings under Windows
+///
 class path : public std::filesystem::path
 {
 private:
