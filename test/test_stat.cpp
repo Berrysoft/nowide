@@ -60,8 +60,32 @@ void test_main(int, char** argv, char**)
         struct _stat stdStat;
         // Simulate passing a struct that is 4 bytes smaller, e.g. if it uses 32 bit time field instead of 64 bit
         // Need to use the detail function directly
-        TEST(nowide::detail::stat(filename.c_str(), &stdStat, sizeof(stdStat) - 4u) == EINVAL);
+        TEST(nowide::detail::stat(filename.c_str(), &stdStat, sizeof(stdStat) - 4u) == -1);
         TEST(errno == EINVAL);
+    }
+    std::cout << " -- stat - different time_t size" << std::endl;
+    {
+        struct _stat32 stdStat32;
+        TEST(
+          nowide::detail::stat(filename.c_str(), reinterpret_cast<nowide::posix_stat_t*>(&stdStat32), sizeof(stdStat32))
+          == 0);
+        TEST(stdStat32.st_size == testDataSize);
+        struct _stat64i32 stdStat64i32;
+        TEST(nowide::detail::stat(filename.c_str(),
+                                  reinterpret_cast<nowide::posix_stat_t*>(&stdStat64i32),
+                                  sizeof(stdStat64i32))
+             == 0);
+        TEST(stdStat64i32.st_size == testDataSize);
+
+        struct _stat32i64 stdStat32i64;
+        TEST(
+          nowide::detail::stat(filename.c_str(), reinterpret_cast<nowide::stat_t*>(&stdStat32i64), sizeof(stdStat32i64))
+          == 0);
+        TEST(stdStat32i64.st_size == testDataSize);
+        struct _stat64 stdStat64;
+        TEST(nowide::detail::stat(filename.c_str(), reinterpret_cast<nowide::stat_t*>(&stdStat64), sizeof(stdStat64))
+             == 0);
+        TEST(stdStat64.st_size == testDataSize);
     }
 #endif
 
