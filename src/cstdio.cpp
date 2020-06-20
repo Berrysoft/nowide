@@ -10,7 +10,7 @@
 
 #define NOWIDE_SOURCE
 
-#ifdef _MSC_VER
+#ifdef NOWIDE_MSVC
 #define _CRT_SECURE_NO_WARNINGS
 #elif(defined(__MINGW32__) || defined(__CYGWIN__)) && defined(__STRICT_ANSI__)
 // Need the _w* functions which are extensions on MinGW/Cygwin
@@ -21,14 +21,15 @@
 #include <nowide/stackstring.hpp>
 
 namespace nowide {
-FILE* freopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode, FILE* NOWIDE_RESTRICT stream)
+std::FILE*
+freopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode, std::FILE* NOWIDE_RESTRICT stream)
 {
     const wstackstring wname(file_name);
     const wshort_stackstring wmode(mode);
     return _wfreopen(wname.data(), wmode.data(), stream);
 }
 
-FILE* fopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode)
+std::FILE* fopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode)
 {
     const wstackstring wname(file_name);
     const wshort_stackstring wmode(mode);

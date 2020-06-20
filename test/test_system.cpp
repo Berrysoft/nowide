@@ -5,7 +5,7 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifdef _MSC_VER
+#ifdef NOWIDE_MSVC
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 

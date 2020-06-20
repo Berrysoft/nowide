@@ -97,11 +97,11 @@ private:
     FILE* f_;
 };
 
-#if defined(_MSC_VER)
+#if defined(NOWIDE_MSVC)
 extern "C" void _ReadWriteBarrier(void);
 #pragma intrinsic(_ReadWriteBarrier)
 #define NOWIDE_READ_WRITE_BARRIER() _ReadWriteBarrier()
-#elif defined(__GNUC__)
+#elif defined(NOWIDE_GCC)
 #if(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) > 40100
 #define NOWIDE_READ_WRITE_BARRIER() __sync_synchronize()
 #else

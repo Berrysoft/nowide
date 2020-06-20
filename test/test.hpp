@@ -14,7 +14,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#if defined(_MSC_VER) && defined(_CPPLIB_VER) && defined(_DEBUG)
+#if defined(NOWIDE_MSVC) && defined(_CPPLIB_VER) && defined(_DEBUG)
 #include <crtdbg.h>
 #endif
 
@@ -23,11 +23,11 @@ struct test_monitor
 {
     test_monitor()
     {
-#if defined(_MSC_VER) && (_MSC_VER > 1310)
+#if defined(NOWIDE_MSVC) && (NOWIDE_MSVC > 1310)
         // disable message boxes on assert(), abort()
         ::_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 #endif
-#if defined(_MSC_VER) && defined(_CPPLIB_VER) && defined(_DEBUG)
+#if defined(NOWIDE_MSVC) && defined(_CPPLIB_VER) && defined(_DEBUG)
         // disable message boxes on iterator debugging violations
         _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
         _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
@@ -60,7 +60,7 @@ inline void test_equal_impl(const T& lhs, const U& rhs, const char* file, const 
     test_failed(ss.str().c_str(), file, line, function);
 }
 
-#ifdef _MSC_VER
+#ifdef NOWIDE_MSVC
 #define DISABLE_CONST_EXPR_DETECTED __pragma(warning(push)) __pragma(warning(disable : 4127))
 #define DISABLE_CONST_EXPR_DETECTED_POP __pragma(warning(pop))
 #else

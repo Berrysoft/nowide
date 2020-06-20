@@ -20,16 +20,15 @@ using std::freopen;
 using std::remove;
 using std::rename;
 #else
-
 ///
 /// \brief Same as freopen but file_name and mode are UTF-8 strings
 ///
-NOWIDE_DECL FILE*
-freopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode, FILE* NOWIDE_RESTRICT stream);
+NOWIDE_DECL std::FILE*
+freopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode, std::FILE* NOWIDE_RESTRICT stream);
 ///
 /// \brief Same as fopen but file_name and mode are UTF-8 strings
 ///
-NOWIDE_DECL FILE* fopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode);
+NOWIDE_DECL std::FILE* fopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode);
 ///
 /// \brief Same as rename but old_name and new_name are UTF-8 strings
 ///
