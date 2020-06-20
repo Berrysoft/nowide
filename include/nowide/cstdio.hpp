@@ -19,7 +19,6 @@ using std::fopen;
 using std::freopen;
 using std::remove;
 using std::rename;
-using std::tmpnam;
 #else
 
 ///
