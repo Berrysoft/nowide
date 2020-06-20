@@ -32,7 +32,7 @@
 #define NOWIDE_CLANG __clang__
 #endif // __clang__
 
-#ifdef __GNUC__
+#ifdef NOWIDE_GCC
 #define NOWIDE_SYMBOL_VISIBLE __attribute__((__visibility__("default")))
 #endif
 
@@ -59,14 +59,14 @@
 #endif // NOWIDE_DYN_LINK
 
 #ifndef NOWIDE_LIKELY
-#ifdef __GNUC__
+#ifdef NOWIDE_GCC
 #define NOWIDE_LIKELY(x) (__builtin_expect(!!(x), 1))
 #else
 #define NOWIDE_LIKELY(x) (x)
 #endif // __GNUC__
 #endif
 #ifndef NOWIDE_UNLIKELY
-#ifdef __GNUC__
+#ifdef NOWIDE_GCC
 #define NOWIDE_UNLIKELY(x) (__builtin_expect(!!(x), 0))
 #else
 #define NOWIDE_UNLIKELY(x) (x)
