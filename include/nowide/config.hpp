@@ -25,6 +25,14 @@
 #endif
 
 #ifdef __GNUC__
+#define NOWIDE_GCC __GNUC__
+#endif // __GNUC__
+
+#ifdef __clang__
+#define NOWIDE_CLANG __clang__
+#endif // __clang__
+
+#ifdef __GNUC__
 #define NOWIDE_SYMBOL_VISIBLE __attribute__((__visibility__("default")))
 #endif
 
@@ -64,6 +72,12 @@
 #define NOWIDE_UNLIKELY(x) (x)
 #endif // __GNUC__
 #endif
+
+#if defined(NOWIDE_MSVC) || defined(NOWIDE_GCC) || defined(NOWIDE_CLANG)
+#define NOWIDE_RESTRICT __restrict
+#else
+#define NOWIDE_RESTRICT
+#endif // NOWIDE_MSVC || NOWIDE_GCC || NOWIDE_CLANG
 
 //! @endcond
 

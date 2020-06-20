@@ -21,14 +21,14 @@
 #include <nowide/stackstring.hpp>
 
 namespace nowide {
-FILE* freopen(const char* file_name, const char* mode, FILE* stream)
+FILE* freopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode, FILE* NOWIDE_RESTRICT stream)
 {
     const wstackstring wname(file_name);
     const wshort_stackstring wmode(mode);
     return _wfreopen(wname.data(), wmode.data(), stream);
 }
 
-FILE* fopen(const char* file_name, const char* mode)
+FILE* fopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode)
 {
     const wstackstring wname(file_name);
     const wshort_stackstring wmode(mode);

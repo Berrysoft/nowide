@@ -32,8 +32,9 @@ typedef struct ::_stat posix_stat_t;
 
 /// \cond INTERNAL
 namespace detail {
-    NOWIDE_DECL int stat(const char* path, stat_t* buffer, std::size_t buffer_size);
-    NOWIDE_DECL int stat(const char* path, posix_stat_t* buffer, std::size_t buffer_size);
+    NOWIDE_DECL int stat(const char* NOWIDE_RESTRICT path, stat_t* NOWIDE_RESTRICT buffer, std::size_t buffer_size);
+    NOWIDE_DECL int
+    stat(const char* NOWIDE_RESTRICT path, posix_stat_t* NOWIDE_RESTRICT buffer, std::size_t buffer_size);
 } // namespace detail
 /// \endcond
 
@@ -42,7 +43,7 @@ namespace detail {
 ///
 /// Return information about a file from an UTF-8 encoded path
 ///
-inline int stat(const char* path, stat_t* buffer)
+inline int stat(const char* NOWIDE_RESTRICT path, stat_t* NOWIDE_RESTRICT buffer)
 {
     return detail::stat(path, buffer, sizeof(*buffer));
 }
@@ -51,7 +52,7 @@ inline int stat(const char* path, stat_t* buffer)
 ///
 /// Return information about a file from an UTF-8 encoded path
 ///
-inline int stat(const char* path, posix_stat_t* buffer)
+inline int stat(const char* NOWIDE_RESTRICT path, posix_stat_t* NOWIDE_RESTRICT buffer)
 {
     return detail::stat(path, buffer, sizeof(*buffer));
 }

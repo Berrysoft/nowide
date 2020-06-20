@@ -25,11 +25,12 @@ using std::tmpnam;
 ///
 /// \brief Same as freopen but file_name and mode are UTF-8 strings
 ///
-NOWIDE_DECL FILE* freopen(const char* file_name, const char* mode, FILE* stream);
+NOWIDE_DECL FILE*
+freopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode, FILE* NOWIDE_RESTRICT stream);
 ///
 /// \brief Same as fopen but file_name and mode are UTF-8 strings
 ///
-NOWIDE_DECL FILE* fopen(const char* file_name, const char* mode);
+NOWIDE_DECL FILE* fopen(const char* NOWIDE_RESTRICT file_name, const char* NOWIDE_RESTRICT mode);
 ///
 /// \brief Same as rename but old_name and new_name are UTF-8 strings
 ///

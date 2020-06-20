@@ -18,7 +18,7 @@
 #include <nowide/stat.hpp>
 
 namespace nowide::detail {
-int stat(const char* path, stat_t* buffer, std::size_t buffer_size)
+int stat(const char* NOWIDE_RESTRICT path, stat_t* NOWIDE_RESTRICT buffer, std::size_t buffer_size)
 {
     const wstackstring wpath(path);
     switch(buffer_size)
@@ -31,7 +31,7 @@ int stat(const char* path, stat_t* buffer, std::size_t buffer_size)
     }
 }
 
-int stat(const char* path, posix_stat_t* buffer, std::size_t buffer_size)
+int stat(const char* NOWIDE_RESTRICT path, posix_stat_t* NOWIDE_RESTRICT buffer, std::size_t buffer_size)
 {
     const wstackstring wpath(path);
     switch(buffer_size)
