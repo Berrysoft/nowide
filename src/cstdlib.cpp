@@ -18,7 +18,7 @@
 
 #include <nowide/cstdlib.hpp>
 #include <nowide/stackstring.hpp>
-#include <vector>
+#include <string>
 #include <windows.h>
 
 namespace nowide {
@@ -30,18 +30,18 @@ char* getenv(const char* key)
 
     static constexpr size_t buf_size = 64;
     wchar_t buf[buf_size];
-    std::vector<wchar_t> tmp;
+    std::wstring tmp;
     wchar_t* ptr = buf;
     size_t n = GetEnvironmentVariableW(name.data(), buf, buf_size);
-    if(n == 0 && GetLastError() == 203) // ERROR_ENVVAR_NOT_FOUND
-        return 0;
+    if(n == 0 && GetLastError() == ERROR_ENVVAR_NOT_FOUND)
+        return nullptr;
     if(n >= buf_size)
     {
-        tmp.resize(n + 1, L'\0');
-        n = GetEnvironmentVariableW(name.data(), &tmp[0], static_cast<unsigned>(tmp.size() - 1));
+        tmp.resize(n, L'\0');
+        n = GetEnvironmentVariableW(name.data(), &tmp[0], static_cast<unsigned>(tmp.size()));
         // The size may have changed
-        if(n >= tmp.size() - 1)
-            return 0;
+        if(n >= tmp.size())
+            return nullptr;
         ptr = &tmp[0];
     }
     value.convert(ptr);
@@ -54,7 +54,7 @@ int setenv(const char* key, const char* value, int overwrite)
     if(!overwrite)
     {
         wchar_t unused[2];
-        if(GetEnvironmentVariableW(name.data(), unused, 2) != 0 || GetLastError() != 203) // ERROR_ENVVAR_NOT_FOUND
+        if(GetEnvironmentVariableW(name.data(), unused, 2) != 0 || GetLastError() != ERROR_ENVVAR_NOT_FOUND)
             return 0;
     }
     const wstackstring wval(value);
