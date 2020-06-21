@@ -10,7 +10,7 @@
 
 #define NOWIDE_SOURCE
 
-#ifdef NOWIDE_MSVC
+#ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #elif(defined(__MINGW32__) || defined(__CYGWIN__)) && defined(__STRICT_ANSI__)
 // Need the _w* functions which are extensions on MinGW/Cygwin

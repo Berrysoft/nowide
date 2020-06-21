@@ -8,9 +8,8 @@
 
 #define NOWIDE_SOURCE
 
+#include <Windows.h>
 #include <nowide/args.hpp>
-
-#include <windows.h>
 
 namespace nowide {
 args::wargv_ptr::wargv_ptr() noexcept

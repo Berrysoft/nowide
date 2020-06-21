@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <nowide/args.hpp>
 #include <nowide/utf/convert.hpp>
@@ -136,16 +137,17 @@ void run_parent(const char* exe_path)
     TEST(nowide::unsetenv("NOWIDE_TEST_NONE") == 0);
     TEST(nowide::setenv("NOWIDE_EMPTY", "", 1) == 0);
     TEST(nowide::getenv("NOWIDE_EMPTY"));
-    std::string command = "\"";
-    command += exe_path;
-    command += "\" ";
-    command += example;
+    std::ostringstream command_stream;
+    command_stream << std::quoted(exe_path) << ' ' << example;
+    std::string command = command_stream.str();
     TEST(nowide::system(command.c_str()) == 0);
     std::cout << "Parent ok" << std::endl;
 #else
     std::wstring envVar = L"NOWIDE_TEST=" + nowide::widen(example);
     TEST(_wputenv(envVar.c_str()) == 0);
-    std::wstring wcommand = nowide::widen(exe_path) + L" " + nowide::widen(example);
+    std::wostringstream wcommand_stream;
+    wcommand_stream << std::quoted(nowide::widen(exe_path)) << L' ' << nowide::widen(example);
+    std::wstring wcommand = wcommand_stream.str();
     TEST(_wsystem(wcommand.c_str()) == 0);
     std::cout << "Wide Parent ok" << std::endl;
 #endif

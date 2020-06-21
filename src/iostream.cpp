@@ -6,7 +6,9 @@
 //  accompanying file LICENSE or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
+
 #define NOWIDE_SOURCE
+
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -18,7 +20,7 @@
 #define NOMINMAX
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 
 #ifdef NOWIDE_MSVC
 #define NOWIDE_IOSTREAM_DECL

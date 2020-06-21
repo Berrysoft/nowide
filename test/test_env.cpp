@@ -51,6 +51,7 @@ void test_main(int, char**, char**)
     // End the string before the equals sign -> Expect fail
     penv2[strlen("NOWIDE_TEST1")] = '\0';
     TEST(nowide::putenv(penv2) == -1);
+    TEST(errno == EINVAL);
     TEST(nowide::getenv("NOWIDE_TEST1"));
     TEST(nowide::getenv("NOWIDE_TEST1") == example);
 #endif
