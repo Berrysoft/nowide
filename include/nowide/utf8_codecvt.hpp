@@ -10,14 +10,12 @@
 #ifndef NOWIDE_UTF8_CODECVT_HPP_INCLUDED
 #define NOWIDE_UTF8_CODECVT_HPP_INCLUDED
 
-#include <cstdint>
 #include <cstring>
 #include <locale>
 #include <nowide/replacement.hpp>
 #include <nowide/utf/utf.hpp>
 
 namespace nowide {
-
 static_assert(sizeof(std::mbstate_t) >= 2, "mbstate_t is too small to store an UTF-16 codepoint");
 namespace detail {
     inline char16_t read_state(const std::mbstate_t& src)
@@ -44,6 +42,10 @@ class utf8_codecvt;
 template<typename CharType>
 class utf8_codecvt<CharType, 1> : public std::codecvt<CharType, char, std::mbstate_t>
 {
+public:
+    using std::codecvt<CharType, char, std::mbstate_t>::codecvt;
+
+protected:
     bool do_always_noconv() const noexcept override
     {
         return true;
@@ -55,10 +57,7 @@ template<typename CharType>
 class utf8_codecvt<CharType, 2> : public std::codecvt<CharType, char, std::mbstate_t>
 {
 public:
-    static_assert(sizeof(CharType) >= 2, "CharType must be able to store UTF16 code point");
-
-    utf8_codecvt(size_t refs = 0) : std::codecvt<CharType, char, std::mbstate_t>(refs)
-    {}
+    using std::codecvt<CharType, char, std::mbstate_t>::codecvt;
 
 protected:
     using uchar = CharType;
@@ -164,7 +163,7 @@ protected:
                 //    second surrogate pair
                 ch -= 0x10000;
                 char16_t vh = static_cast<char16_t>(ch >> 10);
-                char16_t vl = ch & 0x3FF;
+                char16_t vl = static_cast<char16_t>(ch & 0x3FF);
                 char16_t w1 = vh + 0xD800;
                 char16_t w2 = vl + 0xDC00;
                 if(state == 0)
@@ -274,8 +273,7 @@ template<typename CharType>
 class utf8_codecvt<CharType, 4> : public std::codecvt<CharType, char, std::mbstate_t>
 {
 public:
-    utf8_codecvt(size_t refs = 0) : std::codecvt<CharType, char, std::mbstate_t>(refs)
-    {}
+    using std::codecvt<CharType, char, std::mbstate_t>::codecvt;
 
 protected:
     using uchar = CharType;

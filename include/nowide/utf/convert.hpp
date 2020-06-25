@@ -28,13 +28,12 @@ template<typename CharOut, typename CharIn>
 CharOut*
 convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, const CharIn* source_end) noexcept
 {
+    if(!buffer_size)
+        return nullptr;
     CharOut* rv = buffer;
-    if(buffer_size == 0)
-        return 0;
     buffer_size--;
     while(source_begin != source_end)
     {
-        using namespace utf;
         code_point c = utf_traits<CharIn>::template decode(source_begin, source_end);
         if(c == illegal || c == incomplete)
         {
@@ -43,7 +42,7 @@ convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, 
         size_t width = utf_traits<CharOut>::width(c);
         if(buffer_size < width)
         {
-            rv = NULL;
+            rv = nullptr;
             break;
         }
         buffer = utf_traits<CharOut>::template encode(c, buffer);
@@ -69,11 +68,9 @@ convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {
     std::basic_string<CharOut, TraitsOut, AllocOut> result{alloc};
     using inserter_type = std::back_insert_iterator<std::basic_string<CharOut, TraitsOut, AllocOut>>;
     inserter_type inserter(result);
-    using namespace utf;
-    code_point c;
     while(begin != end)
     {
-        c = utf_traits<CharIn>::template decode(begin, end);
+        code_point c = utf_traits<CharIn>::template decode(begin, end);
         if(c == illegal || c == incomplete)
         {
             c = NOWIDE_REPLACEMENT_CHARACTER;

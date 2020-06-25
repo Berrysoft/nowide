@@ -39,7 +39,7 @@ static constexpr code_point incomplete = 0xFFFFFFFEu;
 ///
 /// \brief the function checks if \a v is a valid code point
 ///
-constexpr bool is_valid_codepoint(code_point v)
+constexpr bool is_valid_codepoint(code_point v) noexcept
 {
     if(v > 0x10FFFF)
         return false;
