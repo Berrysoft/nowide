@@ -225,7 +225,13 @@ NOWIDE_IOSTREAM_DECL alignas(std::ostream) char clog[sizeof(std::ostream)];
 #define NOWIDE_OSTREAM(name) "?" #name "@nowide@@3V?$basic_ostream@DU?$char_traits@D@std@@@std@@A"
 #define NOWIDE_PCHAR(name) "?" #name "@nowide@@3PADA"
 
-#define NOWIDE_MSVC_EXPORT(exp, ori) "/EXPORT:" exp "=" ori
+#ifdef NOWIDE_DYN_LINK
+#define NOWIDE_MSVC_EXPORT_COMMAND "export"
+#else
+#define NOWIDE_MSVC_EXPORT_COMMAND "alternatename"
+#endif // NOWIDE_DYN_LINK
+
+#define NOWIDE_MSVC_EXPORT(exp, ori) "/" NOWIDE_MSVC_EXPORT_COMMAND ":" exp "=" ori
 
 #define NOWIDE_EXPORT_ISTREAM(name) NOWIDE_MSVC_EXPORT(NOWIDE_ISTREAM(name), NOWIDE_PCHAR(name))
 #define NOWIDE_EXPORT_OSTREAM(name) NOWIDE_MSVC_EXPORT(NOWIDE_OSTREAM(name), NOWIDE_PCHAR(name))
