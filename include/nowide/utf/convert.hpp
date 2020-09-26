@@ -34,7 +34,7 @@ convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, 
     buffer_size--;
     while(source_begin != source_end)
     {
-        code_point c = utf_traits<CharIn>::template decode(source_begin, source_end);
+        code_point c = utf_traits<CharIn>::decode(source_begin, source_end);
         if(c == illegal || c == incomplete)
         {
             c = NOWIDE_REPLACEMENT_CHARACTER;
@@ -45,7 +45,7 @@ convert_buffer(CharOut* buffer, size_t buffer_size, const CharIn* source_begin, 
             rv = nullptr;
             break;
         }
-        buffer = utf_traits<CharOut>::template encode(c, buffer);
+        buffer = utf_traits<CharOut>::encode(c, buffer);
         buffer_size -= width;
     }
     *buffer++ = 0;
@@ -70,12 +70,12 @@ convert_string(const CharIn* begin, const CharIn* end, const AllocOut& alloc = {
     inserter_type inserter(result);
     while(begin != end)
     {
-        code_point c = utf_traits<CharIn>::template decode(begin, end);
+        code_point c = utf_traits<CharIn>::decode(begin, end);
         if(c == illegal || c == incomplete)
         {
             c = NOWIDE_REPLACEMENT_CHARACTER;
         }
-        utf_traits<CharOut>::template encode(c, inserter);
+        utf_traits<CharOut>::encode(c, inserter);
     }
     return result;
 }
