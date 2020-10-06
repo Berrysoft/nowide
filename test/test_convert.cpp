@@ -78,6 +78,16 @@ std::string narrow_convert(const std::wstring& s)
     return nowide::convert<char, wchar_t>(std::wstring_view(s));
 }
 
+std::wstring widen_string_view(const std::string& s)
+{
+    return nowide::widen(std::string_view(s));
+}
+
+std::string narrow_string_view(const std::wstring& s)
+{
+    return nowide::narrow(std::wstring_view(s));
+}
+
 void test_main(int, char**, char**)
 {
     std::string hello = "\xd7\xa9\xd7\x9c\xd7\x95\xd7\x9d";
@@ -125,4 +135,6 @@ void test_main(int, char**, char**)
     run_all(widen_raw_string_and_size, narrow_raw_string_and_size);
     std::cout << "- template convert" << std::endl;
     run_all(widen_convert, narrow_convert);
+    std::cout << "- (std::string_view)" << std::endl;
+    run_all(widen_string_view, narrow_string_view);
 }
