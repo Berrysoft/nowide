@@ -65,6 +65,9 @@ ForEachMacros:
   - foreach
   - Q_FOREACH
   - BOOST_FOREACH
+  - NOWIDE_LIKELY_IF
+  - NOWIDE_UNLIKELY_IF
+  - NOWIDE_ELSE
 IncludeBlocks:   Preserve
 IncludeCategories:
   - Regex:           '<boost/(nowide/)?config.hpp>'

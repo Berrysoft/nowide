@@ -58,20 +58,29 @@
 #define NOWIDE_DECL
 #endif // NOWIDE_DYN_LINK
 
-#ifndef NOWIDE_LIKELY
+#ifndef NOWIDE_LIKELY_IF
 #ifdef NOWIDE_GCC
-#define NOWIDE_LIKELY(x) (__builtin_expect(!!(x), 1))
+#define NOWIDE_LIKELY_IF(x) if(__builtin_expect(!!(x), 1))
+#elif __has_cpp_attribute(likely)
+#define NOWIDE_LIKELY_IF(x) [[likely]] if(x)
 #else
-#define NOWIDE_LIKELY(x) (x)
-#endif // __GNUC__
-#endif
-#ifndef NOWIDE_UNLIKELY
+#define NOWIDE_LIKELY_IF(x) if(x)
+#endif // NOWIDE_GCC
+#endif // !NOWIDE_LIKELY_IF
+
+#ifndef NOWIDE_UNLIKELY_IF
 #ifdef NOWIDE_GCC
-#define NOWIDE_UNLIKELY(x) (__builtin_expect(!!(x), 0))
+#define NOWIDE_UNLIKELY_IF(x) if(__builtin_expect(!!(x), 0))
+#elif __has_cpp_attribute(likely)
+#define NOWIDE_UNLIKELY_IF(x) [[unlikely]] if(x)
 #else
-#define NOWIDE_UNLIKELY(x) (x)
-#endif // __GNUC__
-#endif
+#define NOWIDE_UNLIKELY_IF(x) if(x)
+#endif // NOWIDE_GCC
+#endif // !NOWIDE_UNLIKELY_IF
+
+#ifndef NOWIDE_ELSE
+#define NOWIDE_ELSE(x) else x
+#endif // !NOWIDE_ELSE
 
 #if defined(NOWIDE_MSVC) || defined(NOWIDE_GCC) || defined(NOWIDE_CLANG)
 #define NOWIDE_RESTRICT __restrict

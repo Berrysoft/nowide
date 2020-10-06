@@ -61,13 +61,13 @@ struct utf_traits<CharType, 1>
         unsigned char c = ci;
         if(c < 128)
             return 0;
-        if(NOWIDE_UNLIKELY(c < 194))
+        NOWIDE_UNLIKELY_IF(c < 194)
             return -1;
         if(c < 224)
             return 1;
         if(c < 240)
             return 2;
-        if(NOWIDE_LIKELY(c <= 244))
+        NOWIDE_LIKELY_IF(c <= 244)
             return 3;
         return -1;
     }
@@ -77,18 +77,12 @@ struct utf_traits<CharType, 1>
     static constexpr int width(code_point value) noexcept
     {
         if(value <= 0x7F)
-        {
             return 1;
-        } else if(value <= 0x7FF)
-        {
+        if(value <= 0x7FF)
             return 2;
-        } else if(NOWIDE_LIKELY(value <= 0xFFFF))
-        {
+        NOWIDE_LIKELY_IF(value <= 0xFFFF)
             return 3;
-        } else
-        {
-            return 4;
-        }
+        return 4;
     }
 
     static constexpr bool is_trail(char_type ci) noexcept
@@ -105,7 +99,7 @@ struct utf_traits<CharType, 1>
     template<typename Iterator>
     static constexpr code_point decode(Iterator& p, Iterator e) noexcept(noexcept(*p++))
     {
-        if(NOWIDE_UNLIKELY(p == e))
+        NOWIDE_UNLIKELY_IF(p == e)
             return incomplete;
 
         unsigned char lead = *p++;
@@ -113,7 +107,7 @@ struct utf_traits<CharType, 1>
         // First byte is fully validated here
         int trail_size = trail_length(lead);
 
-        if(NOWIDE_UNLIKELY(trail_size < 0))
+        NOWIDE_UNLIKELY_IF(trail_size < 0)
             return illegal;
 
         //
@@ -130,7 +124,7 @@ struct utf_traits<CharType, 1>
         switch(trail_size)
         {
         case 3:
-            if(NOWIDE_UNLIKELY(p == e))
+            NOWIDE_UNLIKELY_IF(p == e)
                 return incomplete;
             tmp = *p++;
             if(!is_trail(tmp))
@@ -138,7 +132,7 @@ struct utf_traits<CharType, 1>
             c = (c << 6) | (tmp & 0x3F);
             [[fallthrough]];
         case 2:
-            if(NOWIDE_UNLIKELY(p == e))
+            NOWIDE_UNLIKELY_IF(p == e)
                 return incomplete;
             tmp = *p++;
             if(!is_trail(tmp))
@@ -146,7 +140,7 @@ struct utf_traits<CharType, 1>
             c = (c << 6) | (tmp & 0x3F);
             [[fallthrough]];
         case 1:
-            if(NOWIDE_UNLIKELY(p == e))
+            NOWIDE_UNLIKELY_IF(p == e)
                 return incomplete;
             tmp = *p++;
             if(!is_trail(tmp))
@@ -156,11 +150,11 @@ struct utf_traits<CharType, 1>
 
         // Check code point validity: no surrogates and
         // valid range
-        if(NOWIDE_UNLIKELY(!is_valid_codepoint(c)))
+        NOWIDE_UNLIKELY_IF(!is_valid_codepoint(c))
             return illegal;
 
         // make sure it is the most compact representation
-        if(NOWIDE_UNLIKELY(width(c) != trail_size + 1))
+        NOWIDE_UNLIKELY_IF(width(c) != trail_size + 1)
             return illegal;
 
         return c;
@@ -177,10 +171,9 @@ struct utf_traits<CharType, 1>
 
         if(lead < 224)
             trail_size = 1;
-        else if(NOWIDE_LIKELY(lead < 240)) // non-BMP rare
+        NOWIDE_ELSE(NOWIDE_LIKELY_IF(lead < 240)) // non-BMP rare
             trail_size = 2;
-        else
-            trail_size = 3;
+        else trail_size = 3;
 
         code_point c = lead & ((1 << (6 - trail_size)) - 1);
 
@@ -204,12 +197,14 @@ struct utf_traits<CharType, 1>
         {
             *out++ = static_cast<char_type>((value >> 6) | 0xC0);
             *out++ = static_cast<char_type>((value & 0x3F) | 0x80);
-        } else if(NOWIDE_LIKELY(value <= 0xFFFF))
+        }
+        NOWIDE_ELSE(NOWIDE_LIKELY_IF(value <= 0xFFFF))
         {
             *out++ = static_cast<char_type>((value >> 12) | 0xE0);
             *out++ = static_cast<char_type>(((value >> 6) & 0x3F) | 0x80);
             *out++ = static_cast<char_type>((value & 0x3F) | 0x80);
-        } else
+        }
+        else
         {
             *out++ = static_cast<char_type>((value >> 18) | 0xF0);
             *out++ = static_cast<char_type>(((value >> 12) & 0x3F) | 0x80);
@@ -264,13 +259,11 @@ struct utf_traits<CharType, 2>
     template<typename It>
     static constexpr code_point decode(It& current, It last) noexcept(noexcept(*current++))
     {
-        if(NOWIDE_UNLIKELY(current == last))
+        NOWIDE_UNLIKELY_IF(current == last)
             return incomplete;
         char16_t w1 = *current++;
-        if(NOWIDE_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
-        {
+        NOWIDE_LIKELY_IF(w1 < 0xD800 || 0xDFFF < w1)
             return w1;
-        }
         if(w1 > 0xDBFF)
             return illegal;
         if(current == last)
@@ -284,10 +277,8 @@ struct utf_traits<CharType, 2>
     static constexpr code_point decode_valid(It& current) noexcept(noexcept(*current++))
     {
         char16_t w1 = *current++;
-        if(NOWIDE_LIKELY(w1 < 0xD800 || 0xDFFF < w1))
-        {
+        NOWIDE_LIKELY_IF(w1 < 0xD800 || 0xDFFF < w1)
             return w1;
-        }
         char16_t w2 = *current++;
         return combine_surrogate(w1, w2);
     }
@@ -300,10 +291,11 @@ struct utf_traits<CharType, 2>
     template<typename It>
     static It encode(code_point u, It out) noexcept(noexcept(*out++))
     {
-        if(NOWIDE_LIKELY(u <= 0xFFFF))
+        NOWIDE_LIKELY_IF(u <= 0xFFFF)
         {
             *out++ = static_cast<char_type>(u);
-        } else
+        }
+        else
         {
             u -= 0x10000;
             *out++ = static_cast<char_type>(0xD800 | (u >> 10));
@@ -341,10 +333,10 @@ struct utf_traits<CharType, 4>
     template<typename It>
     static constexpr code_point decode(It& current, It last) noexcept(noexcept(*current++))
     {
-        if(NOWIDE_UNLIKELY(current == last))
+        NOWIDE_UNLIKELY_IF(current == last)
             return incomplete;
         code_point c = *current++;
-        if(NOWIDE_UNLIKELY(!is_valid_codepoint(c)))
+        NOWIDE_UNLIKELY_IF(!is_valid_codepoint(c))
             return illegal;
         return c;
     }
